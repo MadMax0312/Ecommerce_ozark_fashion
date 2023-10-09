@@ -1,17 +1,109 @@
 const User = require("../models/userModel");
 const bcrypt = require('bcrypt');
+const nodemailer = require("nodemailer");
 
+const securePassword = async(password)=>{
+  try{
 
-const securePassword = async (password) => {
-  try {
-    const saltRounds = 10; // You can adjust the number of salt rounds according to your security needs
-    const passwordHash = await bcrypt.hash(password, saltRounds);
-    return passwordHash;
-  } catch (error) {
-    console.error(error.message);
-    throw error; // Rethrow the error to handle it at a higher level if needed
+   const passwordHash = await bcrypt.hash(password, 10);
+   return passwordHash;
+
+  }catch(error){
+    console.log(error.message);
   }
 }
+
+//for send mail
+const sendVerifyMail = async(email, otp)=>{
+
+  try{
+
+    const transporter = nodemailer.createTransport({
+      host:'smtp.gmail.com',
+      port:587,
+      secure:false,
+      requireTLS:true,
+      auth:{
+        user:'thahirmuhammedap@gmail.com',
+        pass:'hpey gbkn ncbk yrju'
+      }
+    })
+    const mailOptions = {
+      from:'thahirmuhammedap@gmail.com',
+      to:email,
+      subject:'For verification of mail',
+      html: `<p>Hii your OTP is: <strong>${otp}</strong> </p>`
+    }
+     await transporter.sendMail(mailOptions);
+
+  }catch(error){
+    console.log(error.message);
+  }
+};
+
+//user otp
+const loadOtpPage = async(req,res)=>{
+  try {
+      res.redirect('/otp');
+
+  } catch (error) {
+     console.log(error.message); 
+  }
+}
+
+
+//ottp verification and otp storing in session
+const verifyOtp = async(req,res)=>{
+
+  try {
+
+      console.log("fbhjgdahfj")
+         // setting otp date and time
+         const otpCode = generateOTP();
+         const otpExpiry = new Date();
+         otpExpiry.setMinutes(otpExpiry.getMinutes() + 10); // OTP expires in 10 minutes
+
+         const userCheck = await User.findOne({email:req.body.email})
+         if(userCheck)
+         {
+             res.send("User Already Exists");
+         }else{
+
+         const spassword = await securePassword(req.body.password);
+          req.session.firstname = req.body.firstname;
+          req.session.lastname = req.body.lastname;
+          req.session.mobile = req.body.mno;
+          req.session.email = req.body.email;
+          
+          if(req.body.firstname && req.body.email && req.body.lastname&& req.body.mno){
+              if(req.body.password === req.body.cpassword) {
+                  req.session.password = spassword;
+                  req.session.otp = {
+                      code: otpCode,
+                      expiry: otpExpiry,
+                  };        
+                      // Send OTP to the user's email
+                      sendVerifyMail(req.session.email, req.session.otp.code);
+                     
+                      res.render("otp")
+                  } else {
+                      res.render("registration",{message: "Password doesn't match"})
+                  }
+              }
+              else{
+                  res.render("registration",{message: "Please enter all details"})
+              }
+
+          
+         }
+         
+  } catch (error) {
+      console.log(error); 
+  }
+
+}
+
+//-----route to sign up page-----------------------------
 
 const loadRegister = async(req,res) => {
   try{
@@ -23,30 +115,37 @@ const loadRegister = async(req,res) => {
   }
 };
 
+//otp genarating
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+
+///-----Inserting user details in sign up page============
+
 const insertUser = async(req,res) => {
   console.log('Request Body:', req.body);
   try{
     console.log("ljhgghjg");
     console.log('Password from form:', req.body.password);
-    const spassword = await securePassword(req.body.password)
+    if(req.body.otp===req.session.otp.code){
+
     const user = new User({
-      first_name:req.body.firstname,
-      last_name:req.body.lastname,
-      email:req.body.email,
-      mobile:req.body.mno,
-      password:spassword
+      first_name:req.session.firstname,
+      last_name:req.session.lastname,
+      email:req.session.email,
+      mobile:req.session.mobile,
+      password: req.session.password,
+      isVerified:1
     });
 
     const userData = await user.save();
     console.log(userData);
-
-    if(userData){
-      // sendVerifyMail(req.body.name, req.body.email, userData._id);
-      res.redirect("/login");
-    }else{
-      res.render("registration", {message:"Oops! Your registration is failed"})
-    }
-
+      res.render("login");
+  }else {
+    res.render('otp', {message:"Invalid OTP"})
+  }
+    
   }catch(error){
     console.log(error.message);
   }
@@ -98,13 +197,27 @@ const verifyLogin = async(req,res) => {
   }catch(error){
     console.log(error.message);
   }
-
 }
+
+const loadOtp = async(req,res)=>{
+
+  try {
+
+    res.render('otp');
+
+  }catch(error){
+    console.log(error.message);
+  }
+
+};
 
 module.exports = {
   loadRegister,
   insertUser,
   loginLoad,
-  verifyLogin
-  
+  verifyLogin,
+  loadOtp,
+  sendVerifyMail,
+  verifyOtp,
+  loadOtpPage
 }

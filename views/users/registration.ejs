@@ -2,7 +2,7 @@
 
 <div class="container">
   <h2 class="mb-4 text-center"><strong>Registration</strong></h2>
-  <form action="" method="POST">
+  <form action="/register" method="POST">
     <div class="form-group">
       <input type="text" class="form-control" name="firstname" placeholder="First Name" required>
     </div>
@@ -13,13 +13,13 @@
       <input type="email" class="form-control" name="email" placeholder="Email" required>
     </div>
     <div class="form-group">
-      <input type="tel" class="form-control" name="mno" placeholder="Mobile Number" required>
+      <input type="mno" class="form-control" name="mno" placeholder="Mobile Number" required>
     </div>
     <div class="form-group">
       <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
     </div>
     <div class="form-group">
-      <input type="password" class="form-control" id="cpassword" name="Confirm" placeholder="Confirm Password" required>
+      <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Confirm Password" required>
     </div>
     <div id="password-mismatch" class="alert alert-danger mt-3" style="display: none;">
       Passwords do not match. Please try again.
