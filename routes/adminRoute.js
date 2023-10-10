@@ -36,6 +36,14 @@ admin_route.get('/products', adminController.loadProducts);
 
 admin_route.get('/categories', adminController.loadCatogories);
 
+admin_route.get('/editCategories', adminController.loadEditCatogories);
+
+admin_route.get('/addCategories', adminController.loadAddCategories);
+
+admin_route.post('/addCategories', adminController.addCategory);
+
+admin_route.get('/unlist-category', adminController.unlistCategory);
+
 admin_route.get('/banner', adminController.loadBanner);
 
 admin_route.get('/coupons', adminController.loadCoupons);

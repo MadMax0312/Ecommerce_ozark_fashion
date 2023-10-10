@@ -1,4 +1,5 @@
 const Admin = require("../models/adminModel");
+const Category = require("../models/categoryModel");
 const bcrypt = require("bcrypt");
 const randomstring = require("randomstring");
 
@@ -68,7 +69,7 @@ const verifyLogin = async(req,res) => {
 const loadDashboard = async(req,res) => {
 
   try {
-    const adminData = await Admin.findById({ _id:req.session.admin_id });
+    // const adminData = await Admin.findById({ _id:req.session.admin_id });
     res.render('home');
 
   }catch(error){
@@ -89,6 +90,8 @@ const loadUsers = async(req,res) =>{
   }
 }
 
+////===========Products Section -----===========\\\\\\\\\\\\\
+
 const loadProducts = async(req,res) =>{
 
   try{
@@ -100,16 +103,119 @@ const loadProducts = async(req,res) =>{
   }
 }
 
-const loadCatogories = async(req,res) =>{
+////////---------Category Section  -----------====================
+
+const loadCatogories = async (req, res) => {
+  try {
+    const categories = await Category.find(); // Assuming you want to retrieve all categories from the database
+    res.render('categories', { Category: categories });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+//---------------Rendering Add category page---------======================
+
+const loadAddCategories = async(req,res) =>{
 
   try{
 
-    res.render('categories');
+    res.render('addCategories');
 
   }catch(error){
     console.log(error.message);
   }
 }
+
+//=================Adding Category-----=====================//
+
+const addCategory = async(req,res) => {
+
+  try{
+
+    const categoryname = req.body.categoryname;
+    const categorydes = req.body.categorydes;
+   
+    const data = new Category({
+      categoryname:categoryname,
+      description:categorydes,
+      status:true
+    });
+
+    console.log(data);
+
+    const categoryData = await data.save();
+
+    if(categoryData){
+      res.redirect('/admin/categories');
+
+    }else{
+      res.render('addCategories',{message:"Something went wrong"});
+    }
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+// const unlistCategory= async(req,res) => {
+//   try {
+
+//     const id = req.query.id;
+//     console.log(id);
+//     const data = await Category.findOne({ _id:id });
+//     console.log(data)
+//     if(data.status===true){
+//       data.status=false
+//     }else{
+//       data.status=true
+//     }
+//     console.log(data)
+
+//     // const categories = await Category.find()
+
+//     res.render('categories', { Category: data });
+    
+
+//   }catch(error){
+//     console.log(error.message);
+//   }
+// }
+
+///==============To unlist Category----=================================
+
+const unlistCategory = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const category = await Category.findById(id);
+
+    if (category) {
+      category.status = !category.status;
+      await category.save();
+    }
+
+    const categories = await Category.find();
+    res.render('categories', { Category: categories });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+//==============Rendering Edit Category Page--------=========================
+
+const loadEditCatogories = async(req,res) =>{
+
+  try{
+
+    res.render('editCategories');
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+//////===========Banner Section ===================///////////////// 
 
 const loadBanner = async(req,res) =>{
 
@@ -163,8 +269,14 @@ module.exports = {
   loadUsers,
   loadProducts,
   loadCatogories,
+  loadEditCatogories,
+  loadAddCategories,
+  addCategory,
+  unlistCategory,
   loadBanner,
   loadCoupons,
   loadOrder,
   loadSales
 }
+
+
