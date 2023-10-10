@@ -8,8 +8,16 @@ const app = express();
 
 app.use("/static",express.static(path.join(__dirname,'public')));
 
+//for user routes-----------------------///////////////
+
 const userRoute = require("./routes/userRoute");
 app.use('/',userRoute);
+
+//for admin routes-----------------------------///////////////////
+
+const adminRoute = require("./routes/adminRoute");
+app.use('/admin',adminRoute);
+
 
 app.listen(process.env.PORT || 8080, () => {
   console.log("Server is running....");
