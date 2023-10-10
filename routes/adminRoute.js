@@ -24,10 +24,24 @@ const auth = require("../middleware/adminAuth");
 
 const adminController = require("../controllers/adminController");
 
-admin_route.get('/',auth.isLogout,adminController.loadLogin);
+admin_route.get('/',adminController.loadLogin);
 
 admin_route.post('/',adminController.verifyLogin);
 
 admin_route.get('/home',adminController.loadDashboard);
+
+admin_route.get('/users', adminController.loadUsers);
+
+admin_route.get('/products', adminController.loadProducts);
+
+admin_route.get('/categories', adminController.loadCatogories);
+
+admin_route.get('/banner', adminController.loadBanner);
+
+admin_route.get('/coupons', adminController.loadCoupons);
+
+admin_route.get('/orders', adminController.loadOrder)
+
+admin_route.get('/sales', adminController.loadSales)
 
 module.exports = admin_route;

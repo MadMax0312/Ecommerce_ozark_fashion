@@ -76,8 +76,95 @@ const loadDashboard = async(req,res) => {
   }
 }
 
+///----------Loading user page in admin dashboard===========
+
+const loadUsers = async(req,res) =>{
+
+  try{
+
+    res.render('users');
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+const loadProducts = async(req,res) =>{
+
+  try{
+
+    res.render('products');
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+const loadCatogories = async(req,res) =>{
+
+  try{
+
+    res.render('categories');
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+const loadBanner = async(req,res) =>{
+
+  try{
+
+    res.render('banner');
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+const loadCoupons = async(req,res) =>{
+
+  try{
+
+    res.render('coupons');
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+const loadOrder = async(req,res) =>{
+
+  try{
+
+    res.render('orders');
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+const loadSales = async(req,res) =>{
+
+  try{
+
+    res.render('sales');
+
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+
 module.exports = {
   loadLogin,
   verifyLogin,
-  loadDashboard
+  loadDashboard,
+  loadUsers,
+  loadProducts,
+  loadCatogories,
+  loadBanner,
+  loadCoupons,
+  loadOrder,
+  loadSales
 }
