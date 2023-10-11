@@ -4,6 +4,77 @@
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">
+
+            <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h2 class="card-title" style="text-align: center;">PRODUCTS</h2>
+                  <div class="table-responsive">
+                    <table class="table table-dark">
+                      <thead>
+                        <tr>
+
+                          <th> Product </th>
+                          <th> Category </th>
+                          <th> Size </th>
+                          <!-- <th> Color </th> -->
+                          <th> Price </th>
+                          <th> Quantity </th>
+                          <th> Image </th>
+                          <th> Edit </th>
+                          <th> Action </th>
+                        </tr>
+
+                      </thead>
+                      
+                 
+
+                    <% if (Product.length > 0) {
+                      for (let i = 0; i < Product.length; i++) { %>
+                          <tr>
+                             
+                              <td><%= Product[i].productname %></td>
+                              <td><%= Product[i].category.categoryname %></td>
+                              <td><%= Product[i].size %></td>
+                              
+                              <!-- <td><%= Product[i].color %></td> -->
+                              <td><%= Product[i].price %></td>
+                              <td><%= Product[i].quantity %></td>
+                              <td><img src="/static/Assets/images/<%= Product[i].image %>" alt="ProductImage" width="50px" height="50px"></td>
+                              
+                              <td> <a href="/admin/edit-product">
+                                <a href="/admin/edit-product?id=<%= Product[i]._id %>" class="btn btn-outline-secondary btn-icon-text">
+                                  Edit <i class="mdi mdi-file-check btn-icon-append"></i>
+                                </a>
+                                
+                              </a>
+                              </td>
+                              <td>
+                                  <% if (Product[i].status === false) { %>
+                                    <a href="/admin/unlist-product?id=<%= Product[i]._id %>">
+                                      <button type="button" class="btn btn-inverse-success btn-fw">
+                                        List
+                                      </button>
+                                    </a>
+                                  <% } else { %>
+                                    <a href="/admin/unlist-product?id=<%= Product[i]._id %>">
+                                      <button type="button" class="btn btn-inverse-danger btn-fw">
+                                        Unlist
+                                      </button>
+                                    </a> 
+                                  <% } %>
+                              </td>
+                          </tr>
+                      <% }
+                  } %>
+                  
+                    
+                     </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
           <!-- content-wrapper ends -->
           <!-- partial:../../partials/_footer.html -->

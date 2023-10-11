@@ -1,5 +1,6 @@
 const Admin = require("../models/adminModel");
 const Category = require("../models/categoryModel");
+const Product = require("../models/productModel");
 const bcrypt = require("bcrypt");
 const randomstring = require("randomstring");
 
@@ -92,14 +93,66 @@ const loadUsers = async(req,res) =>{
 
 ////===========Products Section -----===========\\\\\\\\\\\\\
 
-const loadProducts = async(req,res) =>{
+const viewProducts = async(req,res) =>{
+
+  try {
+    const products = await Product.find().populate("category"); // Populate the category field
+    const categories = await Category.find(); // Assuming you want to retrieve all categories from the database
+    res.render('products', { Product: products, Category: categories });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+const loadaddProducts = async (req, res) => {
+  try {
+    // Fetch categories from the database
+    const categories = await Category.find();
+
+    // Render the addProducts.ejs template with the Category variable
+    res.render('addProducts', { Category: categories });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+const addProducts = async(req,res) =>{
 
   try{
 
-    res.render('products');
+    const productname = req.body.productname;
+    const category = req.body.category;
+    const size = req.body.size
+    const description = req.body.description;
+    const price = req.body.price;
+    const quantity = req.body.quantity;
+    const image = req.file.filename;
+
+    console.log("kjhgffg");
+    const newProduct = new Product({
+      productname:productname,
+      category:category,
+      size:size,
+      description:description,
+      price:price,
+      // color,
+      image:image,
+      quantity:quantity,
+      status:true
+    });
+    const productData = await newProduct.save();
+    console.log(productData);
+    if(productData){
+      res.redirect('/admin/view-products');
+    }else{
+      res.render('addProducts',{message:"Something went wrong"});
+    }
 
   }catch(error){
-    console.log(error.message);
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
 }
 
@@ -156,6 +209,42 @@ const addCategory = async(req,res) => {
 
   }catch(error){
     console.log(error.message);
+  }
+}
+
+const unlistProduct = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const product = await Product.findById(id);
+
+    if (product) {
+      product.status = !product.status;
+      await product.save();
+    }
+
+    const products = await Product.find();
+    res.render('products', { Product: products });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const loadEditProducts = async (req, res) => {
+  try {
+    const id = req.query.id;
+    console.log("ID:", id);
+
+    const product = await Product.findById(id);
+    console.log(product);
+
+    if (product) {
+      res.render('editProducts', { data: product }); // Pass the category object to the template
+    } else {
+      res.redirect('/admin/products');
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send('Internal Server Error');
   }
 }
 
@@ -290,7 +379,11 @@ module.exports = {
   verifyLogin,
   loadDashboard,
   loadUsers,
-  loadProducts,
+  viewProducts,
+  loadaddProducts,
+  addProducts,
+  unlistProduct,
+  loadEditProducts,
   loadCatogories,
   loadEditCatogories,
   editCategory,

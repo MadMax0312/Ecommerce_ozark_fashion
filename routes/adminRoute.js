@@ -20,6 +20,25 @@ admin_route.set("views","./views/admin");
 
 admin_route.use(express.static('public'));
 
+//----------To Add Images ---=======================
+
+const multer = require("multer");
+const path = require("path");
+
+admin_route.use(express.static('public'))
+
+const storage = multer.diskStorage({
+  destination:function(req,file,cb){
+    cb(null,path.join(__dirname,'../public/Assets/images'));
+  },
+  filename:function(req,file,cb) {
+    const name = Date.now()+'-'+file.originalname;
+    cb(null,name)
+  }
+})
+ 
+const upload = multer({storage:storage});
+
 const auth = require("../middleware/adminAuth");
 
 const adminController = require("../controllers/adminController");
@@ -32,7 +51,15 @@ admin_route.get('/home',adminController.loadDashboard);
 
 admin_route.get('/users', adminController.loadUsers);
 
-admin_route.get('/products', adminController.loadProducts);
+admin_route.get('/view-products', adminController.viewProducts);
+
+admin_route.get('/add-products', adminController.loadaddProducts);
+
+admin_route.post('/add-products',upload.single('image'), adminController.addProducts);
+
+admin_route.get('/unlist-product', adminController.unlistProduct);
+
+admin_route.get('/edit-product', adminController.loadEditProducts);
 
 admin_route.get('/categories', adminController.loadCatogories);
 
