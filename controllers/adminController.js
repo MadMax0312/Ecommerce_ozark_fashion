@@ -204,11 +204,34 @@ const unlistCategory = async (req, res) => {
 
 //==============Rendering Edit Category Page--------=========================
 
-const loadEditCatogories = async(req,res) =>{
+const loadEditCatogories = async (req, res) => {
+  try {
+    const id = req.query.id;
+    console.log("ID:", id);
+
+    const category = await Category.findById(id);
+    console.log(category);
+
+    if (category) {
+      res.render('editCategories', { data: category }); // Pass the category object to the template
+    } else {
+      res.redirect('/admin/categories');
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+///=============Editing Category==========///////////////////
+
+const editCategory = async(req,res) => {
 
   try{
 
-    res.render('editCategories');
+    const editData = await Category.findByIdAndUpdate({ _id:req.body.id },{$set:{ categoryname:req.body.categoryname, description:req.body.categorydes }});
+
+    res.redirect('/admin/categories');
 
   }catch(error){
     console.log(error.message);
@@ -270,6 +293,7 @@ module.exports = {
   loadProducts,
   loadCatogories,
   loadEditCatogories,
+  editCategory,
   loadAddCategories,
   addCategory,
   unlistCategory,
