@@ -96,9 +96,49 @@ const loadUsers = async(req,res) =>{
 const viewProducts = async(req,res) =>{
 
   try {
+
+    var search = '';                    //<----this is where we search for the users in dashboard 
+    if(req.query.search){          
+      search = req.query.search;
+    }
+
+    var page = 1;
+    if(req.query.page){
+      page = req.query.page;
+    }
+
+    const limit = 5;
+
+    const productData = await Product.find({ 
+      $or: [
+        { productname: { $regex: '.*' + search + '.*', $options: 'i' } }, // Case-insensitive search
+        { size: { $regex: '.*' + search + '.*', $options: 'i' } }
+      ]
+    })
+    .limit(limit * 1)
+    .skip((page-1) * limit)
+    .exec();
+
+    const count = await Product.find({ 
+      $or: [
+        { productname: { $regex: '.*' + search + '.*', $options: 'i' } }, // Case-insensitive search
+        { size: { $regex: '.*' + search + '.*', $options: 'i' } }
+        
+      ]
+    }).countDocuments();
+
     const products = await Product.find().populate("category"); // Populate the category field
     const categories = await Category.find(); // Assuming you want to retrieve all categories from the database
-    res.render('products', { Product: products, Category: categories });
+
+    res.render('products', {
+      Product: products ,
+      Category: categories,
+      AllProducts: productData,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page
+       // You should include Category in the object as well if you are using it in your template
+  });
+
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
