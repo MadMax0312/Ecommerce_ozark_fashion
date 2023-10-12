@@ -4,15 +4,105 @@
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">
-          </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:../../partials/_footer.html -->
-       
-          <!-- partial -->
+
+            <div class="row ">
+          
+          <div class="col-12 grid-margin">
+              <div class="card">
+                  <div class="card-body">
+                      <div class="mb-5 ">
+                          <ul class="navbar-nav w-100">
+                              <li class="nav-item w-100">
+                                  <!-- d-none -->
+                                  <form style="margin-top: 20px; text-align: center;">
+                                    <input type="text" name="search" placeholder="Search Users" style="padding: 5px; width: 300px; border: none;">
+                                    <input type="submit" value="Search" style="padding: 5px; background-color: #007bff; color: #fff;border: none;">
+                                  </form>
+                              </li>
+                          </ul>
+                      </div>
+                      <h4 class="card-title">Users</h4>
+                      <div class="table-responsive">
+                          <table class="table" id="user-table">
+                              <thead>
+                                  <tr>
+
+                                      <th> First Name </th>
+                                      <th> Last Name </th>
+                                      <th> Email </th>
+                                      <th> Mobile No.</th>
+                                      <th> Status </th>
+                                      <th> Joined On</th>
+                                      <th> Action</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                <% if (users.length > 0) { %>
+                                  <% for (var i = 0; i < users.length; i++) { %>
+                                      <!-- list -->
+                                      <tr>
+                                          <td> <%= users[i].first_name %> </td>
+                                          <td> <%= users[i].last_name %> </td>
+                                          <td> <%= users[i].email %> </td>
+                                          <td> <%= users[i].mobile %> </td>
+                                          <td>
+                                              <% if(users[i].isVerified==false){ %>
+                                                  <span class="pl-2 text-danger">Not verified</span>
+                                              <% } else { %> 
+                                                  <span class="pl-2 text-success">verified</span>
+                                              <% } %>
+                                          </td>
+                                          <td> <%= new Date(users[i].createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %> </td>
+                                          <td>
+                                              <!-- Add a data-id attribute with the user's _id -->
+                                              <% if (users[i].isBlock === false) { %>
+                                                <a href="/admin/block-user?id=<%= users[i]._id %>">
+                                                  <button type="button" class="btn btn-inverse-danger">
+                                                    Block
+                                                  </button>
+                                                </a>
+                                              <% } else { %>
+                                                <a href="/admin/block-user?id=<%= users[i]._id %>">
+                                                  <button type="button" class="btn btn-inverse-success">
+                                                    UnBlock
+                                                  </button>
+                                                </a>
+                                              <% } %>
+                                          </td>
+                                      </tr>
+                                  <% } %>
+                              <% } else { %>
+                                  <tr>
+                                      <td colspan="7">User not Found</td>
+                                  </tr>
+                              <% } %>
+                                                                                        
+                              </tbody>
+                            </table>
+
+                             <!-- ------------Adding Pagination -------------- -->
+
+                     <% if (typeof totalPages !== 'undefined') { %>
+                      <div class="pagination-container">
+                          <% for(let j=1; j <= totalPages; j++){ %>
+                              <a href="?page=<%= j %>"><%= j %></a>
+                          <% } %>
+                      </div>
+                  <% } %>
+                    
+
+  <!-- ------------------------------------------------------- -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+            <!-- content-wrapper ends -->
+          </div>
         <!-- main-panel ends -->
       </div>
-      <!-- page-body-wrapper ends -->
-    </div>
+    
 
     <%- include('../adminLayouts/footer.ejs') %>

@@ -60,6 +60,7 @@ const verifyOtp = async(req,res)=>{
       console.log("fbhjgdahfj")
          // setting otp date and time
          const otpCode = generateOTP();
+         console.log(otpCode);
          const otpExpiry = new Date();
          otpExpiry.setMinutes(otpExpiry.getMinutes() + 10); // OTP expires in 10 minutes
 
@@ -75,7 +76,7 @@ const verifyOtp = async(req,res)=>{
           req.session.mobile = req.body.mno;
           req.session.email = req.body.email;
           
-          if(req.body.firstname && req.body.email && req.body.lastname&& req.body.mno){
+          if(req.body.firstname && req.body.email && req.body.lastname && req.body.mno){
               if(req.body.password === req.body.cpassword) {
                   req.session.password = spassword;
                   req.session.otp = {
@@ -173,7 +174,7 @@ const verifyLogin = async(req,res) => {
     const email = req.body.email;
     // console.log('email:', email);
     const password = req.body.password;
-    // console.log('password:', password);
+    console.log('password:', password);
 
     const userData = await User.findOne({email:email});
     console.log('userData:', userData);

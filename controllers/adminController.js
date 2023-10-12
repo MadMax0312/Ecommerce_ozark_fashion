@@ -1,6 +1,8 @@
 const Admin = require("../models/adminModel");
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
+const User = require("../models/userModel");
+const paginate = require("../middleware/paginate");
 const bcrypt = require("bcrypt");
 const randomstring = require("randomstring");
 
@@ -80,16 +82,71 @@ const loadDashboard = async(req,res) => {
 
 ///----------Loading user page in admin dashboard===========
 
-const loadUsers = async(req,res) =>{
+const loadUsers = async (req,res)=>{
+  try {
 
-  try{
+    var search = '';                    //<----this is where we search for the users in dashboard -----------------
+    if(req.query.search){          
+      search = req.query.search;
+    }
 
-    res.render('users');
+    var page = 1;
+    if(req.query.page){
+      page = req.query.page;
+    }
 
-  }catch(error){
-    console.log(error.message);
+    const limit = 5;
+
+    const userData = await User.find({ 
+      $or: [
+        { first_name: { $regex: '.*' + search + '.*', $options: 'i' } }, // Case-insensitive search
+        { last_name: { $regex: '.*' + search + '.*', $options: 'i' } },
+        { email: { $regex: '.*' + search + '.*', $options: 'i' } }
+      ]
+    })
+    .limit(limit * 1)
+    .skip((page-1) * limit)
+    .exec();
+
+    const count = await User.find({ 
+      $or: [
+        { first_name: { $regex: '.*' + search + '.*', $options: 'i' } }, // Case-insensitive search
+        { last_name: { $regex: '.*' + search + '.*', $options: 'i' } },
+        { email: { $regex: '.*' + search + '.*', $options: 'i' } }
+        
+      ]
+    }).countDocuments();
+    
+    res.render('users', {
+      users:userData,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page
+  });
+
+  } catch (error) {
+    console.log(error);
   }
 }
+
+const blockUsers = async (req, res) => {
+
+  try {
+
+    const id = req.query.id;
+    const user = await User.findById(id);
+
+    if (user) {
+      user.isBlock = !user.isBlock;
+      await user.save();
+    }
+
+    const users = await User.find();
+    res.render('users', { users: users });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 
 ////===========Products Section -----===========\\\\\\\\\\\\\
 
@@ -115,6 +172,7 @@ const viewProducts = async(req,res) =>{
         { size: { $regex: '.*' + search + '.*', $options: 'i' } }
       ]
     })
+    .populate("category")
     .limit(limit * 1)
     .skip((page-1) * limit)
     .exec();
@@ -127,13 +185,11 @@ const viewProducts = async(req,res) =>{
       ]
     }).countDocuments();
 
-    const products = await Product.find().populate("category"); // Populate the category field
     const categories = await Category.find(); // Assuming you want to retrieve all categories from the database
 
     res.render('products', {
-      Product: products ,
+      Product: productData ,
       Category: categories,
-      AllProducts: productData,
       totalPages: Math.ceil(count / limit),
       currentPage: page
        // You should include Category in the object as well if you are using it in your template
@@ -196,6 +252,25 @@ const addProducts = async(req,res) =>{
   }
 }
 
+///--------------Unlisting products-----------------------------
+
+const unlistProduct = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const product = await Product.findById(id);
+
+    if (product) {
+      product.status = !product.status;
+      await product.save();
+    }
+
+    const products = await Product.find();
+    res.render('products', { Product: products });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 ////////---------Category Section  -----------====================
 
 const loadCatogories = async (req, res) => {
@@ -251,23 +326,6 @@ const addCategory = async(req,res) => {
     console.log(error.message);
   }
 }
-
-const unlistProduct = async (req, res) => {
-  try {
-    const id = req.query.id;
-    const product = await Product.findById(id);
-
-    if (product) {
-      product.status = !product.status;
-      await product.save();
-    }
-
-    const products = await Product.find();
-    res.render('products', { Product: products });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
 
 const loadEditProducts = async (req, res) => {
   try {
@@ -419,6 +477,7 @@ module.exports = {
   verifyLogin,
   loadDashboard,
   loadUsers,
+  blockUsers,
   viewProducts,
   loadaddProducts,
   addProducts,

@@ -40,6 +40,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage:storage});
 
 const auth = require("../middleware/adminAuth");
+const paginate = require("../middleware/paginate");
 
 const adminController = require("../controllers/adminController");
 
@@ -49,7 +50,9 @@ admin_route.post('/',adminController.verifyLogin);
 
 admin_route.get('/home',adminController.loadDashboard);
 
-admin_route.get('/users', adminController.loadUsers);
+admin_route.get('/users', adminController.loadUsers); 
+
+admin_route.get('/block-user', adminController.blockUsers); 
 
 admin_route.get('/view-products', adminController.viewProducts);
 

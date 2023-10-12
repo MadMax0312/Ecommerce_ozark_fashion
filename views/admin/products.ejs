@@ -13,7 +13,7 @@
                   <form style="margin-top: 20px; text-align: center;">
                     <input type="text" name="search" placeholder="Product name or Size" style="padding: 5px; width: 300px; border: none;">
                     <input type="submit" value="Search" style="padding: 5px; background-color: #007bff; color: #fff;border: none;">
-                </form>
+                  </form>
 
                 <br>
 
@@ -34,11 +34,10 @@
                         </tr>
 
                       </thead>
-                      
-                 
+                                      
 
-                      <% if (Product.length > 0 && AllProducts.length > 0) {
-                        for (let i = 0; i < Product.length && i < AllProducts.length; i++) { %>
+                      <% if (Product.length > 0) {
+                        for (let i = 0; i < Product.length; i++) { %>
                           <tr>
                              
                               <td><%= Product[i].productname %></td>
