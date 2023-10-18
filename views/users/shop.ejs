@@ -1,0 +1,142 @@
+<%- include('../userLayouts/header.ejs') %>
+<%- include('../userLayouts/navbar.ejs') %>
+
+
+<div class="bg-light py-3">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 mb-0"><a href="index.html">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Shop</strong></div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="site-section">
+  <div class="container">
+    <div class="row mb-5">
+      <div class="col-md-9 order-2">
+
+        <div class="row">
+          <div class="col-md-12 mb-5">
+            <div class="float-md-left mb-4"><h2 class="text-black h5">Shop All</h2></div>
+            <div class="d-flex">
+              <div class="dropdown mr-1 ml-md-auto">
+                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" id="dropdownMenuOffset" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  FILTER
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuOffset">
+                  <a class="dropdown-item" href="#">Men</a>
+                  <a class="dropdown-item" href="#">Women</a>
+                  <a class="dropdown-item" href="#">Children</a>
+                </div>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" id="dropdownMenuReference" data-toggle="dropdown">SORT</button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuReference">
+                  <a class="dropdown-item" href="/shop?sort=price_low_to_high">Price, low to high</a>
+                  <a class="dropdown-item" href="/shop?sort=price_high_to_low">Price, high to low</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <% if (Product.length > 0) {
+            for (let i = 0; i < Product.length; i++) { %>
+              <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
+                <div class="block-4 text-center border">
+                  <figure class="block-4-image">
+                    <a href="shop-single.html">
+                      <img src="/static/Assets/images/<%= Product[i].image %>" alt="Product Image" class="img-fluid">
+                    </a>
+                  </figure>
+                  <div class="block-4-text p-4">
+                    <h3><a href="shop-single.html"><%= Product[i].productname %></a></h3>
+                    <p class="mb-0"><%= Product[i].category.categoryname %></p>
+                    <p class="text-primary font-weight-bold">$<%= Product[i].price %></p>
+                  </div>
+                </div>
+              </div>
+          <% }
+          } else { %>
+            <div class="col-12">
+              <p class="text-center">No products available.</p>
+            </div>
+          <% } %>
+        </div>
+
+        <% if (typeof totalPages !== 'undefined') { %>
+          <div class="pagination-container">
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>"><i class="fas fa-chevron-left"></i> Previous</a>
+            <% } %>
+            <% for(let j=1; j <= totalPages; j++){ %>
+                <a href="?page=<%= j %>" class="<%= j === currentPage ? 'active' : '' %>"><%= j %></a>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>">Next <i class="fas fa-chevron-right"></i></a>
+            <% } %>
+          </div>
+        <% } %>
+
+      </div>
+
+
+
+      <div class="col-md-3 order-1 mb-5 mb-md-0">
+        <div class="border p-4 rounded mb-4">
+          <h3 class="mb-3 h6 text-uppercase text-black d-block">Categories</h3>
+          <ul class="list-unstyled mb-0">
+            <li class="mb-1"><a href="#" class="d-flex"><span>Men</span> <span class="text-black ml-auto">(2,220)</span></a></li>
+            <li class="mb-1"><a href="#" class="d-flex"><span>Women</span> <span class="text-black ml-auto">(2,550)</span></a></li>
+            <li class="mb-1"><a href="#" class="d-flex"><span>Children</span> <span class="text-black ml-auto">(2,124)</span></a></li>
+          </ul>
+        </div>
+
+        <div class="border p-4 rounded mb-4">
+          <div class="mb-4">
+            <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Price</h3>
+            <div id="slider-range" class="border-primary"></div>
+            <input type="text" name="text" id="amount" class="form-control border-0 pl-0 bg-white" disabled="" />
+          </div>
+
+          <div class="mb-4">
+            <h3 class="mb-3 h6 text-uppercase text-black d-block">Size</h3>
+            <label for="s_sm" class="d-flex">
+              <input type="checkbox" id="s_sm" class="mr-2 mt-1"> <span class="text-black">Small (2,319)</span>
+            </label>
+            <label for="s_md" class="d-flex">
+              <input type="checkbox" id="s_md" class="mr-2 mt-1"> <span class="text-black">Medium (1,282)</span>
+            </label>
+            <label for="s_lg" class="d-flex">
+              <input type="checkbox" id="s_lg" class="mr-2 mt-1"> <span class="text-black">Large (1,392)</span>
+            </label>
+          </div>
+
+          <div class="mb-4">
+            <h3 class="mb-3 h6 text-uppercase text-black d-block">Color</h3>
+            <a href="#" class="d-flex color-item align-items-center" >
+              <span class="bg-danger color d-inline-block rounded-circle mr-2"></span> <span class="text-black">Red (2,429)</span>
+            </a>
+            <a href="#" class="d-flex color-item align-items-center" >
+              <span class="bg-success color d-inline-block rounded-circle mr-2"></span> <span class="text-black">Green (2,298)</span>
+            </a>
+            <a href="#" class="d-flex color-item align-items-center" >
+              <span class="bg-info color d-inline-block rounded-circle mr-2"></span> <span class="text-black">Blue (1,075)</span>
+            </a>
+            <a href="#" class="d-flex color-item align-items-center" >
+              <span class="bg-primary color d-inline-block rounded-circle mr-2"></span> <span class="text-black">Purple (1,075)</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<%- include('../userLayouts/footer.ejs') %>

@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Product = require("../models/productModel");
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 
@@ -155,6 +156,18 @@ const insertUser = async(req,res) => {
 
 //Login user methods started
 
+const login = async(req,res)=>{
+
+  try {
+
+    res.render('home');
+
+  }catch(error){
+    console.log(error.message);
+  }
+
+};
+
 const loginLoad = async(req,res)=>{
 
   try {
@@ -176,21 +189,32 @@ const verifyLogin = async(req,res) => {
     const password = req.body.password;
     console.log('password:', password);
 
-    const userData = await User.findOne({email:email});
+    var userData = await User.findOne({email:email});
     console.log('userData:', userData);
 
     if(userData){
 
-      const passwordMatch = await bcrypt.compare(password, userData.password);
-      console.log('passwordMatch:', passwordMatch);
-      
-      if(passwordMatch){
+      if(userData.isBlock === false){
+        const passwordMatch = await bcrypt.compare(password, userData.password);
+        console.log('passwordMatch:', passwordMatch);
+
+        if(passwordMatch){
+          if(userData.is_verified == 0){
+            res.render('login',{message:"Please verify your email"});
+          }else{
+            req.session.user_id = userData._id;
+            console.log(req.session.user_id );
+
+
+            res.redirect('/')
+          }
+        }else{
+          res.render('login',{message:"Login details are incorrect"});
+        }
 
       }else{
-        res.render('login',{message:"Login details are incorrect"});
+        res.render('login',{message:"Your account has been blocked"});
       }
-
-
     }else{
       res.render('login',{message:"Login details are incorrect"});
     }
@@ -212,6 +236,152 @@ const loadOtp = async(req,res)=>{
 
 };
 
+//-------loading shop page------------//
+
+const loadShop = async (req, res) => {
+  try {
+     var search = '';
+     if (req.query.search) {
+       search = req.query.search;
+     }
+ 
+     var page = 1;
+     if (req.query.page) {
+       page = parseInt(req.query.page);
+     }
+ 
+     const limit = 3;
+ 
+     let sortOption = {};
+     if (req.query.sort === 'price_low_to_high') {
+       sortOption = { price: 1 };
+     } else if (req.query.sort === 'price_high_to_low') {
+       sortOption = { price: -1 };
+     }
+ 
+     const count = await Product.countDocuments({
+       $or: [
+         { productname: { $regex: '.*' + search + '.*', $options: 'i' } },
+         { size: { $regex: '.*' + search + '.*', $options: 'i' } },
+         { price: { $regex: '.*' + search + '.*', $options: 'i' } }
+       ],
+       status: true // Only get products with status true
+     });
+ 
+     const totalPages = Math.ceil(count / limit);
+ 
+     const productData = await Product.find({
+       $or: [
+         { productname: { $regex: '.*' + search + '.*', $options: 'i' } },
+         { size: { $regex: '.*' + search + '.*', $options: 'i' } },
+         { price: { $regex: '.*' + search + '.*', $options: 'i' } }
+       ],
+       status: true // Only get products with status true
+     })
+     .sort(sortOption) // Apply sorting here
+     .skip((page - 1) * limit)
+     .limit(limit);
+ 
+    console.log(productData);
+
+    res.render('shop', {
+      Product: productData,
+      totalPages: totalPages,
+      currentPage: page,
+      search: search,
+      sortOption: req.query.sort // Pass the sort option back to the template for indicating active sorting
+    });
+  } catch (error) {
+    console.log(error.message);
+    // Handle error and send appropriate response
+  }
+};
+
+//========= User Details =======//
+
+const loadUser = async (req, res) => {
+  try {
+    if (!req.session.user_id) {
+      res.redirect('/login');
+      return;
+    }
+
+    const userData = await User.findById(req.session.user_id);
+    if (userData) {
+      res.render('userProfile', { user: userData });
+    } else {
+      res.status(404).send('User not found');
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+
+//=============Edit User Details ====//
+
+const loadEditUser = async (req, res) => {
+  try {
+    console.log("aaaaa");
+    const id = req.query.id;
+    console.log("ID:", id);
+
+    const userData = await User.findById({ _id:id })
+    console.log(userData);
+
+    if (userData) {
+      res.render('editProfile', { user: userData }); // Pass the category object to the template
+    } else {
+      res.redirect('/userProfile');
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+const updateProfile = async (req, res) => {
+  try {
+    console.log(req.body); 
+    const id = req.body.user_id;
+    console.log("User ID:", id); // Check if user_id is received correctly
+
+    if (!id) {
+      // Handle the case where user_id is undefined or falsy
+      res.status(400).send('Invalid user ID');
+      return;
+    }
+
+    const updatedUserData = await User.findByIdAndUpdate(
+      { _id: id }, // Use id directly here, no need for req.body.user_id
+      {
+        $set: {
+          first_name: req.body.firstName,
+          last_name: req.body.lastName,
+          email: req.body.email,
+          mobile: req.body.mno,
+        }
+      },
+      { new: true } // Add this option to return the updated document
+    );
+
+    console.log(updatedUserData);
+
+    // Redirect to the user page after successful update
+    res.status(200).redirect('/userProfile');
+  } catch (error) {
+    console.log(error.message);
+    // Handle errors appropriately, e.g., by rendering an error page
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+
+
+
+
 module.exports = {
   loadRegister,
   insertUser,
@@ -220,5 +390,11 @@ module.exports = {
   loadOtp,
   sendVerifyMail,
   verifyOtp,
-  loadOtpPage
+  login,
+  loadOtpPage,
+  loadShop,
+  loadUser,
+  loadEditUser,
+  updateProfile
+  
 }

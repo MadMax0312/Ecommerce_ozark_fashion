@@ -1,9 +1,9 @@
-<%- include('../adminLayouts/header.ejs') %>
+<!-- <%- include('../adminLayouts/header.ejs') %>
 <%- include('../adminLayouts/sidebar.ejs') %>
-<%- include('../adminLayouts/navbar.ejs') %>
+<%- include('../adminLayouts/navbar.ejs') %> -->
         <!-- partial -->
         <div class="main-panel">
-          <div class="content-wrapper">
+          <div class="content-wrapper" >
 
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
@@ -47,8 +47,9 @@
                               <!-- <td><%= Product[i].color %></td> -->
                               <td><%= Product[i].price %></td>
                               <td><%= Product[i].quantity %></td>
-                              <td><img src="/static/Assets/images/<%= Product[i].image %>" alt="ProductImage" width="50px" height="50px"></td>
-                              
+                              <td>
+                                <img src="/static/Assets/images/<%= Product[i].image %>" alt="ProductImage" style="width: 100px; height: 100px; border: none; border-radius: 0;">
+                            </td>                                                         
                               <td> <a href="/admin/edit-product">
                                 <a href="/admin/edit-product?id=<%= Product[i]._id %>" class="btn btn-outline-secondary btn-icon-text">
                                   Edit <i class="mdi mdi-file-check btn-icon-append"></i>
@@ -94,21 +95,16 @@
                   <% } %>
                     
 
-  <!-- ------------------------------------------------------- -->
+
                   </div>
                 </div>
               </div>
             </div>
 
           </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:../../partials/_footer.html -->
-       
-          <!-- partial -->
         </div>
-        <!-- main-panel ends -->
-      </div>
-      <!-- page-body-wrapper ends -->
-    </div>
 
-    <%- include('../adminLayouts/footer.ejs') %>
+        
+    
+
+    <!-- <%- include('../adminLayouts/footer.ejs') %> -->

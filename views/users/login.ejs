@@ -9,7 +9,7 @@
   <% } %>
 
   <h2 class="mb-4 text-center"><strong>Login</strong></h2>
-  <form action="/login" method="post">
+  <form action="/login" method="post" onsubmit="return validateForm()">
     <div class="form-group">
       <input type="email" class="form-control" name="email" placeholder="Enter email" id="email" required>
       <p id="email-error" class="error-message"></p>

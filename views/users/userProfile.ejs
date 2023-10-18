@@ -1,0 +1,35 @@
+<%- include('../userLayouts/header.ejs') %>
+<%- include('../userLayouts/navbar.ejs') %>
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>User Account</h1>
+      <form class="user-account-form" action="" method="">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" class="form-control" id="firstName"  value="<%= user.first_name %>" readonly>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" class="form-control" id="lastName"  value="<%= user.last_name %>" readonly>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" class="form-control" id="email"  value="<%= user.email %>" readonly>
+        </div>
+        <div class="form-group">
+          <label for="mobile">Mobile Number</label>
+          <input type="tel" class="form-control" id="mobile"  value="<%= user.mobile %>" readonly>
+        </div>
+        <a href="/userProfile-Edit?id=<%= user._id %>">
+          <button type="button" class="btn btn-primary">Edit</button>
+        </a>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<%- include('../userLayouts/footer.ejs') %>

@@ -1,14 +1,22 @@
 const mongoose = require("mongoose");
 const path = require("path");
+const session = require("express-session");
+const config = require("./config/config");
 
 mongoose.connect("mongodb://127.0.0.1:27017/Ozark_Fashion");
 
 const express = require("express")
 const app = express();
 
+app.use(session({
+  secret:config.sessionSecret, 
+  resave:false,
+  saveUninitialized:true
+}))  
+
+
 app.use("/static",express.static(path.join(__dirname,'public')));
 
-//for user routes-----------------------///////////////
 
 const userRoute = require("./routes/userRoute");
 app.use('/',userRoute);

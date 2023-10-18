@@ -9,7 +9,7 @@
   <% } %>
 
   <h2 class="mb-4 text-center"><strong>Admin Login</strong></h2>
-  <form action="" method="post">
+  <form action="" method="post" onsubmit="return validateForm()">
     <div class="form-group">
       <input type="email" class="form-control" name="email" placeholder="Enter email" id="email" required>
       <p id="email-error" class="error-message"></p>

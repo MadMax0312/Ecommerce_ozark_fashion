@@ -1,9 +1,7 @@
 <%- include('../adminLayouts/header.ejs') %>
 <%- include('../adminLayouts/sidebar.ejs') %>
 <%- include('../adminLayouts/navbar.ejs') %>
-        <!-- partial -->
 
-        <!--============================ Adding categories table=============== -->
         <div class="main-panel">
           <div class="content-wrapper">
 
@@ -48,6 +46,7 @@
                                     <input type="file" name="image" required>
                                 </div>
                             </div>
+                           
                             <div class="col-md-6 mb-4">
                                 <div class="col-md-12 grid-margin">
                                     <div class="card">
@@ -103,6 +102,10 @@
                       </div>
                     </div> -->
 
+
+                    <div class="input-container">
+                      <input type="hidden" name="id" value="<%= data._id %>">
+                    </div>
                   
                     <button type="submit" class="btn btn-primary mr-2">Submit</button>
                     <button class="btn btn-dark">Cancel</button>
