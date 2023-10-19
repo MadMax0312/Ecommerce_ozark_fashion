@@ -347,6 +347,7 @@ const addProducts = async(req,res) =>{
 
 const unlistProduct = async (req, res) => {
   try {
+    
     const id = req.query.id;
     const product = await Product.findById(id);
 

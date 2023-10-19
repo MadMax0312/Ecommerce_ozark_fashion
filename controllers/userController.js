@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
+const Cart = require("../models/cartModel")
 const bcrypt = require('bcrypt');
 const nodemailer = require("nodemailer");
 
@@ -138,7 +139,8 @@ const insertUser = async(req,res) => {
       email:req.session.email,
       mobile:req.session.mobile,
       password: req.session.password,
-      isVerified:1
+      is_verified:1,
+      isBlock: false
     });
 
     const userData = await user.save();
@@ -378,7 +380,76 @@ const updateProfile = async (req, res) => {
   }
 };
 
+///===========Rendering product info page -=-----------//
 
+const loadProductInfo = async (req, res) => {
+  try {
+
+    const id = req.query.id
+    const product = await Product.findById(id);
+
+    const pddata = await Product.find();
+
+    res.render('productInfo', {Product:product, data:pddata });
+
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+//========== Rendering cart ==========//
+
+function calculateSubtotal(products) {
+  return products.reduce((total, product) => total + product.quantity * product.price, 0);
+}
+
+// Function to calculate total
+function calculateTotal(products) {
+  return calculateSubtotal(products);
+}
+
+const loadCart = async (req, res) => {
+  try {
+    const cartItems = await Cart.find().populate('product');
+
+    const subtotal = calculateSubtotal(cartItems);
+    const total = calculateTotal(cartItems);
+
+    res.render('cart', { Product: cartItems });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
+const addToCart = async (req, res) => {
+  try {
+    const productId = req.query.id;
+    const product = await Product.findById(productId);
+    const quantity = req.body.quantity; // Retrieve quantity from the request body
+
+    let cartItem = await Cart.findOne({ product: productId });
+
+    if (cartItem) {
+      // If the product is already in the cart, update the quantity
+      cartItem.quantity += parseInt(quantity, 10);
+    } else {
+      // If the product is not in the cart, create a new cart item
+      cartItem = new Cart({
+        product: product,
+        quantity: parseInt(quantity, 10),
+      });
+    }
+
+    await cartItem.save();
+
+    res.redirect('/product-info');
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
 
 
@@ -395,6 +466,11 @@ module.exports = {
   loadShop,
   loadUser,
   loadEditUser,
-  updateProfile
+  updateProfile,
+  loadProductInfo,
+  loadCart,
+  addToCart
+  // calculateSubtotal,
+  // calculateTotal
   
 }

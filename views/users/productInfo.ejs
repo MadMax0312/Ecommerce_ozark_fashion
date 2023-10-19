@@ -1,0 +1,129 @@
+<%- include('../userLayouts/header.ejs') %>
+<%- include('../userLayouts/navbar.ejs') %>
+
+<div class="site-wrap">
+
+  <div class="bg-light py-3">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 mb-0"><a href="/">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black"><%= Product.productname %></strong></div>
+      </div>
+    </div>
+  </div>  
+
+  <div class="site-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <img src="/static/Assets/images/<%= Product.image %>" alt="Image" class="img-fluid">
+        </div>
+        <div class="col-md-6">
+          <h2 class="text-black"><%= Product.productname %></h2>
+          <p><%= Product.description %></p>
+          <p><strong class="text-primary h4">₹500.00</strong></p>
+          <div class="mb-1 d-flex">
+            <label for="option-sm" class="d-flex mr-3 mb-3">
+              <span class="d-inline-block mr-2" style="top:-2px; position: relative;"><input type="radio" id="option-sm" name="shop-sizes"></span> <span class="d-inline-block text-black">Small</span>
+            </label>
+            <label for="option-md" class="d-flex mr-3 mb-3">
+              <span class="d-inline-block mr-2" style="top:-2px; position: relative;"><input type="radio" id="option-md" name="shop-sizes"></span> <span class="d-inline-block text-black">Medium</span>
+            </label>
+            <label for="option-lg" class="d-flex mr-3 mb-3">
+              <span class="d-inline-block mr-2" style="top:-2px; position: relative;"><input type="radio" id="option-lg" name="shop-sizes"></span> <span class="d-inline-block text-black">Large</span>
+            </label>
+            <label for="option-xl" class="d-flex mr-3 mb-3">
+              <span class="d-inline-block mr-2" style="top:-2px; position: relative;"><input type="radio" id="option-xl" name="shop-sizes"></span> <span class="d-inline-block text-black">Extra Large</span>
+            </label>
+          </div>
+          <div class="mb-5">
+            <div class="input-group mb-3" style="max-width: 120px;">
+              <div class="input-group-prepend">
+                <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+              </div>
+              <input type="text" class="form-control text-center" name="quantity" value="1" placeholder="1" aria-label="Example text with button addon" aria-describedby="button-addon1">
+              <div class="input-group-append">
+                <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
+              </div>
+            </div>
+          </div>
+
+          <p><a href="/addToCart?id=<%= Product._id %>" class="buy-now btn btn-sm btn-warning">Add To Cart</a></p>
+
+          <br>
+
+          <p><a href="/cart" class="buy-now btn btn-sm btn-dark" style="color: white;">Go To Cart</a></p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="site-section block-3 site-blocks-2 bg-light">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-7 site-section-heading text-center pt-4">
+          <h2>Featured Products</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="nonloop-block-3 owl-carousel">
+            <% if (data.length > 0) {
+              for (let i = 0; i < Math.min(data.length, 5); i++) { %>
+                <div class="item">
+                  <div class="block-4 text-center">
+                    <figure class="block-4-image">
+                      <img src="/static/Assets/images/<%= data[i].image %>" alt="Image placeholder" class="img-fluid">
+                    </figure>
+                    <div class="block-4-text p-4">
+                      <h3><a href="#"><%= data[i].productname %></a></h3>
+                      <p class="mb-0">Finding perfect t-shirt</p>
+                      <p class="text-primary font-weight-bold">₹<%= data[i].price %></p>
+                    </div>
+                  </div>
+                </div>
+              <% }
+            } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+// Example using Fetch API for making a POST request
+// Example using Fetch API for making a POST request
+fetch('/addToCart?id=' + productId, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ quantity: desiredQuantity }),
+})
+.then(response => {
+  if (response.ok) {
+    // If the response is successful (HTTP status code 200-299)
+    return response.json(); // Parse the JSON data returned by the server
+  }
+  throw new Error('Network response was not ok: ' + response.statusText); // Handle HTTP errors
+})
+.then(data => {
+  // Handle the response data from the server
+  // For example, you can show a success message to the user
+  console.log('Cart updated successfully:', data);
+  // You can update your UI or show a success message to the user here
+})
+.catch(error => {
+  // Handle errors, e.g., show an error message to the user
+  console.error('There was a problem with the fetch operation:', error);
+  // You can update your UI or show an error message to the user here
+});
+
+
+
+</script>
+
+<%- include('../userLayouts/footer.ejs') %>

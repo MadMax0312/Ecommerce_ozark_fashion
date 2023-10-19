@@ -1,15 +1,12 @@
-
-function validateForm() {
+function validatedForm() {
 
   document.getElementById('email-error').textContent = '';
-  document.getElementById('password-error').textContent = '';
   document.getElementById('name1-error').textContent = '';
   document.getElementById('mobile-error').textContent = '';
 
   const email = document.getElementById('email').value;
   const name1 = document.getElementById('name1').value;
   const mobile = document.getElementById('mobile').value;
-  const password = document.getElementById('password').value;
 
   // Regular expression for email validation with optional '@' symbol
   const emailRegex = /^[^\s@]+(@[^\s@]+\.[^\s@]+)?$/;
@@ -36,28 +33,5 @@ function validateForm() {
       return false;
   }
 
-  if (!password || password.length < 4) {
-      document.getElementById('password-error').textContent = 'Password must be at least 4 characters';
-      return false;
-  }
-
   return true;
 }
-
-
-
-document.addEventListener("DOMContentLoaded", function() {
-  const form = document.querySelector("form");
-  const passwordField = document.getElementById("password");
-  const confirmPasswordField = document.getElementById("cpassword");
-  const passwordMismatchDiv = document.getElementById("password-mismatch");
-
-  form.addEventListener("submit", function(event) {
-      if (passwordField.value !== confirmPasswordField.value) {
-          passwordMismatchDiv.style.display = "block";
-          event.preventDefault(); // Prevent form submission
-      } else {
-          passwordMismatchDiv.style.display = "none";
-      }
-  });
-});

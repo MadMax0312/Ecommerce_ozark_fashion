@@ -41,6 +41,11 @@ user_route.get('/userProfile-Edit',auth.isLogin, userController.loadEditUser);
 
 user_route.post('/userProfile-Edit', userController.updateProfile);
 
+user_route.get('/product-info', userController.loadProductInfo);
+
+user_route.get('/cart', userController.loadCart);
+
+user_route.post('/addToCart', userController.addToCart);
 
 module.exports = user_route;
 

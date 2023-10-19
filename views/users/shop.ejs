@@ -5,7 +5,7 @@
 <div class="bg-light py-3">
   <div class="container">
     <div class="row">
-      <div class="col-md-12 mb-0"><a href="index.html">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Shop</strong></div>
+      <div class="col-md-12 mb-0"><a href="/">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Shop</strong></div>
     </div>
   </div>
 </div>
@@ -26,9 +26,9 @@
                   FILTER
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuOffset">
-                  <a class="dropdown-item" href="#">Men</a>
-                  <a class="dropdown-item" href="#">Women</a>
-                  <a class="dropdown-item" href="#">Children</a>
+                  <a class="dropdown-item" href="#" style="color: #000;">Men</a>
+                  <a class="dropdown-item" href="#" style="color: #000;">Women</a>
+                  <a class="dropdown-item" href="#" style="color: #000;">Children</a>
                 </div>
               </div>
               <div class="btn-group">
@@ -48,14 +48,16 @@
               <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
                 <div class="block-4 text-center border">
                   <figure class="block-4-image">
-                    <a href="shop-single.html">
+                    <a href="/product-info?id=<%= Product[i]._id %>">
                       <img src="/static/Assets/images/<%= Product[i].image %>" alt="Product Image" class="img-fluid">
                     </a>
                   </figure>
                   <div class="block-4-text p-4">
-                    <h3><a href="shop-single.html"><%= Product[i].productname %></a></h3>
+                    <h3><a href="#" style="color: gray;"><%= Product[i].productname %></a></h3>
                     <p class="mb-0"><%= Product[i].category.categoryname %></p>
-                    <p class="text-primary font-weight-bold">$<%= Product[i].price %></p>
+                    <p class="text-black font-weight-semibold"><%= Product[i].description %></p>
+                    <p class="text-black font-weight-semibold">₹<%= Product[i].price %></p>
+                    
                   </div>
                 </div>
               </div>
