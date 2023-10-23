@@ -1,0 +1,54 @@
+<%- include('../userLayouts/header.ejs') %>
+<%- include('../userLayouts/navbar.ejs') %>
+
+<div class="site-wrap">
+
+  <div class="bg-light py-3">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 mb-0"><a href="/">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Wishlist</strong></div>
+      </div>
+    </div>
+  </div>  
+
+  <div class="site-section">
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-md-9 order-2">
+
+          <div class="row">
+            <% if (Product.length > 0) {
+              for (let i = 0; i < Product.length; i++) { %>
+                <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
+                  <div class="block-4 text-center border">
+                    <figure class="block-4-image">
+                      <a href="/product-info?id=<%= Product[i]._id %>">
+                        <img src="/static/Assets/images/<%= Product[i].image %>" alt="Product Image" class="img-fluid">
+                      </a>
+                    </figure>
+                    <div class="block-4-text p-4">
+                      <h3><a href="#" style="color: gray;"><%= Product[i].productname %></a></h3>
+                      <p class="mb-0"><%= Product[i].category.categoryname %></p>
+                      <p class="text-black font-weight-semibold"><%= Product[i].description %></p>
+                      <p class="text-black font-weight-semibold">₹<%= Product[i].price %></p>
+                      <p><a href="/addToCart?id=<%= Product._id %>" class="buy-now btn btn-sm" style="background-color: white; color: blue;">Add To Cart</a></p>
+                      
+                    </div>
+                  </div>
+                </div>
+            <% }
+            } else { %>
+              <div class="col-12">
+                <p class="text-center">No products available.</p>
+              </div>
+            <% } %>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<%- include('../userLayouts/footer.ejs') %>

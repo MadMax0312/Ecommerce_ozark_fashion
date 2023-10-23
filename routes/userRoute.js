@@ -1,8 +1,10 @@
 const express = require("express");
-const user_route = express();
+const path = require("path");
 const session = require("express-session");
 
 const config = require("../config/config");
+
+const user_route = express();
 
 user_route.use(
   session({
@@ -28,7 +30,7 @@ user_route.post('/register',userController.verifyOtp);
 user_route.get('/otp',userController.loadOtpPage);
 user_route.post('/otp',userController.insertUser);
 
-user_route.get('/login',userController.loginLoad);
+user_route.get('/login', auth.isLogout, userController.loginLoad);
 user_route.post('/login',userController.verifyLogin);
 
 user_route.get('/',userController.login);
@@ -43,9 +45,15 @@ user_route.post('/userProfile-Edit', userController.updateProfile);
 
 user_route.get('/product-info', userController.loadProductInfo);
 
-user_route.get('/cart', userController.loadCart);
+user_route.get('/wishlist', userController.loadWishlist);
+
+user_route.post('addToWishlist', userController.addToWishlist);
+
+user_route.get('/cart', auth.isLogin, userController.loadCart);
 
 user_route.post('/addToCart', userController.addToCart);
+
+user_route.get('/about', userController.loadAbout)
 
 module.exports = user_route;
 

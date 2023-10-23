@@ -48,7 +48,14 @@
                               <td><%= Product[i].price %></td>
                               <td><%= Product[i].quantity %></td>
                               <td>
-                                <img src="/static/Assets/images/<%= Product[i].image %>" alt="ProductImage" style="width: 100px; height: 100px; border: none; border-radius: 0;">
+                            
+                                <% if (Product[i].image && Product[i].image.length > 0) { %>
+                                  <% const visibleImages = Product[i].image.filter(image => !deletedImages.includes(image)).slice(0, 4); %>
+                                  <% visibleImages.forEach(image => { %>
+                                    <img src="/static/admin/Assets/images/products/<%= image %>" alt="<%= Product[i].productname %>">
+                                  <% }); %>
+                                <% } %>
+
                             </td>                                                         
                               <td> <a href="/admin/edit-product">
                                 <a href="/admin/edit-product?id=<%= Product[i]._id %>" class="btn btn-outline-secondary btn-icon-text">
