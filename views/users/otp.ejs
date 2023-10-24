@@ -1,24 +1,64 @@
 <%- include('../layouts/header.ejs') %>
 
-<div class="container" style="margin-top: 100px;">
-  <h2 class="mb-4 text-center"><strong>OTP Verification</strong></h2>
+<div class="container" style="margin-top: 100px">
+    <h2 class="mb-4 text-center"><strong>OTP Verification</strong></h2>
 
-  <% if (typeof message !== 'undefined') { %>
-    <div id="invalid-msg" class="alert alert-danger text-danger text-center mt-3">
-      <h4> <%- message %> </h4>
-    </div>
-  <% } %>
+    <% if(typeof message !== 'undefined'){ %>
 
-  <form action="/otp" method="POST">
-    <div class="form-group">
-      <input type="text" class="form-control" name="otp" placeholder="Enter OTP" required>
+    <h6 id="invalid-msg" class="text-danger text-center"><%- message %></h6>
+
+    <% } %>
+
+    <form action="/otp" method="POST">
+        <div class="form-group">
+            <input type="text" class="form-control" name="otp" placeholder="Enter OTP" required />
+        </div>
+        <button type="submit" class="btn btn-success">Verify OTP</button>
+        <p class="text-danger mt-3">Time left: <span id="timer">45</span></p>
+    </form>
+    <div class="mt-3 text-center">
+        <p>
+            Didn't receive OTP?
+            <a href="/resendOtp"
+                ><button class="btn btn-dander" id="resendButton" onclick="resendOTP()">
+                    <a href="/resendOtp">Resend OTP</a>
+                </button></a
+            >
+        </p>
     </div>
-    <button type="submit" class="btn btn-success">Verify OTP</button>
-  </form>
-  <div class="mt-3 text-center">
-    <p>Didn't receive OTP? <a href="#">Resend OTP</a></p>
-  </div>
- 
 </div>
+
+<script>
+    let countdown = 45; // Initial countdown value in seconds
+    let timerElement = document.getElementById("timer");
+    let resendButton = document.getElementById("resendButton");
+    let countdownInterval;
+
+    // Function to update the countdown timer
+    function updateTimer() {
+        timerElement.textContent = countdown + " seconds";
+        countdown--;
+        resendButton.disabled = true;
+        if (countdown < 0) {
+            clearInterval(countdownInterval);
+            timerElement.textContent = "0 seconds";
+            resendButton.disabled = false;
+        }
+    }
+
+    // Function to resend OTP
+    function resendOTP() {
+        // Reset the timer
+        countdown = 45;
+        timerElement.textContent = countdown + " seconds";
+        resendButton.disabled = true;
+
+        // Start the countdown again
+        countdownInterval = setInterval(updateTimer, 1000);
+    }
+
+    // Initial countdown start
+    countdownInterval = setInterval(updateTimer, 1000);
+</script>
 
 <%- include('../layouts/footer.ejs') %>

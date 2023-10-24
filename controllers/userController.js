@@ -3,7 +3,9 @@ const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 const Wishlist = require("../models/wishlistModel");
 const bcrypt = require("bcrypt");
+const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
+const randomstring = require("randomstring");
 
 const securePassword = async (password) => {
     try {
@@ -52,11 +54,19 @@ const loadOtpPage = async (req, res) => {
 const verifyOtp = async (req, res) => {
     try {
         console.log("fbhjgdahfj");
-        // setting otp date and time
-        const otpCode = generateOTP();
+
+        const otpCode = otpGenerator.generate(6, {
+            digits: true,
+            alphabets: false,
+            specialChars: false,
+            upperCaseAlphabets: false,
+            lowerCaseAlphabets: false,
+        });
+
         console.log(otpCode);
-        const otpExpiry = new Date();
-        otpExpiry.setMinutes(otpExpiry.getMinutes() + 10); // OTP expires in 10 minutes
+
+        const otpcurTime = Date.now() / 1000;
+        const otpExpiry = otpcurTime + 45;
 
         const userCheck = await User.findOne({ email: req.body.email });
         if (userCheck) {
@@ -104,6 +114,38 @@ const loadRegister = async (req, res) => {
 //otp genarating
 const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+//------Resend OTP
+
+const resendOtp = async (req, res) => {
+    try {
+        const currentTime = Date.now() / 1000;
+        console.log("current", currentTime);
+        if (req.session.otp.expiry != null) {
+            if (currentTime > req.session.otp.expiry) {
+                console.log("expire", req.session.otp.expiry);
+                const newDigit = otpGenerator.generate(6, {
+                    digits: true,
+                    alphabets: false,
+                    specialChars: false,
+                    upperCaseAlphabets: false,
+                    lowerCaseAlphabets: false,
+                });
+                req.session.otp.code = newDigit;
+                const newExpiry = currentTime + 45;
+                req.session.otp.expiry = newExpiry;
+                sendVerifyMail(req.session.email, req.session.otp.code);
+                res.render("otp", { message: "OTP has been send to your emaiil" });
+            } else {
+                res.render("otp", { message: "You can request a new otp after old otp expires" });
+            }
+        } else {
+            res.send("Please register again");
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
 };
 
 ///-----Inserting user details in sign up page============
@@ -194,6 +236,105 @@ const verifyLogin = async (req, res) => {
 const loadOtp = async (req, res) => {
     try {
         res.render("otp");
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
+//===========Forgot Password===========////
+
+const loadForgotPassword = async (req, res) => {
+    try {
+        res.render("forgotPassword");
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
+const resetPasswordMail = async (first_name, last_name, email, token) => {
+    try {
+        const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            requireTLS: true,
+            auth: {
+                user: "thahirmuhammedap@gmail.com",
+                pass: "hpey gbkn ncbk yrju",
+            },
+        });
+
+        const mailOptions = {
+            from: "thahirmuhammedap@gmail.com",
+            to: email,
+            subject: "For Reset Password",
+            html: `<p> Hi, ${first_name} ${last_name}, please click here to <a href="http://127.0.0.1:8080/changePassword?token=${token}"> Reset </a> your password</p>`,
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email has been sent:-", info.response);
+            }
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
+const forgotVerify = async (req, res) => {
+    try {
+        const email = req.body.email;
+        const userData = await User.findOne({ email: email });
+        console.log(userData);
+
+        if (userData) {
+            if (userData.is_verified === 0) {
+                res.render("forgotPassword", { message: "Please verify your mail" });
+            } else {
+                const randomString = randomstring.generate();
+                console.log(randomString);
+
+                const updatedData = await User.updateOne({ email: email }, { $set: { token: randomString } });
+                console.log(updatedData);
+
+                resetPasswordMail(userData.first_name, userData.last_name, userData.email, randomString);
+
+                res.render("forgotPassword", { message: "Please check your mail to reset your password" });
+            }
+        } else {
+            res.render("forgotPassword");
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
+const loadChangePassword = async (req, res) => {
+    try {
+        const token = req.query.token;
+        const tokenData = await User.findOne({ token: token });
+
+        if (tokenData) {
+            res.render("changePassword", { user_id: tokenData._id });
+        } else {
+            res.render("404", { message: "Token is invalid" });
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
+const updatePassword = async (req, res) => {
+    try {
+        const password = req.body.password;
+        const user_id = req.body.user_id;
+
+        const spassword = await securePassword(password);
+
+        const updatedData = await User.findByIdAndUpdate({ _id: user_id }, { $set: { password: spassword, token: "" } });
+
+        res.render("login", { message: "Password Updated Successfully" });
     } catch (error) {
         console.log(error.message);
     }
@@ -447,19 +588,14 @@ const addToCart = async (req, res) => {
 
 //---------Rendering about page-----------///
 
-const loadAbout = async(req, res) => {
-
-  try{
-
-    res.render('about');
-
-  }catch(error){
-    console.log(error.message);
-    res.status(500).send("Internal Server Error");
-  }
-
-
-}
+const loadAbout = async (req, res) => {
+    try {
+        res.render("about");
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+};
 
 module.exports = {
     loadRegister,
@@ -469,8 +605,13 @@ module.exports = {
     loadOtp,
     sendVerifyMail,
     verifyOtp,
+    resendOtp,
     login,
     loadOtpPage,
+    loadForgotPassword,
+    forgotVerify,
+    loadChangePassword,
+    updatePassword,
     loadShop,
     loadUser,
     loadEditUser,
@@ -480,7 +621,7 @@ module.exports = {
     addToWishlist,
     loadCart,
     addToCart,
-    loadAbout
+    loadAbout,
     // calculateSubtotal,
     // calculateTotal
 };

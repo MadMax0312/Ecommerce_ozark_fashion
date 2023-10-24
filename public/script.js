@@ -14,6 +14,14 @@ function validateForm() {
   // Regular expression for email validation with optional '@' symbol
   const emailRegex = /^[^\s@]+(@[^\s@]+\.[^\s@]+)?$/;
 
+  if (!email && !name1 && !password && !mobile) {
+    document.getElementById('email-error').textContent = 'Email field should not be empty';
+    document.getElementById('name1-error').textContent = 'Name field should not be empty';
+    document.getElementById('password-error').textContent = 'Password field should not be empty';
+    document.getElementById('mobile-error').textContent = 'Mobile field should not be empty';
+    return false;
+}
+
   if (!email) {
       document.getElementById('email-error').textContent = 'Email field should not be empty';
       return false;

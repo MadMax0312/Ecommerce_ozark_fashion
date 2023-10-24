@@ -28,10 +28,21 @@ user_route.get('/register',userController.loadRegister);
 user_route.post('/register',userController.verifyOtp);
 
 user_route.get('/otp',userController.loadOtpPage);
+
+user_route.get('/resendOtp', userController.resendOtp);
+
 user_route.post('/otp',userController.insertUser);
 
 user_route.get('/login', auth.isLogout, userController.loginLoad);
 user_route.post('/login',userController.verifyLogin);
+
+user_route.get('/forgotPassword', userController.loadForgotPassword);
+
+user_route.post('/forgotPassword', userController.forgotVerify); 
+
+user_route.get('/changePassword', userController.loadChangePassword);
+
+user_route.post('/changePassword', userController.updatePassword);
 
 user_route.get('/',userController.login);
 

@@ -1,45 +1,77 @@
 <%- include('../layouts/header.ejs') %>
 
+<style>
+  .container {
+      max-height: 100%;
+      height: 100%;
+      padding: 0 15px;
+      margin: 0 auto;
+      margin-top: 30px;
+  }
+
+  .form-group {
+      margin-bottom: 10px;
+  }
+
+  .form-control {
+      width: 100%;
+      height: 33px;
+      box-sizing: border-box;
+  }
+
+  .error-message {
+      color: red;
+  }
+</style>
+
 <div class="container">
-  <h2 class="mb-4 text-center"><strong>Registration</strong></h2>
-  <form action="/register" method="POST" onsubmit="return validateForm()">
-    <div class="form-group">
-      <input type="text" class="form-control" name="firstname" id="name1" placeholder="First Name" required>
-      <p id="name1-error" class="error-message"></p>
+    <h2 class="mb-4 text-center" style="margin: 0;"><strong>Registration</strong></h2>
+
+    <% if(typeof message !== 'undefined'){ %>
+
+    <h6 id="invalid-msg" class="text-danger text-center"><%- message %></h6>
+
+    <% } %>
+
+    <form action="/register" method="POST" onsubmit="return validateForm()">
+        <div class="form-group">
+            <input type="text" class="form-control" name="firstname" id="name1" placeholder="First Name" />
+            <span id="name1-error" class="error-message"></span>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="lastname" id="name2" placeholder="Last Name" />
+            <span id="name2-error" class="error-message"></span>
+        </div>
+        <div class="form-group">
+            <input type="email" class="form-control" name="email" id="email" placeholder="Email" />
+            <p id="email-error" class="error-message"></p>
+        </div>
+        <div class="form-group">
+            <input type="mno" class="form-control" name="mno" id="mobile" placeholder="Mobile Number"  />
+            <p id="mobile-error" class="error-message"></p>
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password"  />
+            <p id="password-error" class="error-message"></p>
+        </div>
+        <div class="form-group">
+            <input
+                type="password"
+                class="form-control"
+                id="cpassword"
+                name="cpassword"
+                placeholder="Confirm Password"
+            />
+            <span id="password-error" class="error-message"></span>
+        </div>
+        <div id="password-mismatch" class="alert alert-danger mt-3" style="display: none">
+            Passwords do not match. Please try again.
+        </div>
+        <button type="submit" class="btn btn-success">Register</button>
+    </form>
+    <div class="mt-3 text-center">
+        <p>Already Registered? <a href="/login">Login Here</a></p>
     </div>
-    <div class="form-group">
-      <input type="text" class="form-control" name="lastname" id="name2" placeholder="Last Name" required>
-      <p id="name2-error" class="error-message"></p>
-    </div>
-    <div class="form-group">
-      <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
-      <p id="email-error" class="error-message"></p>
-    </div>
-    <div class="form-group">
-      <input type="mno" class="form-control" name="mno" id="mobile" placeholder="Mobile Number" required>
-      <p id="mobile-error" class="error-message"></p>
-    </div>
-    <div class="form-group">
-      <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-      <p id="password-error" class="error-message"></p>
-    </div>
-    <div class="form-group">
-      <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Confirm Password" required>
-      <p id="password-error" class="error-message"></p>
-    </div>
-    <div id="password-mismatch" class="alert alert-danger mt-3" style="display: none;">
-      Passwords do not match. Please try again.
-    </div>
-    <button type="submit" class="btn btn-success">Register</button>
-  </form>
-  <div class="mt-3 text-center">
-    <p>Already Registered? <a href="/login">Login Here</a></p>
-  </div>
-  <% if (typeof message !== 'undefined') { %>
-    <div id="success-msg" class="alert alert-success text-center mt-3">
-      <%- message %>
-    </div>
-  <% } %>
 </div>
 
 <%- include('../layouts/footer.ejs') %>
