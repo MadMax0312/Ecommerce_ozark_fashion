@@ -23,6 +23,8 @@ user_route.use(express.json());
 user_route.use(express.urlencoded({extended:true}));
 
 const userController = require("../controllers/userController");
+const wishlistController = require("../controllers/wishlistController");
+const cartController = require("../controllers/cartController");
 
 user_route.get('/register',userController.loadRegister);
 user_route.post('/register',userController.verifyOtp);
@@ -56,11 +58,11 @@ user_route.post('/userProfile-Edit', userController.updateProfile);
 
 user_route.get('/product-info', userController.loadProductInfo);
 
-user_route.get('/wishlist', userController.loadWishlist);
+user_route.get('/wishlist', wishlistController.loadWishlist);
 
-user_route.post('addToWishlist', userController.addToWishlist);
+user_route.post('/addToWishlist', wishlistController.addToWishlist);
 
-user_route.get('/cart', auth.isLogin, userController.loadCart);
+user_route.get('/cart', cartController.loadCart);
 
 user_route.post('/addToCart', userController.addToCart);
 

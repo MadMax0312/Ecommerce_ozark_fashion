@@ -8,7 +8,7 @@
   <div class="bg-light py-3">
     <div class="container">
       <div class="row">
-        <div class="col-md-12 mb-0"><a href="index.html">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Cart</strong></div>
+        <div class="col-md-12 mb-0"><a href="/">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Cart</strong></div>
       </div>
     </div>
   </div>
@@ -31,30 +31,30 @@
               </thead>
               <tbody>
 
-                <% if (Product.length > 0) {
-                  for (let i = 0; i < Product.length; i++) { %>
+                <% if (data.length > 0) {
+                  for (let i = 0; i < data.length; i++) { %>
 
                 <tr>
                   <td class="product-thumbnail">
-                    <img src="/static/Assets/images/<%= Product[i].image %>" alt="ProductImage" style="width: 100px; height: 100px; border: none; border-radius: 0;" class="image-fluid">
+                    <img src="/static/admin/Assets/images/products/<%= data[i].product.image %>" alt="ProductImage" style="width: 100px; height: 100px; border: none; border-radius: 0;" class="image-fluid">
                   </td>
                   <td class="product-name">
-                    <%= Product[i].productname %>
+                    <%= data[i].product.productname %>
                   </td>
-                  <td><%= Product[i].price %></td>
+                  <td><%= data[i].product.price %></td>
                   <td>
                     <div class="input-group mb-3" style="max-width: 120px;">
                       <div class="input-group-prepend">
                         <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
                       </div>
-                      <input type="text" class="form-control text-center quantity-input" value="<%= Product[i].quantity %>" data-product-id="<%= Product[i]._id %>" aria-label="Quantity" aria-describedby="button-addon1">
+                      <input type="text" class="form-control text-center quantity-input" value="<%= data[i].product.quantity %>" data-product-id="<%= data[i]._id %>" aria-label="Quantity" aria-describedby="button-addon1">
                       <div class="input-group-append">
                         <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
                       </div>
                     </div>
 
                   </td>
-                  <td><%= Product[i].quantity * Product[i].price %></td>
+                  <td><%= data[i].product.quantity * data[i].product.price %></td>
                   <td><a href="#" class="btn btn-primary btn-sm">X</a></td>
                 </tr>
 

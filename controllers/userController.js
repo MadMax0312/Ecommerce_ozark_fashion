@@ -354,7 +354,7 @@ const loadShop = async (req, res) => {
             page = parseInt(req.query.page);
         }
 
-        const limit = 3;
+        const limit = 6;
 
         let sortOption = {};
         if (req.query.sort === "price_low_to_high") {
@@ -496,42 +496,6 @@ const loadProductInfo = async (req, res) => {
     }
 };
 
-////--------------Rendering wishlist=========////
-
-const loadWishlist = async (req, res) => {
-    try {
-        const id = req.query.id;
-        const product = await Product.findById(id);
-
-        res.render("wishlist", { Product: product });
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
-    }
-};
-
-//---------Adding products to wishlist---------//
-
-const addToWishlist = async (req, res) => {
-    try {
-        const productId = req.query.id;
-        const product = await Product.findById(productId);
-
-        let wishItem = await Wishlist.findOne({ product: productId });
-
-        if (!wishItem) {
-            wishItem = new Wishlist({
-                product: product._id,
-            });
-        }
-
-        await wishItem.save();
-        res.redirect("/product-info");
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
-    }
-};
 
 //========== Rendering cart ==========//
 
@@ -617,8 +581,6 @@ module.exports = {
     loadEditUser,
     updateProfile,
     loadProductInfo,
-    loadWishlist,
-    addToWishlist,
     loadCart,
     addToCart,
     loadAbout,

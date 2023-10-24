@@ -8,6 +8,7 @@ const cartSchema = new mongoose.Schema({
   },
   quantity: {
     type: Number,
+    required: true,
     default: 1, // Default quantity is 1 when a new item is added to the cart
   },
 });

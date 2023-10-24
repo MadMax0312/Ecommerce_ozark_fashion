@@ -4,6 +4,7 @@ const productSchema = new mongoose.Schema({
   productname: {
     type: String,
     required: true,
+    trim: true
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,

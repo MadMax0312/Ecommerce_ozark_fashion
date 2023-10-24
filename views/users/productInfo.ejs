@@ -83,6 +83,7 @@
                                 type="text"
                                 class="form-control text-center"
                                 name="quantity"
+                                id="quantityInput"
                                 value="1"
                                 placeholder="1"
                                 aria-label="Example text with button addon"
@@ -95,21 +96,19 @@
                     </div>
 
                     <p>
-                        <a
-                            href="/addToWishlist?id=<%= Product._id %>"
-                            class="buy-now btn btn-sm"
+                        <a href="#" class="addToWishlistBtn buy-now btn btn-sm" id="cool"
                             style="color: white; background-color: orange; border-radius: 20px"
-                            >Add to Wishlist</a
-                        >
+                            data-product-id="<%= Product._id %>">Add to Wishlist</a>
                     </p>
 
                     <p>
                         <a
-                            href="/addToCart?id=<%= Product._id %>"
-                            class="buy-now btn btn-sm"
-                            style="background-color: rgb(255, 255, 55); color: black; border-radius: 20px"
-                            >Add To Cart</a
-                        >
+                            href="#"
+                            class="addToCartBtn buy-now btn btn-sm" id="hot"
+                            style="background-color: rgb(52, 186, 47); color: black; border-radius: 20px"
+                            data-product-id="<%= Product._id %>">
+                            Add To Cart</a>
+                        
                     </p>
 
                     <p>
@@ -162,34 +161,97 @@
     </div>
 </div>
 
+<!-- Move this script block to the end of your HTML body, just before the closing </body> tag -->
 <script>
-    // Example using Fetch API for making a POST request
-    // Example using Fetch API for making a POST request
+
+    document.body.addEventListener("click", (event) => {
+        
+        console.log("ddfddfdf");
+        if (event.target.matches(".addToWishlistBtn")) {
+            
+            const productId = document.getElementById('cool').getAttribute('data-product-id');
+            console.log("Product ID:", productId);
+            if (productId) {
+                addToWishlist(productId);
+            } else {
+                console.error("Product ID is undefined");
+            }
+        }
+    });
+
+    function addToWishlist(productId) {
+        fetch("/addToWishlist?id=" + productId, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: productId }),
+        })
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error("Network response was not ok: " + response.statusText);
+        })
+        .then((data) => {
+            console.log("Product added to wishlist successfully:", data);
+            // You can update your UI or show a success message to the user here
+        })
+        .catch((error) => {
+            console.error("There was a problem with the fetch operation:", error);
+            // Handle errors, e.g., show an error message to the user
+        });
+    }
+
+    document.body.addEventListener("click", (event) => {
+        console.log("kkkkkkkkkkkkk");
+    if (event.target.matches(".addToCartBtn")) {
+        console.log("redddddd");
+        const productId = document.getElementById('hot').getAttribute('data-product-id');
+        const quantityInput = document.getElementById('quantityInput');
+        const quantity = parseInt(quantityInput.value, 10); // Parse the input value to an integer
+        console.log(quantity);
+
+        if (!isNaN(quantity) && quantity > 0) {
+            console.log("enter");
+            addToCart(productId, quantity);
+        } else {
+            console.error("Invalid quantity");
+            // Optionally, show an error message to the user
+        }
+    }
+});
+
+function addToCart(productId, quantity) {
     fetch("/addToCart?id=" + productId, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ quantity: desiredQuantity }),
+        body: JSON.stringify({ id: productId, quantity: quantity }), 
     })
-        .then((response) => {
-            if (response.ok) {
-                // If the response is successful (HTTP status code 200-299)
-                return response.json(); // Parse the JSON data returned by the server
-            }
-            throw new Error("Network response was not ok: " + response.statusText); // Handle HTTP errors
-        })
-        .then((data) => {
-            // Handle the response data from the server
-            // For example, you can show a success message to the user
-            console.log("Cart updated successfully:", data);
-            // You can update your UI or show a success message to the user here
-        })
-        .catch((error) => {
-            // Handle errors, e.g., show an error message to the user
-            console.error("There was a problem with the fetch operation:", error);
-            // You can update your UI or show an error message to the user here
-        });
+    .then((response) => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error("Network response was not ok: " + response.statusText);
+    })
+    .then((data) => {
+        console.log("Product added to cart successfully:", data);
+        // Optionally, you can update your UI to reflect the changes in the cart, e.g., update total price, display success message, etc.
+    })
+    .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+        // Handle errors, e.g., show an error message to the user
+    });
+}
+
+
+
+
+
 </script>
+
+
 
 <%- include('../userLayouts/footer.ejs') %>
