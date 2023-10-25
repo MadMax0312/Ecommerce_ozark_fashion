@@ -1,55 +1,70 @@
-<%- include('../userLayouts/header.ejs') %>
-<%- include('../userLayouts/navbar.ejs') %>
+<%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
 <div class="site-wrap">
-
-  <div class="bg-light py-3">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12 mb-0"><a href="/">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Wishlist</strong></div>
-      </div>
-    </div>
-  </div>  
-
-  <div class="site-section">
-    <div class="container">
-      <div class="row mb-5">
-        <div class="col-md-12 order-2">
-
-          <div class="row">
-            <% if (data.length > 0) {
-              for (let i = 0; i < data.length; i++) { %>
-                <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
-                  <div class="block-4 text-center border">
-                    <figure class="block-4-image">
-                      <a href="/product-info?id=<%= data[i].product._id %>">
-                        <img src="/static/admin/Assets/images/products/<%= data[i].product.image[0] %>" alt="Product Image" class="img-fluid">
-                      </a>
-                    </figure>
-                    <div class="block-4-text p-4" style="height: 200px;">
-                      <h3><a href="#" style="color: gray;"><%= data[i].product.productname %></a></h3>
-                  
-                      <p class="text-black font-weight-semibold"><%= data[i].product.description %></p>
-                      <p class="text-black font-weight-semibold" style="margin: 0;">₹<%= data[i].product.price %></p>
-                      <p style="margin: 0;"><a href="/addToCart?id=<%= data[i]._id %>" class="buy-now btn btn-sm" style="background-color: white; color: blue; padding-bottom: 0;">Add To Cart</a></p>
-                      <p style="margin: 0; height: 35px;"><a href="/remove-wishlist?id=<%= data[i]._id %>" class="buy-now btn btn-sm" style="background-color: white; color: red; height: 35px; border: none;">Remove</a></p>
-                      
-                    </div>
-                  </div>
+    <div class="bg-light py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 mb-0">
+                    <a href="/">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Wishlist</strong>
                 </div>
-            <% }
-            } else { %>
-              <div class="col-12">
-                <p class="text-center">No products available.</p>
-              </div>
-            <% } %>
-          </div>
-
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 
+    <div class="site-section">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-md-12 order-2">
+                    <div class="row">
+                        <% if (data.length > 0) { for (let i = 0; i < data.length; i++) { const products = data[i].product;
+                        %>
+                        <!-- Loop through products in the wishlist -->
+                        <% products.forEach(product => { %>
+                        <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
+                            <div class="block-4 text-center border">
+                                <figure class="block-4-image">
+                                    <a href="/product-info?id=<%= product._id %>">
+                                        <img
+                                            src="/static/admin/Assets/images/products/<%= product.image?.[0] %>"
+                                            alt="Product Image"
+                                            class="img-fluid"
+                                        />
+                                    </a>
+                                </figure>
+                                <div class="block-4-text p-4" style="height: 200px">
+                                    <h3><a href="#" style="color: gray"><%= product.productname %></a></h3>
+                                    <p class="text-black font-weight-semibold"><%= product.description %></p>
+                                    <p class="text-black font-weight-semibold" style="margin: 0">₹<%= product.price %></p>
+                                    <p style="margin: 0">
+                                        <a
+                                            href="/addToCart?id=<%= product._id %>"
+                                            class="buy-now btn btn-sm"
+                                            style="background-color: white; color: blue; padding-bottom: 0"
+                                            >Add To Cart</a
+                                        >
+                                    </p>
+                                    <p style="margin: 0; height: 35px">
+                                        <a
+                                            href="/remove-wishlist?wishlistId=<%= data[i]._id %>&productId=<%= data[i].product[0]._id %>"
+                                            class="buy-now btn btn-sm"
+                                            style="background-color: white; color: red; height: 35px; border: none"
+                                        >
+                                            Remove
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %> <% } } else { %>
+                        <div class="col-12">
+                            <p class="text-center">No products available.</p>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../userLayouts/footer.ejs') %>
 </div>
-
-<%- include('../userLayouts/footer.ejs') %>

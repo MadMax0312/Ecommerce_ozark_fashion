@@ -12,40 +12,42 @@
         </div>
     </div>
 
-    
-
     <div class="site-section">
         <div class="container">
             <div class="row">
-
-
-              <div class="col-md-6">
-    <div id="imageCarousel" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner">
-            <% if (Product && Product.image && Product.image.length > 0) {
-                Product.image.forEach((data, index) => { %>
-                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                        <img src="/static/admin/Assets/images/products/<%= data %>" class="d-block w-100" alt="Image">
+                <div class="col-md-6">
+                    <div id="imageCarousel" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <% if (Product && Product.image && Product.image.length > 0) { Product.image.forEach((data,
+                            index) => { %>
+                            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                <img
+                                    src="/static/admin/Assets/images/products/<%= data %>"
+                                    class="d-block w-100"
+                                    alt="Image"
+                                />
+                            </div>
+                            <% }); } else { %>
+                            <div class="carousel-item active">
+                                <img
+                                    src="/static/admin/Assets/images/products/<%= data %>"
+                                    class="d-block w-100"
+                                    alt="Placeholder Image"
+                                />
+                            </div>
+                            <% } %>
+                        </div>
+                        <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
                     </div>
-                <% });
-            } else { %>
-                <div class="carousel-item active">
-                    <img src="/static/admin/Assets/images/products/<%= data %>" class="d-block w-100" alt="Placeholder Image">
                 </div>
-            <% } %>
-        </div>
-        <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-        </a>
-    </div>
-</div>
 
-                
                 <div class="col-md-6">
                     <h2 class="text-black"><%= Product.productname %></h2>
                     <p><%= Product.description %></p>
@@ -77,9 +79,7 @@
                         </label>
                     </div>
 
-
                     <div id="wishlistMessage" class="alert" role="alert"></div>
-
 
                     <div class="mb-5">
                         <div class="input-group mb-3" style="max-width: 120px">
@@ -102,27 +102,27 @@
                         </div>
                     </div>
 
-
-
-                   
-
-                 
-
                     <p>
-                        <a href="#" class="addToWishlistBtn buy-now btn btn-sm" id="cool"
+                        <a
+                            href="#"
+                            class="addToWishlistBtn buy-now btn btn-sm"
+                            id="cool"
                             style="color: white; background-color: orange; border-radius: 20px"
-                            data-product-id="<%= Product._id %>">Add to Wishlist</a>
+                            data-product-id="<%= Product._id %>"
+                            >Add to Wishlist</a
+                        >
                     </p>
 
                     <p>
                         <a
                             href="#"
-                            class="addToCartBtn buy-now btn btn-sm" id="hot"
+                            class="addToCartBtn buy-now btn btn-sm"
+                            id="hot"
                             style="background-color: rgb(52, 186, 47); color: black; border-radius: 20px"
-                            data-product-id="<%= Product._id %>">
+                            data-product-id="<%= Product._id %>"
+                        >
                             Add To Cart
                         </a>
-                        
                     </p>
 
                     <p>
@@ -143,144 +143,128 @@
                 </div>
             </div>
 
-
             <div class="row">
                 <div class="col-md-12">
                     <div class="nonloop-block-3 owl-carousel">
-                        <% if (data.length > 0) { 
-                            for (let i = 0; i < Math.min(data.length, 5); i++) { %>
-                                <div class="item">
-                                    <div class="block-4 text-center">
-                                        <figure class="block-4-image">
-                                            <img
-                                                src="/static/admin/Assets/images/products/<%= data[i].image[0] %>"
-                                                alt="Image placeholder"
-                                                class="img-fluid"
-                                            />
-                                        </figure>
-                                        <div class="block-4-text p-4">
-                                            <h3><a href="#"><%= data[i].productname %></a></h3>
-                                            <p class="mb-0">Finding perfect t-shirt</p>
-                                            <p class="text-primary font-weight-bold">₹<%= data[i].price %></p>
-                                        </div>
-                                    </div>
+                        <% if (data.length > 0) { for (let i = 0; i < Math.min(data.length, 5); i++) { %>
+                        <div class="item">
+                            <div class="block-4 text-center">
+                                <figure class="block-4-image">
+                                    <img
+                                        src="/static/admin/Assets/images/products/<%= data[i].image[0] %>"
+                                        alt="Image placeholder"
+                                        class="img-fluid"
+                                    />
+                                </figure>
+                                <div class="block-4-text p-4">
+                                    <h3><a href="#"><%= data[i].productname %></a></h3>
+                                    <p class="mb-0">Finding perfect t-shirt</p>
+                                    <p class="text-primary font-weight-bold">₹<%= data[i].price %></p>
                                 </div>
-                            <% } 
-                        } %>
+                            </div>
+                        </div>
+                        <% } } %>
                     </div>
                 </div>
             </div>
-            
         </div>
     </div>
 </div>
 
 <!-- Move this script block to the end of your HTML body, just before the closing </body> tag -->
 <script>
+    var clicked = true;
 
-var clicked = true;
+    document.body.addEventListener("click", async (event) => {
+        if (event.target.matches(".addToWishlistBtn")) {
+            const productId = event.target.getAttribute("data-product-id");
+            const messageElement = document.getElementById("wishlistMessage");
 
-document.body.addEventListener("click", async (event) => {
-    if (event.target.matches(".addToWishlistBtn")) {
-        const productId = event.target.getAttribute('data-product-id');
-        const messageElement = document.getElementById("wishlistMessage");
+            try {
+                const response = await fetch("/addToWishlist?id=" + productId, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id: productId }),
+                });
 
-        try {
-            const response = await fetch("/addToWishlist?id=" + productId, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ id: productId }),
-            });
+                const data = await response.json();
 
-            const data = await response.json();
+                if (response.ok) {
+                    // If the response contains a 'message' property, display it in the div
+                    messageElement.textContent = data.message;
+                    messageElement.className = "alert alert-success"; // Use appropriate class for styling
+                } else {
+                    // Handle the case when there is no message in the response
+                    messageElement.textContent =
+                        data.error || "An error occurred while adding the product to the wishlist.";
+                    messageElement.className = "alert alert-danger";
+                }
 
-            if (response.ok) {
-                // If the response contains a 'message' property, display it in the div
-                messageElement.textContent = data.message;
-                messageElement.className = "alert alert-success"; // Use appropriate class for styling
-            } else {
-                // Handle the case when there is no message in the response
-                messageElement.textContent = data.error || "An error occurred while adding the product to the wishlist.";
+                setTimeout(() => {
+                    messageElement.remove();
+                }, 3000);
+
+                // Refresh the page content after successful wishlist update (optional)
+                if (response.ok) {
+                    // You can reload the page or update the UI based on your requirements
+                    // For example, you can update the wishlist count or any other relevant information.
+                    // window.location.reload();
+                }
+            } catch (error) {
+                messageElement.textContent = "An error occurred while adding the product to the wishlist.";
                 messageElement.className = "alert alert-danger";
+                setTimeout(() => {
+                    messageElement.remove();
+                }, 3000);
+                console.error("There was a problem with the fetch operation:", error);
             }
-
-            setTimeout(() => {
-                messageElement.remove();
-            }, 3000);
-
-            // Refresh the page content after successful wishlist update (optional)
-            if (response.ok) {
-                // You can reload the page or update the UI based on your requirements
-                // For example, you can update the wishlist count or any other relevant information.
-                // window.location.reload();
-            }
-
-        } catch (error) {
-            messageElement.textContent = "An error occurred while adding the product to the wishlist.";
-            messageElement.className = "alert alert-danger";
-            setTimeout(() => {
-                messageElement.remove();
-            }, 3000);
-            console.error("There was a problem with the fetch operation:", error);
         }
-    }
-});
-
-
-
+    });
 
     document.body.addEventListener("click", (event) => {
         console.log("kkkkkkkkkkkkk");
-    if (event.target.matches(".addToCartBtn")) {
-        console.log("redddddd");
-        const productId = document.getElementById('hot').getAttribute('data-product-id');
-        const quantityInput = document.getElementById('quantityInput');
-        const quantity = parseInt(quantityInput.value, 10); // Parse the input value to an integer
-        console.log(quantity);
+        if (event.target.matches(".addToCartBtn")) {
+            console.log("redddddd");
+            const productId = document.getElementById("hot").getAttribute("data-product-id");
+            const quantityInput = document.getElementById("quantityInput");
+            const quantity = parseInt(quantityInput.value, 10); // Parse the input value to an integer
+            console.log(quantity);
 
-        if (!isNaN(quantity) && quantity > 0) {
-            console.log("enter");
-            addToCart(productId, quantity);
-        } else {
-            console.error("Invalid quantity");
-            // Optionally, show an error message to the user
+            if (!isNaN(quantity) && quantity > 0) {
+                console.log("enter");
+                addToCart(productId, quantity);
+            } else {
+                console.error("Invalid quantity");
+                // Optionally, show an error message to the user
+            }
         }
-    }
-});
-
-function addToCart(productId, quantity) {
-    fetch("/addToCart?id=" + productId, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: productId, quantity: quantity }), 
-        
-    })
-    .then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error("Network response was not ok: " + response.statusText);
-    })
-    .then((data) => {
-        console.log("Product added to cart successfully:", data);
-        // Optionally, you can update your UI to reflect the changes in the cart, e.g., update total price, display success message, etc.
-    })
-    .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
-        // Handle errors, e.g., show an error message to the user
     });
-}
 
-
-
-
-
+    function addToCart(productId, quantity) {
+        fetch("/addToCart?id=" + productId, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: productId, quantity: quantity }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error("Network response was not ok: " + response.statusText);
+            })
+            .then((data) => {
+                console.log("Product added to cart successfully:", data);
+                // Optionally, you can update your UI to reflect the changes in the cart, e.g., update total price, display success message, etc.
+            })
+            .catch((error) => {
+                console.error("There was a problem with the fetch operation:", error);
+                // Handle errors, e.g., show an error message to the user
+            });
+    }
 </script>
-
-
 
 <%- include('../userLayouts/footer.ejs') %>

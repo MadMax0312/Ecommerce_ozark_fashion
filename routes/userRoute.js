@@ -58,7 +58,7 @@ user_route.post('/userProfile-Edit', userController.updateProfile);
 
 user_route.get('/product-info', userController.loadProductInfo);
 
-user_route.get('/wishlist', wishlistController.loadWishlist);
+user_route.get('/wishlist', auth.isLogin, wishlistController.loadWishlist);
 
 user_route.post('/addToWishlist', wishlistController.addToWishlist);
 
