@@ -12,6 +12,8 @@
         </div>
     </div>
 
+    
+
     <div class="site-section">
         <div class="container">
             <div class="row">
@@ -74,6 +76,11 @@
                             <span class="d-inline-block text-black">Extra Large</span>
                         </label>
                     </div>
+
+
+                    <div id="wishlistMessage" class="alert" role="alert"></div>
+
+
                     <div class="mb-5">
                         <div class="input-group mb-3" style="max-width: 120px">
                             <div class="input-group-prepend">
@@ -95,6 +102,12 @@
                         </div>
                     </div>
 
+
+
+                   
+
+                 
+
                     <p>
                         <a href="#" class="addToWishlistBtn buy-now btn btn-sm" id="cool"
                             style="color: white; background-color: orange; border-radius: 20px"
@@ -107,7 +120,8 @@
                             class="addToCartBtn buy-now btn btn-sm" id="hot"
                             style="background-color: rgb(52, 186, 47); color: black; border-radius: 20px"
                             data-product-id="<%= Product._id %>">
-                            Add To Cart</a>
+                            Add To Cart
+                        </a>
                         
                     </p>
 
@@ -164,44 +178,58 @@
 <!-- Move this script block to the end of your HTML body, just before the closing </body> tag -->
 <script>
 
-    document.body.addEventListener("click", (event) => {
-        
-        console.log("ddfddfdf");
-        if (event.target.matches(".addToWishlistBtn")) {
-            
-            const productId = document.getElementById('cool').getAttribute('data-product-id');
-            console.log("Product ID:", productId);
-            if (productId) {
-                addToWishlist(productId);
-            } else {
-                console.error("Product ID is undefined");
-            }
-        }
-    });
+var clicked = true;
 
-    function addToWishlist(productId) {
-        fetch("/addToWishlist?id=" + productId, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: productId }),
-        })
-        .then((response) => {
+document.body.addEventListener("click", async (event) => {
+    if (event.target.matches(".addToWishlistBtn")) {
+        const productId = event.target.getAttribute('data-product-id');
+        const messageElement = document.getElementById("wishlistMessage");
+
+        try {
+            const response = await fetch("/addToWishlist?id=" + productId, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: productId }),
+            });
+
+            const data = await response.json();
+
             if (response.ok) {
-                return response.json();
+                // If the response contains a 'message' property, display it in the div
+                messageElement.textContent = data.message;
+                messageElement.className = "alert alert-success"; // Use appropriate class for styling
+            } else {
+                // Handle the case when there is no message in the response
+                messageElement.textContent = data.error || "An error occurred while adding the product to the wishlist.";
+                messageElement.className = "alert alert-danger";
             }
-            throw new Error("Network response was not ok: " + response.statusText);
-        })
-        .then((data) => {
-            console.log("Product added to wishlist successfully:", data);
-            // You can update your UI or show a success message to the user here
-        })
-        .catch((error) => {
+
+            setTimeout(() => {
+                messageElement.remove();
+            }, 3000);
+
+            // Refresh the page content after successful wishlist update (optional)
+            if (response.ok) {
+                // You can reload the page or update the UI based on your requirements
+                // For example, you can update the wishlist count or any other relevant information.
+                // window.location.reload();
+            }
+
+        } catch (error) {
+            messageElement.textContent = "An error occurred while adding the product to the wishlist.";
+            messageElement.className = "alert alert-danger";
+            setTimeout(() => {
+                messageElement.remove();
+            }, 3000);
             console.error("There was a problem with the fetch operation:", error);
-            // Handle errors, e.g., show an error message to the user
-        });
+        }
     }
+});
+
+
+
 
     document.body.addEventListener("click", (event) => {
         console.log("kkkkkkkkkkkkk");
@@ -229,6 +257,7 @@ function addToCart(productId, quantity) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({ id: productId, quantity: quantity }), 
+        
     })
     .then((response) => {
         if (response.ok) {

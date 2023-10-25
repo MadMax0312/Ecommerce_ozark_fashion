@@ -22,16 +22,17 @@
                 <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
                   <div class="block-4 text-center border">
                     <figure class="block-4-image">
-                      <a href="/product-info?id=<%= data[i]._id %>">
+                      <a href="/product-info?id=<%= data[i].product._id %>">
                         <img src="/static/admin/Assets/images/products/<%= data[i].product.image[0] %>" alt="Product Image" class="img-fluid">
                       </a>
                     </figure>
-                    <div class="block-4-text p-4">
+                    <div class="block-4-text p-4" style="height: 200px;">
                       <h3><a href="#" style="color: gray;"><%= data[i].product.productname %></a></h3>
                   
                       <p class="text-black font-weight-semibold"><%= data[i].product.description %></p>
-                      <p class="text-black font-weight-semibold">₹<%= data[i].product.price %></p>
-                      <p><a href="/addToCart?id=<%= data._id %>" class="buy-now btn btn-sm" style="background-color: white; color: blue;">Add To Cart</a></p>
+                      <p class="text-black font-weight-semibold" style="margin: 0;">₹<%= data[i].product.price %></p>
+                      <p style="margin: 0;"><a href="/addToCart?id=<%= data[i]._id %>" class="buy-now btn btn-sm" style="background-color: white; color: blue; padding-bottom: 0;">Add To Cart</a></p>
+                      <p style="margin: 0; height: 35px;"><a href="/remove-wishlist?id=<%= data[i]._id %>" class="buy-now btn btn-sm" style="background-color: white; color: red; height: 35px; border: none;">Remove</a></p>
                       
                     </div>
                   </div>

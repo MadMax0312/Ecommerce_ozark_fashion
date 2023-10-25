@@ -3,7 +3,12 @@ const path = require("path");
 const session = require("express-session");
 const config = require("./config/config");
 
-mongoose.connect("mongodb://127.0.0.1:27017/Ozark_Fashion");
+mongoose.connect('mongodb://0.0.0.0:27017/Ozark_Fashion', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+
+
 
 const express = require("express")
 const app = express();

@@ -62,9 +62,11 @@ user_route.get('/wishlist', wishlistController.loadWishlist);
 
 user_route.post('/addToWishlist', wishlistController.addToWishlist);
 
+user_route.get('/remove-wishlist', wishlistController.removeProduct);
+
 user_route.get('/cart', cartController.loadCart);
 
-user_route.post('/addToCart', userController.addToCart);
+user_route.post('/addToCart', cartController.addToCart);
 
 user_route.get('/about', userController.loadAbout)
 

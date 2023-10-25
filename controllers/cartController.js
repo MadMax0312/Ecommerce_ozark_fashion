@@ -18,16 +18,19 @@ const addToCart = async (req, res) => {
         console.log("aaaaaa");
         const productId = req.body.id;
         console.log(productId);
-        const product = await Cart.findById(productId);
+        const product = await Product.findById(productId);
         console.log(product);
 
-        if (!product) {
-            return res.status(404).json({ error: "Product not found" });
-        }
+        // if (!product) {
+        //     return res.status(404).json({ error: "Product not found" });
+        // }
+        console.log("kkkkkkkk");
 
-        const quantity = req.body.quantity; // Retrieve quantity from the request body
+        const quantity = req.body.quantity;
+        console.log(quantity); // Retrieve quantity from the request body
 
         let cartItem = await Cart.findOne({ product: productId });
+        console.log(cartItem);
 
         if (!cartItem) {
             // If the product is already in the cart, update the quantity
@@ -48,6 +51,17 @@ const addToCart = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
+
+
+function calculateSubtotal(products) {
+    return products.reduce((total, product) => total + product.quantity * product.price, 0);
+}
+
+// Function to calculate total
+function calculateTotal(products) {
+    return calculateSubtotal(products);
+}
+
 
 module.exports = {
     loadCart,

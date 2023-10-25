@@ -36,7 +36,7 @@
 
                 <tr>
                   <td class="product-thumbnail">
-                    <img src="/static/admin/Assets/images/products/<%= data[i].product.image %>" alt="ProductImage" style="width: 100px; height: 100px; border: none; border-radius: 0;" class="image-fluid">
+                    <img src="/static/admin/Assets/images/products/<%= data[i].product.image[0] %>" alt="ProductImage" style="width: 100px; height: 100px; border: none; border-radius: 0;" class="image-fluid">
                   </td>
                   <td class="product-name">
                     <%= data[i].product.productname %>
@@ -47,14 +47,14 @@
                       <div class="input-group-prepend">
                         <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
                       </div>
-                      <input type="text" class="form-control text-center quantity-input" value="<%= data[i].product.quantity %>" data-product-id="<%= data[i]._id %>" aria-label="Quantity" aria-describedby="button-addon1">
+                      <input type="text" class="form-control text-center quantity-input" value="<%= data[i].quantity %>" data-product-id="<%= data[i]._id %>" aria-label="Quantity" aria-describedby="button-addon1">
                       <div class="input-group-append">
                         <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
                       </div>
                     </div>
 
                   </td>
-                  <td><%= data[i].product.quantity * data[i].product.price %></td>
+                  <td><%= data[i].quantity * data[i].product.price %></td>
                   <td><a href="#" class="btn btn-primary btn-sm">X</a></td>
                 </tr>
 

@@ -497,59 +497,6 @@ const loadProductInfo = async (req, res) => {
 };
 
 
-//========== Rendering cart ==========//
-
-function calculateSubtotal(products) {
-    return products.reduce((total, product) => total + product.quantity * product.price, 0);
-}
-
-// Function to calculate total
-function calculateTotal(products) {
-    return calculateSubtotal(products);
-}
-
-const loadCart = async (req, res) => {
-    try {
-        const cartItems = await Cart.find().populate("product");
-
-        const subtotal = calculateSubtotal(cartItems);
-        const total = calculateTotal(cartItems);
-
-        res.render("cart", { Product: cartItems });
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
-    }
-};
-
-const addToCart = async (req, res) => {
-    try {
-        const productId = req.query.id;
-        const product = await Product.findById(productId);
-        const quantity = req.body.quantity; // Retrieve quantity from the request body
-
-        let cartItem = await Cart.findOne({ product: productId });
-
-        if (cartItem) {
-            // If the product is already in the cart, update the quantity
-            cartItem.quantity += parseInt(quantity, 10);
-        } else {
-            // If the product is not in the cart, create a new cart item
-            cartItem = new Cart({
-                product: product,
-                quantity: parseInt(quantity, 10),
-            });
-        }
-
-        await cartItem.save();
-
-        res.redirect("/product-info");
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
-    }
-};
-
 //---------Rendering about page-----------///
 
 const loadAbout = async (req, res) => {
@@ -581,9 +528,5 @@ module.exports = {
     loadEditUser,
     updateProfile,
     loadProductInfo,
-    loadCart,
-    addToCart,
-    loadAbout,
-    // calculateSubtotal,
-    // calculateTotal
+    loadAbout
 };
