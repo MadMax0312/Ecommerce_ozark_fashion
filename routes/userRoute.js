@@ -64,7 +64,9 @@ user_route.post('/addToWishlist', wishlistController.addToWishlist);
 
 user_route.get('/remove-wishlist', wishlistController.removeProduct);
 
-user_route.get('/cart', cartController.loadCart);
+user_route.get('/remove-cart', cartController.removeProduct);
+
+user_route.get('/cart', auth.isLogin, cartController.loadCart);
 
 user_route.post('/addToCart', cartController.addToCart);
 

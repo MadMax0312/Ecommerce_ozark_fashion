@@ -4,53 +4,80 @@ const Cart = require("../models/cartModel");
 
 const loadCart = async (req, res) => {
     try {
-        const cartItems = await Cart.find().populate("product");
+        const user = req.session.user_id;
+        
+        // Query the Cart collection and populate the product field with actual product data
+        const cartItems = await Cart.find({ user_id: user }).populate('product');
 
-        res.render("cart", { data: cartItems });
+        let subtotal = 0;
+        if (cartItems.length > 0) {
+            subtotal = cartItems.reduce((total, cartItem) => {
+                const productTotalPrice = cartItem.product.reduce((itemTotal, product) => {
+                    const productPrice = product.price;
+                    const quantity = cartItem.quantity;
+                    return itemTotal + productPrice * quantity;
+                }, 0);
+
+                return total + productTotalPrice;
+            }, 0);
+        }
+
+        res.render('cart', { data: cartItems, subtotal: subtotal });
     } catch (error) {
         console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        res.status(500).send('Internal Server Error');
     }
 };
 
 const addToCart = async (req, res) => {
     try {
-        console.log("aaaaaa");
         const productId = req.body.id;
-        console.log(productId);
-        const product = await Product.findById(productId);
-        console.log(product);
-
-        // if (!product) {
-        //     return res.status(404).json({ error: "Product not found" });
-        // }
-        console.log("kkkkkkkk");
-
+        const user_id = req.session.user_id;
         const quantity = req.body.quantity;
-        console.log(quantity); // Retrieve quantity from the request body
 
-        let cartItem = await Cart.findOne({ product: productId });
-        console.log(cartItem);
+        let cartItem = await Cart.findOne({ user_id, product: productId });
 
         if (!cartItem) {
-            // If the product is already in the cart, update the quantity
+            // If the product is not in the cart, add it with the specified quantity
             cartItem = new Cart({
-                product: product,
+                user_id,
+                product: [productId], // Store product IDs in an array
                 quantity: parseInt(quantity, 10),
             });
             await cartItem.save();
 
-            return res.status(200).json({ message: "Product added to wishlist successfully" });
+            return res.status(200).json({ message: "Product added to cart successfully" });
         } else {
+            // If the product is already in the cart, update the quantity
             cartItem.quantity += parseInt(quantity, 10);
             await cartItem.save();
+
             return res.status(200).json({ message: "Product quantity updated in cart successfully" });
-        } 
+        }
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
     }
 };
+
+const removeProduct = async(req, res) => {
+    try{
+
+        const cartId = req.query.cartId;
+        const productId = req.query.productId;
+
+        const cart = await Cart.findById(cartId);
+
+        cart.product.pull(productId);
+
+        await cart.save();
+
+        res.redirect("/cart");
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
 
 
 function calculateSubtotal(products) {
@@ -66,4 +93,5 @@ function calculateTotal(products) {
 module.exports = {
     loadCart,
     addToCart,
+    removeProduct
 };

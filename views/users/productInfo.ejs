@@ -51,7 +51,7 @@
                 <div class="col-md-6">
                     <h2 class="text-black"><%= Product.productname %></h2>
                     <p><%= Product.description %></p>
-                    <p><strong class="text-primary h4">₹500.00</strong></p>
+                    <p><strong class="text-primary h4">₹<%= Product.price %></strong></p>
                     <div class="mb-1 d-flex">
                         <label for="option-sm" class="d-flex mr-3 mb-3">
                             <span class="d-inline-block mr-2" style="top: -2px; position: relative"
@@ -176,95 +176,107 @@
     var clicked = true;
 
     document.body.addEventListener("click", async (event) => {
-        if (event.target.matches(".addToWishlistBtn")) {
-            const productId = event.target.getAttribute("data-product-id");
-            const messageElement = document.getElementById("wishlistMessage");
+    if (event.target.matches(".addToWishlistBtn")) {
+        const productId = event.target.getAttribute("data-product-id");
+        const messageContainer = document.getElementById("wishlistMessage");
 
+        try {
+            const response = await fetch("/addToWishlist?id=" + productId, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: productId }),
+            });
+
+            const data = await response.json();
+            const messageElement = document.createElement("div");
+            messageElement.className = "alert";
+
+            if (response.ok) {
+                messageElement.classList.add("alert-success");
+                messageElement.textContent = data.message;
+            } else {
+                messageElement.classList.add("alert-danger");
+                messageElement.textContent = data.message || "An error occurred while adding the product to the wishlist.";
+            }
+
+            messageContainer.appendChild(messageElement);
+
+            setTimeout(() => {
+                messageElement.remove();
+            }, 3000);
+        } catch (error) {
+            const errorMessage = document.createElement("div");
+            errorMessage.className = "alert alert-danger";
+            errorMessage.textContent = "An error occurred while adding the product to the wishlist.";
+            messageContainer.appendChild(errorMessage);
+
+            setTimeout(() => {
+                errorMessage.remove();
+            }, 3000);
+
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    }
+});
+
+
+document.body.addEventListener("click", async (event) => {
+    if (event.target.matches(".addToCartBtn")) {
+        const productId = event.target.getAttribute("data-product-id");
+        const quantityInput = document.getElementById("quantityInput");
+        const quantity = parseInt(quantityInput.value, 10);
+
+        if (!isNaN(quantity) && quantity > 0) {
             try {
-                const response = await fetch("/addToWishlist?id=" + productId, {
+                const response = await fetch("/addToCart", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ id: productId }),
+                    body: JSON.stringify({ id: productId, quantity: quantity }),
                 });
 
                 const data = await response.json();
 
+                const messageContainer = document.getElementById("wishlistMessage");
+                const messageElement = document.createElement("div");
+                messageElement.className = "alert";
+
                 if (response.ok) {
-                    // If the response contains a 'message' property, display it in the div
+                    messageElement.classList.add("alert-success");
                     messageElement.textContent = data.message;
-                    messageElement.className = "alert alert-success"; // Use appropriate class for styling
                 } else {
-                    // Handle the case when there is no message in the response
-                    messageElement.textContent =
-                        data.error || "An error occurred while adding the product to the wishlist.";
-                    messageElement.className = "alert alert-danger";
+                    messageElement.classList.add("alert-danger");
+                    messageElement.textContent = data.message || "An error occurred while adding the product to the cart.";
                 }
+
+                messageContainer.appendChild(messageElement);
 
                 setTimeout(() => {
                     messageElement.remove();
                 }, 3000);
-
-                // Refresh the page content after successful wishlist update (optional)
-                if (response.ok) {
-                    // You can reload the page or update the UI based on your requirements
-                    // For example, you can update the wishlist count or any other relevant information.
-                    // window.location.reload();
-                }
             } catch (error) {
-                messageElement.textContent = "An error occurred while adding the product to the wishlist.";
-                messageElement.className = "alert alert-danger";
+                const messageContainer = document.getElementById("cartMessage");
+                const errorMessage = document.createElement("div");
+                errorMessage.className = "alert alert-danger";
+                errorMessage.textContent = "An error occurred while adding the product to the cart.";
+                messageContainer.appendChild(errorMessage);
+
                 setTimeout(() => {
-                    messageElement.remove();
+                    errorMessage.remove();
                 }, 3000);
+
                 console.error("There was a problem with the fetch operation:", error);
             }
+        } else {
+            console.error("Invalid quantity");
+            // Optionally, show an error message to the user
         }
-    });
-
-    document.body.addEventListener("click", (event) => {
-        console.log("kkkkkkkkkkkkk");
-        if (event.target.matches(".addToCartBtn")) {
-            console.log("redddddd");
-            const productId = document.getElementById("hot").getAttribute("data-product-id");
-            const quantityInput = document.getElementById("quantityInput");
-            const quantity = parseInt(quantityInput.value, 10); // Parse the input value to an integer
-            console.log(quantity);
-
-            if (!isNaN(quantity) && quantity > 0) {
-                console.log("enter");
-                addToCart(productId, quantity);
-            } else {
-                console.error("Invalid quantity");
-                // Optionally, show an error message to the user
-            }
-        }
-    });
-
-    function addToCart(productId, quantity) {
-        fetch("/addToCart?id=" + productId, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: productId, quantity: quantity }),
-        })
-            .then((response) => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok: " + response.statusText);
-            })
-            .then((data) => {
-                console.log("Product added to cart successfully:", data);
-                // Optionally, you can update your UI to reflect the changes in the cart, e.g., update total price, display success message, etc.
-            })
-            .catch((error) => {
-                console.error("There was a problem with the fetch operation:", error);
-                // Handle errors, e.g., show an error message to the user
-            });
     }
+});
+
 </script>
 
 <%- include('../userLayouts/footer.ejs') %>
