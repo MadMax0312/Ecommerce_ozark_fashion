@@ -178,6 +178,15 @@
                 }
             }
 
+            function updatePlusButtonStatus() {
+                const quantity = parseInt(input.value, 10);
+                if (quantity === 4 ) {
+                    plusButton.disabled = true;
+                } else {
+                    plusButton.disabled = false;
+                }
+            }
+
             minusButton.addEventListener("click", function () {
                 const quantity = parseInt(input.value, 10);
 
@@ -188,18 +197,21 @@
                     totalPriceElements[index].textContent = `₹ ${totalPrice.toFixed(2)}`;
                     updateSubtotal();
                     updateMinusButtonStatus();
+                    updatePlusButtonStatus();
                 }
             });
 
             plusButton.addEventListener("click", function () {
                 const quantity = parseInt(input.value, 10);
                 quantitys = quantity + 1;
+
                 handleQuantityUpdate(productID, quantitys, index);
 
                 const totalPrice = quantitys * productPrices[index];
                 totalPriceElements[index].textContent = `₹ ${totalPrice.toFixed(2)}`;
                 updateSubtotal();
                 updateMinusButtonStatus();
+                updatePlusButtonStatus();
             });
         });
 
