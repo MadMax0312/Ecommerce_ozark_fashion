@@ -18,7 +18,11 @@
                 <div class="col-6 col-md-4 order-3 order-md-3 text-right">
                     <div class="site-top-icons">
                         <ul>
-                            <li><a href="/login">Login</a></li>
+                            <% if (user) { %>
+                                <li><a href="/logout">Logout</a></li>
+                            <% } else { %>
+                                <li><a href="/login">Login</a></li>
+                            <% } %>
                             <li>
                                 <a href="/userProfile"><span class="icon icon-person"></span></a>
                             </li>

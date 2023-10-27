@@ -38,6 +38,8 @@ user_route.post('/otp',userController.insertUser);
 user_route.get('/login', auth.isLogout, userController.loginLoad);
 user_route.post('/login',userController.verifyLogin);
 
+user_route.get('/logout', userController.loadLogout);
+
 user_route.get('/forgotPassword', userController.loadForgotPassword);
 
 user_route.post('/forgotPassword', userController.forgotVerify); 
@@ -69,6 +71,8 @@ user_route.get('/remove-cart', cartController.removeProduct);
 user_route.get('/cart', auth.isLogin, cartController.loadCart);
 
 user_route.post('/addToCart', cartController.addToCart);
+
+user_route.post('/update-cart', cartController.updateCart);
 
 user_route.get('/about', userController.loadAbout)
 

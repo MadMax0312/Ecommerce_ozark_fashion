@@ -23,7 +23,7 @@
                             <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
                                 <img
                                     src="/static/admin/Assets/images/products/<%= data %>"
-                                    class="d-block w-100"
+                                    class="d-block w-1"
                                     alt="Image"
                                 />
                             </div>
@@ -176,71 +176,20 @@
     var clicked = true;
 
     document.body.addEventListener("click", async (event) => {
-    if (event.target.matches(".addToWishlistBtn")) {
-        const productId = event.target.getAttribute("data-product-id");
-        const messageContainer = document.getElementById("wishlistMessage");
+        if (event.target.matches(".addToWishlistBtn")) {
+            const productId = event.target.getAttribute("data-product-id");
+            const messageContainer = document.getElementById("wishlistMessage");
 
-        try {
-            const response = await fetch("/addToWishlist?id=" + productId, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ id: productId }),
-            });
-
-            const data = await response.json();
-            const messageElement = document.createElement("div");
-            messageElement.className = "alert";
-
-            if (response.ok) {
-                messageElement.classList.add("alert-success");
-                messageElement.textContent = data.message;
-            } else {
-                messageElement.classList.add("alert-danger");
-                messageElement.textContent = data.message || "An error occurred while adding the product to the wishlist.";
-            }
-
-            messageContainer.appendChild(messageElement);
-
-            setTimeout(() => {
-                messageElement.remove();
-            }, 3000);
-        } catch (error) {
-            const errorMessage = document.createElement("div");
-            errorMessage.className = "alert alert-danger";
-            errorMessage.textContent = "An error occurred while adding the product to the wishlist.";
-            messageContainer.appendChild(errorMessage);
-
-            setTimeout(() => {
-                errorMessage.remove();
-            }, 3000);
-
-            console.error("There was a problem with the fetch operation:", error);
-        }
-    }
-});
-
-
-document.body.addEventListener("click", async (event) => {
-    if (event.target.matches(".addToCartBtn")) {
-        const productId = event.target.getAttribute("data-product-id");
-        const quantityInput = document.getElementById("quantityInput");
-        const quantity = parseInt(quantityInput.value, 10);
-
-        if (!isNaN(quantity) && quantity > 0) {
             try {
-                const response = await fetch("/addToCart", {
+                const response = await fetch("/addToWishlist?id=" + productId, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ id: productId, quantity: quantity }),
+                    body: JSON.stringify({ id: productId }),
                 });
 
                 const data = await response.json();
-
-                const messageContainer = document.getElementById("wishlistMessage");
                 const messageElement = document.createElement("div");
                 messageElement.className = "alert";
 
@@ -249,7 +198,8 @@ document.body.addEventListener("click", async (event) => {
                     messageElement.textContent = data.message;
                 } else {
                     messageElement.classList.add("alert-danger");
-                    messageElement.textContent = data.message || "An error occurred while adding the product to the cart.";
+                    messageElement.textContent =
+                        data.message || "An error occurred while adding the product to the wishlist.";
                 }
 
                 messageContainer.appendChild(messageElement);
@@ -258,10 +208,9 @@ document.body.addEventListener("click", async (event) => {
                     messageElement.remove();
                 }, 3000);
             } catch (error) {
-                const messageContainer = document.getElementById("cartMessage");
                 const errorMessage = document.createElement("div");
                 errorMessage.className = "alert alert-danger";
-                errorMessage.textContent = "An error occurred while adding the product to the cart.";
+                errorMessage.textContent = "An error occurred while adding the product to the wishlist.";
                 messageContainer.appendChild(errorMessage);
 
                 setTimeout(() => {
@@ -270,13 +219,64 @@ document.body.addEventListener("click", async (event) => {
 
                 console.error("There was a problem with the fetch operation:", error);
             }
-        } else {
-            console.error("Invalid quantity");
-            // Optionally, show an error message to the user
         }
-    }
-});
+    });
 
+    document.body.addEventListener("click", async (event) => {
+        if (event.target.matches(".addToCartBtn")) {
+            const productId = event.target.getAttribute("data-product-id");
+            const quantityInput = document.getElementById("quantityInput");
+            const quantity = parseInt(quantityInput.value, 10);
+
+            if (!isNaN(quantity) && quantity > 0) {
+                try {
+                    const response = await fetch("/addToCart", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: productId, quantity: quantity }),
+                    });
+
+                    const data = await response.json();
+
+                    const messageContainer = document.getElementById("wishlistMessage");
+                    const messageElement = document.createElement("div");
+                    messageElement.className = "alert";
+
+                    if (response.ok) {
+                        messageElement.classList.add("alert-success");
+                        messageElement.textContent = data.message;
+                    } else {
+                        messageElement.classList.add("alert-danger");
+                        messageElement.textContent =
+                            data.message || "An error occurred while adding the product to the cart.";
+                    }
+
+                    messageContainer.appendChild(messageElement);
+
+                    setTimeout(() => {
+                        messageElement.remove();
+                    }, 3000);
+                } catch (error) {
+                    const messageContainer = document.getElementById("cartMessage");
+                    const errorMessage = document.createElement("div");
+                    errorMessage.className = "alert alert-danger";
+                    errorMessage.textContent = "An error occurred while adding the product to the cart.";
+                    messageContainer.appendChild(errorMessage);
+
+                    setTimeout(() => {
+                        errorMessage.remove();
+                    }, 3000);
+
+                    console.error("There was a problem with the fetch operation:", error);
+                }
+            } else {
+                console.error("Invalid quantity");
+                // Optionally, show an error message to the user
+            }
+        }
+    });
 </script>
 
 <%- include('../userLayouts/footer.ejs') %>

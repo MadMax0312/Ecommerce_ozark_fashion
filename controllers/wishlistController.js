@@ -11,7 +11,7 @@ const loadWishlist = async (req, res) => {
         const wishlist = await Wishlist.find({ user_id: user }).populate("product");
         console.log(wishlist);
 
-        res.render("wishlist", { data: wishlist });
+        res.render("wishlist", { data: wishlist, user:req.session.user_id, });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal server error");

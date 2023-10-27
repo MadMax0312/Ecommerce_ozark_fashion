@@ -181,7 +181,10 @@ const insertUser = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        res.render("home");
+
+       
+
+        res.render("home", { user:req.session.user_id }); 
     } catch (error) {
         console.log(error.message);
     }
@@ -194,6 +197,18 @@ const loginLoad = async (req, res) => {
         console.log(error.message);
     }
 };
+
+const loadLogout = async(req, res) => {
+    try{
+
+        req.session.user_id = null;
+
+        res.redirect('/login');
+
+    }catch(error){
+        console.log(error.message);
+    }
+}
 
 const verifyLogin = async (req, res) => {
     try {
@@ -389,6 +404,7 @@ const loadShop = async (req, res) => {
         console.log(productData);
 
         res.render("shop", {
+            user:req.session.user_id,
             Product: productData,
             totalPages: totalPages,
             currentPage: page,
@@ -412,7 +428,7 @@ const loadUser = async (req, res) => {
 
         const userData = await User.findById(req.session.user_id);
         if (userData) {
-            res.render("userProfile", { user: userData });
+            res.render("userProfile", { user: userData , user:req.session.user_id });
         } else {
             res.status(404).send("User not found");
         }
@@ -434,7 +450,7 @@ const loadEditUser = async (req, res) => {
         console.log(userData);
 
         if (userData) {
-            res.render("editProfile", { user: userData }); // Pass the category object to the template
+            res.render("editProfile", { user: userData, user:req.session.user_id, }); // Pass the category object to the template
         } else {
             res.redirect("/userProfile");
         }
@@ -489,7 +505,7 @@ const loadProductInfo = async (req, res) => {
 
         const pddata = await Product.find();
 
-        res.render("productInfo", { Product: product, data: pddata });
+        res.render("productInfo", { Product: product, data: pddata , user:req.session.user_id,});
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
@@ -501,7 +517,7 @@ const loadProductInfo = async (req, res) => {
 
 const loadAbout = async (req, res) => {
     try {
-        res.render("about");
+        res.render("about", {user:req.session.user_id,});
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Internal Server Error");
@@ -512,6 +528,7 @@ module.exports = {
     loadRegister,
     insertUser,
     loginLoad,
+    loadLogout,
     verifyLogin,
     loadOtp,
     sendVerifyMail,
