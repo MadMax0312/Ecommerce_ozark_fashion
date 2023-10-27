@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+
 const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 
@@ -7,7 +7,7 @@ const loadCart = async (req, res) => {
         const user = req.session.user_id;
 
         // Query the Cart collection and populate the 'items.product' field with actual product data
-        const cartItems = await Cart.find({ user_id: user }).populate('items.product');
+        const cartItems = await Cart.find({ user_id: user }).populate("items.product");
 
         let subtotal = 0;
         if (cartItems.length > 0) {
@@ -22,13 +22,12 @@ const loadCart = async (req, res) => {
             }, 0);
         }
 
-        res.render('cart', { data: cartItems, subtotal: subtotal, user: req.session.user_id });
+        res.render("cart", { data: cartItems, subtotal: subtotal, user: req.session.user_id });
     } catch (error) {
         console.error(error.message);
-        res.status(500).send('Internal Server Error');
+        res.status(500).send("Internal Server Error");
     }
 };
-
 
 const updateCart = async (req, res) => {
     try {
@@ -38,8 +37,8 @@ const updateCart = async (req, res) => {
 
         // Find the cart item with the specified product ID and user ID
         const updatedCartItem = await Cart.findOneAndUpdate(
-            { 'items.product': productID, user_id: user },
-            { $set: { 'items.$.quantity': quantity } },
+            { "items.product": productID, user_id: user },
+            { $set: { "items.$.quantity": quantity } },
             { new: true }
         );
 
@@ -47,7 +46,7 @@ const updateCart = async (req, res) => {
         res.json(updatedCartItem);
     } catch (error) {
         console.error(error.message);
-        res.status(500).send('Internal Server Error');
+        res.status(500).send("Internal Server Error");
     }
 };
 
@@ -61,7 +60,7 @@ const addToCart = async (req, res) => {
 
         if (cartItem) {
             // Check if the product is already in the cart
-            const existingProductIndex = cartItem.items.findIndex(item => item.product.equals(productId));
+            const existingProductIndex = cartItem.items.findIndex((item) => item.product.equals(productId));
 
             if (existingProductIndex !== -1) {
                 return res.status(200).json({ message: "Product already in cart" });
@@ -80,14 +79,12 @@ const addToCart = async (req, res) => {
             });
             await newCartItem.save();
             return res.status(200).json({ message: "Product added to cart successfully" });
-            
         }
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
     }
 };
-
 
 const removeProduct = async (req, res) => {
     try {
@@ -97,7 +94,7 @@ const removeProduct = async (req, res) => {
         const cart = await Cart.findById(cartId);
 
         // Find the index of the item with the specified productId in the items array
-        const itemIndex = cart.items.findIndex(item => item.product.equals(productId));
+        const itemIndex = cart.items.findIndex((item) => item.product.equals(productId));
 
         // Remove the item from the items array if found
         if (itemIndex !== -1) {
@@ -108,16 +105,13 @@ const removeProduct = async (req, res) => {
         res.redirect("/cart");
     } catch (error) {
         console.error(error.message);
-        res.status(500).send('Internal Server Error');
+        res.status(500).send("Internal Server Error");
     }
 };
-
-
-
 
 module.exports = {
     loadCart,
     updateCart,
     addToCart,
-    removeProduct
+    removeProduct,
 };

@@ -36,12 +36,18 @@
                                     <p class="text-black font-weight-semibold"><%= product.description %></p>
                                     <p class="text-black font-weight-semibold" style="margin: 0">₹<%= product.price %></p>
                                     <p style="margin: 0">
+
                                         <a
-                                            href="/addToCart?id=<%= product._id %>"
-                                            class="buy-now btn btn-sm"
-                                            style="background-color: white; color: blue; padding-bottom: 0"
-                                            >Add To Cart</a
-                                        >
+                                        href="#"
+                                        class="addToCartBtn buy-now btn btn-sm"
+                                        id="hot"
+                                        style="background-color: white; color: blue; padding-bottom: 0"
+                                        data-product-id="<%= product._id %>"
+                                    >
+                                        Add To Cart
+                                    </a>
+
+
                                     </p>
                                     <p style="margin: 0; height: 35px">
                                         <a
@@ -66,5 +72,39 @@
         </div>
     </div>
 
+
+    <script>
+        document.body.addEventListener("click", async (event) => {
+            if (event.target.matches(".addToCartBtn")) {
+                const productId = event.target.getAttribute("data-product-id");
+                const quantity = 1; // Set the quantity to the desired value
+
+                try {
+                    const response = await fetch("/addToCart", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: productId, quantity: quantity }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Show success message as an alert
+                        alert(data.message);
+                    } else {
+                        // Show error message as an alert
+                        alert(data.message || "An error occurred while adding the product to the cart.");
+                    }
+                } catch (error) {
+                    // Show error message as an alert
+                    alert("An error occurred while adding the product to the cart.");
+                    console.error("There was a problem with the fetch operation:", error);
+                }
+            }
+        });
+    </script>
+
     <%- include('../userLayouts/footer.ejs') %>
-</div>
+

@@ -358,7 +358,7 @@ const updatePassword = async (req, res) => {
 //-------loading shop page------------//
 
 const loadShop = async (req, res) => {
-    try {
+    try { 
         var search = "";
         if (req.query.search) {
             search = req.query.search;
@@ -421,14 +421,19 @@ const loadShop = async (req, res) => {
 
 const loadUser = async (req, res) => {
     try {
+
+        const user = req.session.user_id;
+
         if (!req.session.user_id) {
             res.redirect("/login");
             return;
         }
 
-        const userData = await User.findById(req.session.user_id);
+        const userData = await User.findById({ _id: user });
+        console.log("ddddd");
+        console.log(userData);
         if (userData) {
-            res.render("userProfile", { user: userData , user:req.session.user_id });
+            res.render("userProfile", { user: userData });
         } else {
             res.status(404).send("User not found");
         }
@@ -450,7 +455,7 @@ const loadEditUser = async (req, res) => {
         console.log(userData);
 
         if (userData) {
-            res.render("editProfile", { user: userData, user:req.session.user_id, }); // Pass the category object to the template
+            res.render("editProfile", { user: userData }); // Pass the category object to the template
         } else {
             res.redirect("/userProfile");
         }
