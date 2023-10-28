@@ -2,6 +2,9 @@
 <%- include('../adminLayouts/sidebar.ejs') %>
 <%- include('../adminLayouts/navbar.ejs') %>
         <!-- partial -->
+
+
+
         <div class="main-panel">
           <div class="content-wrapper">
 
@@ -14,14 +17,22 @@
                       <div class="mb-5 ">
                           <ul class="navbar-nav w-100">
                               <li class="nav-item w-100">
-                                  <!-- d-none -->
-                                  <form style="margin-top: 20px; text-align: center;">
+                            
+                                  <form id="search-form" style="margin-top: 20px; text-align: center;">
                                     <input type="text" name="search" placeholder="Search Users" style="padding: 5px; width: 300px; border: none;">
                                     <input type="submit" value="Search" style="padding: 5px; background-color: #007bff; color: #fff;border: none;">
-                                  </form>
+                                </form>
+                                
                               </li>
                           </ul>
                       </div>
+
+
+
+                      <div id="hot" class="alert" role="alert" style="text-align: center; color: white"></div>
+                    
+
+
                     
                       <div class="table-responsive">
                           <table class="table" id="user-table">
@@ -58,17 +69,14 @@
                                               <!-- Add a data-id attribute with the user's _id -->
                                               <% if (users[i].isBlock === false) { %>
                                                 <a href="/admin/block-user?id=<%= users[i]._id %>">
-                                                  <button type="button" class="btn btn-inverse-danger">
-                                                    Block
-                                                  </button>
+                                                    <button data-user-id="<%= users[i]._id %>" class="btn btn-danger">Block</button>
                                                 </a>
-                                              <% } else { %>
+                                            <% } else { %>
                                                 <a href="/admin/block-user?id=<%= users[i]._id %>">
-                                                  <button type="button" class="btn btn-inverse-success">
-                                                    UnBlock
-                                                  </button>
+                                                    <button data-user-id="<%= users[i]._id %>" class="btn btn-success">Unblock</button>
                                                 </a>
-                                              <% } %>
+                                            <% } %>
+                                            
                                           </td>
                                       </tr>
                                   <% } %>
@@ -104,6 +112,56 @@
           </div>
         <!-- main-panel ends -->
       </div>
+
+      <script>
+ document.addEventListener("DOMContentLoaded", () => {
+    const userTable = document.getElementById("user-table");
+
+    userTable.addEventListener("click", async (event) => {
+        if (event.target.classList.contains("btn")) {
+            event.preventDefault(); // Prevent the default behavior of the anchor tag
+            
+            const userId = event.target.getAttribute("data-user-id");
+
+            try {
+                const response = await fetch(`/admin/block-user?id=${userId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                
+
+                const data = await response.json();
+                console.log(data);
+                console.log(data.message);
+
+                const messageElement = document.getElementById('hot');
+                
+
+                if (response.ok) {
+                    const button = event.target;
+                    button.textContent = button.textContent === "Block" ? "Unblock" : "Block";
+                    button.classList.toggle("btn-danger");
+                    button.classList.toggle("btn-success");
+                    messageElement.innerHTML = data.message;
+                } else {
+                    console.error("Error updating user status:", response.statusText);
+                }
+
+                setTimeout(() => {
+                    messageElement.textContent = ""; // Clear the message after 3 seconds
+                }, 3000);
+            } catch (error) {
+                console.error("Network error:", error);
+            }
+        }
+    });
+});
+
+        </script>
+        
     
 
     <%- include('../adminLayouts/footer.ejs') %>

@@ -1,10 +1,10 @@
-
 const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 
 const loadCart = async (req, res) => {
     try {
         const user = req.session.user_id;
+        console.log("User ID from session:", user);
 
         // Query the Cart collection and populate the 'items.product' field with actual product data
         const cartItems = await Cart.find({ user_id: user }).populate("items.product");
@@ -21,8 +21,7 @@ const loadCart = async (req, res) => {
                 return total + productTotalPrice;
             }, 0);
         }
-
-        res.render("cart", { data: cartItems, subtotal: subtotal, user: req.session.user_id });
+        res.render("cart", { data: cartItems, subtotal: subtotal, user: user });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");

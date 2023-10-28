@@ -58,6 +58,17 @@ const verifyLogin = async (req, res) => {
     }
 };
 
+//////==============-----LOGOUT----===========
+
+const loadLogout = async (req, res) => {
+    try {
+        req.session.destroy();
+        res.redirect("/admin");
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
 //-----------------Rendering homePage-------------------------
 
 const loadDashboard = async (req, res) => {
@@ -73,6 +84,7 @@ const loadDashboard = async (req, res) => {
 
 const loadUsers = async (req, res) => {
     try {
+        console.log("dfdfdfdd");
         var search = ""; //<----this is where we search for the users in dashboard -----------------
         if (req.query.search) {
             search = req.query.search;
@@ -83,7 +95,7 @@ const loadUsers = async (req, res) => {
             page = req.query.page;
         }
 
-        const limit = 5;
+        const limit = 3;
 
         const userData = await User.find({
             $or: [
@@ -95,6 +107,8 @@ const loadUsers = async (req, res) => {
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
+
+            console.log(userData);
 
         const count = await User.find({
             $or: [
@@ -122,107 +136,69 @@ const blockUsers = async (req, res) => {
         if (user) {
             user.isBlock = !user.isBlock;
             await user.save();
-
-            const updatedUser = await User.findById(id); //After updating the data
-
-            var search = "";
-            if (req.query.search) {
-                search = req.query.search;
-            }
-
-            var page = 1;
-            if (req.query.page) {
-                page = req.query.page;
-            }
-
-            const limit = 5;
-
-            const count = await User.find({
-                $or: [
-                    { first_name: { $regex: ".*" + search + ".*", $options: "i" } },
-                    { last_name: { $regex: ".*" + search + ".*", $options: "i" } },
-                    { email: { $regex: ".*" + search + ".*", $options: "i" } },
-                ],
-            }).countDocuments();
-
-            const users = await User.find({
-                $or: [
-                    { first_name: { $regex: ".*" + search + ".*", $options: "i" } },
-                    { last_name: { $regex: ".*" + search + ".*", $options: "i" } },
-                    { email: { $regex: ".*" + search + ".*", $options: "i" } },
-                ],
-            })
-                .skip((page - 1) * limit)
-                .limit(limit);
-
-            res.render("users", {
-                users: users,
-                totalPages: Math.ceil(count / limit),
-                currentPage: page,
-            });
+            return res.status(200).json({ message: "User Status Updated" });
         } else {
-            res.status(404).send("User not found");
+            res.status(404).send("User not found"); // Send a 404 error if user is not found
         }
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        console.error(error.message);
+        res.status(500).send("Internal Server Error"); // Send a 500 error for internal server errors
     }
 };
 
 ////===========Products Section -----===========\\\\\\\\\\\\\
 
 const viewProducts = async (req, res) => {
-  try {
-    var search = "";
-    if (req.query.search) {
-      search = req.query.search;
+    try {
+        var search = "";
+        if (req.query.search) {
+            search = req.query.search;
+        }
+
+        var page = 1;
+        if (req.query.page) {
+            page = req.query.page;
+        }
+
+        const limit = 5;
+
+        const productData = await Product.find({
+            $or: [
+                { productname: { $regex: ".*" + search + ".*", $options: "i" } }, // Case-insensitive search
+                { size: { $regex: ".*" + search + ".*", $options: "i" } },
+            ],
+        })
+            .populate("category")
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec();
+
+        const count = await Product.find({
+            $or: [
+                { productname: { $regex: ".*" + search + ".*", $options: "i" } }, // Case-insensitive search
+                { size: { $regex: ".*" + search + ".*", $options: "i" } },
+            ],
+        }).countDocuments();
+
+        const categories = await Category.find();
+
+        const deletedImages = req.body.deleteImages || [];
+
+     // Get the deleted images from the request
+
+        res.render("products", {
+            Product: productData,
+            Category: categories,
+            deletedImages: deletedImages,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+            // ... other variables you're passing to the view
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
     }
-
-    var page = 1;
-    if (req.query.page) {
-      page = req.query.page;
-    }
-
-    const limit = 5;
-
-    const productData = await Product.find({
-      $or: [
-        { productname: { $regex: ".*" + search + ".*", $options: "i" } }, // Case-insensitive search
-        { size: { $regex: ".*" + search + ".*", $options: "i" } },
-      ],
-    })
-      .populate("category")
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .exec();
-
-    const count = await Product.find({
-      $or: [
-        { productname: { $regex: ".*" + search + ".*", $options: "i" } }, // Case-insensitive search
-        { size: { $regex: ".*" + search + ".*", $options: "i" } },
-      ],
-    }).countDocuments();
-
-    const categories = await Category.find();
-    
-    const deletedImages = req.body.deleteImages || [];
-    
-    req.body.deleteImages = [];// Get the deleted images from the request
-
-    res.render("products", {
-      Product: productData,
-      Category: categories,
-      deletedImages: deletedImages,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
-      // ... other variables you're passing to the view
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
 };
-
 
 const loadaddProducts = async (req, res) => {
     try {
@@ -319,9 +295,12 @@ const unlistProduct = async (req, res) => {
 
         const categories = await Category.find();
 
+        const deletedImages = req.body.deleteImages || [];
+
         res.render("products", {
             Product: products,
             Category: categories,
+            deletedImages: deletedImages,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
         });
@@ -356,66 +335,45 @@ const loadEditProducts = async (req, res) => {
 ///==============Editing products=====================
 
 const editProduct = async (req, res) => {
-  try {
-    const id = req.body.id;
-    let product = await Product.findById(id);
-    console.log("Received Data:", req.body); 
+    try {
+        const id = req.body.id;
+        let product = await Product.findById(id);
+        console.log("Received Data:", req.body);
 
-    if (product) {
-      // Update product fields
-      product.productname = req.body.productname;
-      product.category = req.body.category;
-      product.description = req.body.description;
-      product.price = req.body.price;
-      product.quantity = req.body.quantity;
-      product.size = req.body.size;
+        if (product) {
+            // Update product fields
+            product.productname = req.body.productname;
+            product.category = req.body.category;
+            product.description = req.body.description;
+            product.price = req.body.price;
+            product.quantity = req.body.quantity;
+            product.size = req.body.size;
 
-      // Handle existing images
-      const existingImages = Array.isArray(req.body.existingImages) ? req.body.existingImages : [req.body.existingImages];
-      for (const imageToDelete of existingImages) {
-        // Delete the existing image file from the storage
-        console.log("Deleting image:", imageToDelete); // Log the image to be deleted
-        const imagePath = path.join(__dirname, "../static/admin/Assets/images/products", imageToDelete);
-        console.log("Image path:", imagePath); // Log the constructed image path
-        try {
-          fs.unlinkSync(imagePath);
-        } catch (error) {
-          console.error("Error deleting file:", error);
+            // Handle new images
+            if (req.files && req.files.length > 0) {
+                // Clear existing images if there are new images
+                product.image = [];
+                for (let i = 0; i < req.files.length; i++) {
+                    product.image.push(req.files[i].filename);
+                }
+            }
+
+            // Save the updated product
+            const updatedProduct = await product.save();
+
+            if (updatedProduct) {
+                res.redirect("/admin/view-products");
+            } else {
+                res.render("edit-product", { data: product, message: "Failed to update the product" });
+            }
+        } else {
+            res.redirect("/admin/view-products");
         }
-        // Remove the deleted image from the product's image array
-        const index = product.image.indexOf(imageToDelete);
-        if (index !== -1) {
-          product.image.splice(index, 1);
-        }
-      }
-
-      // Handle new images
-      if (req.files && req.files.length > 0) {
-        for (let i = 0; i < req.files.length; i++) {
-          product.image.push(req.files[i].filename);
-        }
-      }
-
-      // Save the updated product
-      const updatedProduct = await product.save();
-
-      if (updatedProduct) {
-        res.redirect("/admin/view-products");
-      } else {
-        res.render("edit-product", { data: product, message: "Failed to update the product" });
-      }
-    } else {
-      res.redirect("/admin/view-products");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
     }
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
 };
-
-
-
-
 
 
 ////////---------Category Section  -----------====================
@@ -559,6 +517,7 @@ const loadSales = async (req, res) => {
 module.exports = {
     loadLogin,
     verifyLogin,
+    loadLogout,
     loadDashboard,
     loadUsers,
     blockUsers,

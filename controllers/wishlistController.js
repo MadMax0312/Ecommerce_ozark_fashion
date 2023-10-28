@@ -11,7 +11,7 @@ const loadWishlist = async (req, res) => {
         const wishlist = await Wishlist.find({ user_id: user }).populate("product");
         console.log(wishlist);
 
-        res.render("wishlist", { data: wishlist, user:req.session.user_id, });
+        res.render("wishlist", { data: wishlist, user: user });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal server error");
@@ -69,9 +69,9 @@ const removeProduct = async (req, res) => {
         res.status(500).send("Internal server error");
     }
 };
-  
+
 module.exports = {
-    loadWishlist, 
+    loadWishlist,
     addToWishlist,
     removeProduct,
 };

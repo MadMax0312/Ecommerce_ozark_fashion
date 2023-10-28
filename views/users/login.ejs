@@ -11,10 +11,10 @@
   
       <% } %>
 
-    <form action="/login" method="post" onsubmit="return validateForm()">
+    <form action="/login" method="post" onsubmit="return validatingForm()">
         <div class="form-group">
-            <input type="email" class="form-control" name="email" placeholder="Enter email" id="email" required />
-            <p id="email-error" class="error-message"></p>
+            <input type="email" class="form-control" name="email" placeholder="Enter email" id="email" />
+            <p id="email-error" class="error-message" style="color: red;"></p>
         </div>
         <div class="form-group">
             <input
@@ -23,9 +23,9 @@
                 name="password"
                 placeholder="Enter password"
                 id="password"
-                required
+                
             />
-            <p id="password-error" class="error-message"></p>
+            <p id="password-error" class="error-message" style="color: red;"></p>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Login</button>
     </form>

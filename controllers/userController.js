@@ -181,10 +181,7 @@ const insertUser = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-
-       
-
-        res.render("home", { user:req.session.user_id }); 
+        res.render("home", { user: req.session.user_id });
     } catch (error) {
         console.log(error.message);
     }
@@ -198,17 +195,15 @@ const loginLoad = async (req, res) => {
     }
 };
 
-const loadLogout = async(req, res) => {
-    try{
-
+const loadLogout = async (req, res) => {
+    try {
         req.session.user_id = null;
 
-        res.redirect('/login');
-
-    }catch(error){
+        res.redirect("/");
+    } catch (error) {
         console.log(error.message);
     }
-}
+};
 
 const verifyLogin = async (req, res) => {
     try {
@@ -358,7 +353,7 @@ const updatePassword = async (req, res) => {
 //-------loading shop page------------//
 
 const loadShop = async (req, res) => {
-    try { 
+    try {
         var search = "";
         if (req.query.search) {
             search = req.query.search;
@@ -377,6 +372,11 @@ const loadShop = async (req, res) => {
         } else if (req.query.sort === "price_high_to_low") {
             sortOption = { price: -1 };
         }
+
+
+
+        console.log("fdjdsljldjkl", sortOption);
+
 
         const count = await Product.countDocuments({
             $or: [
@@ -401,10 +401,8 @@ const loadShop = async (req, res) => {
             .skip((page - 1) * limit)
             .limit(limit);
 
-        console.log(productData);
-
         res.render("shop", {
-            user:req.session.user_id,
+            user: req.session.user_id,
             Product: productData,
             totalPages: totalPages,
             currentPage: page,
@@ -421,7 +419,6 @@ const loadShop = async (req, res) => {
 
 const loadUser = async (req, res) => {
     try {
-
         const user = req.session.user_id;
 
         if (!req.session.user_id) {
@@ -510,19 +507,18 @@ const loadProductInfo = async (req, res) => {
 
         const pddata = await Product.find();
 
-        res.render("productInfo", { Product: product, data: pddata , user:req.session.user_id,});
+        res.render("productInfo", { Product: product, data: pddata, user: req.session.user_id });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
     }
 };
 
-
 //---------Rendering about page-----------///
 
 const loadAbout = async (req, res) => {
     try {
-        res.render("about", {user:req.session.user_id,});
+        res.render("about", { user: req.session.user_id });
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Internal Server Error");
@@ -550,5 +546,5 @@ module.exports = {
     loadEditUser,
     updateProfile,
     loadProductInfo,
-    loadAbout
+    loadAbout,
 };
