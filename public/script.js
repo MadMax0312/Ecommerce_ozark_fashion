@@ -1,6 +1,4 @@
 
-
-
 function validateForm() {
 
     const emailError = document.getElementById('email-error');
@@ -86,18 +84,19 @@ function validateForm() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    const errorMessages = document.querySelectorAll('.error-message');
+  const errorMessages = document.querySelectorAll('.error-message');
 
-  
+  function hideErrorMessages() {
+      errorMessages.forEach(function(errorMessage) {
+          errorMessage.textContent = '';
+      });
+  } 
 
-        function hideErrorMessages() {
-          errorMessages.forEach(function(errorMessage) {
-            errorMessage.textContent = '';
-          });
-        } 
-          setTimeout(hideErrorMessages, 4000);
-                  // Hide error messages after 3 seco  
-})
+  setTimeout(function() {
+      hideErrorMessages();
+  }, 4000); // Hide error messages after 4 seconds
+});
+
 
 
 

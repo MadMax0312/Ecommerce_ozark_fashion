@@ -59,7 +59,7 @@ admin_route.get("/add-products", adminController.loadaddProducts);
 
 admin_route.post("/add-products", upload.array("images", 4), adminController.addProducts);
 
-admin_route.get("/unlist-product", auth.isLogin, adminController.unlistProduct);
+admin_route.post("/unlist-product", auth.isLogin, adminController.unlistProduct);
 
 admin_route.get("/edit-product", auth.isLogin, adminController.loadEditProducts);
 

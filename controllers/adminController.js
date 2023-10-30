@@ -74,7 +74,11 @@ const loadLogout = async (req, res) => {
 const loadDashboard = async (req, res) => {
     try {
         // const adminData = await Admin.findById({ _id:req.session.admin_id });
-        res.render("home");
+        const userCount = await User.find().countDocuments();
+        const blockCount = await User.find({isBlock:true}).countDocuments();
+        const productCount = await Product.find().countDocuments();
+
+        res.render("home", {Ucount:userCount, Pcount:productCount, Bcount:blockCount});
     } catch (error) {
         console.log(error.message);
     }
@@ -108,7 +112,6 @@ const loadUsers = async (req, res) => {
             .skip((page - 1) * limit)
             .exec();
 
-            console.log(userData);
 
         const count = await User.find({
             $or: [
@@ -117,6 +120,8 @@ const loadUsers = async (req, res) => {
                 { email: { $regex: ".*" + search + ".*", $options: "i" } },
             ],
         }).countDocuments();
+
+    
 
         res.render("users", {
             users: userData,
@@ -133,7 +138,7 @@ const blockUsers = async (req, res) => {
         const id = req.query.id;
         const user = await User.findById(id);
 
-        if (user) {
+        if (user) { 
             user.isBlock = !user.isBlock;
             await user.save();
             return res.status(200).json({ message: "User Status Updated" });
@@ -261,51 +266,13 @@ const unlistProduct = async (req, res) => {
         if (product) {
             product.status = !product.status;
             await product.save();
+            return res.status(200).json({ message: "Product Status Updated" });
+        } else {
+            res.status(404).send("Product not found"); // Send a 404 error if product is not found
         }
-
-        var search = ""; //<----this is where we search for the users in dashboard
-        if (req.query.search) {
-            search = req.query.search;
-        }
-
-        var page = 1;
-        if (req.query.page) {
-            page = req.query.page;
-        }
-
-        const limit = 5;
-
-        const count = await Product.find({
-            $or: [
-                { productname: { $regex: ".*" + search + ".*", $options: "i" } }, // Case-insensitive search
-                { size: { $regex: ".*" + search + ".*", $options: "i" } },
-            ],
-        }).countDocuments();
-
-        const products = await Product.find({
-            $or: [
-                { productname: { $regex: ".*" + search + ".*", $options: "i" } }, // Case-insensitive search
-                { size: { $regex: ".*" + search + ".*", $options: "i" } },
-            ],
-        })
-            .populate("category")
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .exec();
-
-        const categories = await Category.find();
-
-        const deletedImages = req.body.deleteImages || [];
-
-        res.render("products", {
-            Product: products,
-            Category: categories,
-            deletedImages: deletedImages,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page,
-        });
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
+        res.status(500).send("Internal Server Error"); // Send a 500 error for internal server errors
     }
 };
 

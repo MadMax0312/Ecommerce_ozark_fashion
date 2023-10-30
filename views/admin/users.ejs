@@ -1,126 +1,123 @@
-<%- include('../adminLayouts/header.ejs') %>
-<%- include('../adminLayouts/sidebar.ejs') %>
-<%- include('../adminLayouts/navbar.ejs') %>
-        <!-- partial -->
+<%- include('../adminLayouts/header.ejs') %> <%- include('../adminLayouts/sidebar.ejs') %> <%-
+include('../adminLayouts/navbar.ejs') %>
+<!-- partial -->
 
 
 
-        <div class="main-panel">
-          <div class="content-wrapper">
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title" style="text-align: center">USERS</h2>
+                        <div class="mb-5">
+                            <ul class="navbar-nav w-100">
+                                <li class="nav-item w-100">
+                                    <form id="search-form" style="margin-top: 20px; text-align: center">
+                                        <input
+                                            type="text"
+                                            name="search"
+                                            placeholder="Search Users"
+                                            style="padding: 5px; width: 300px; border: none"
+                                        />
+                                        <input
+                                            type="submit"
+                                            value="Search"
+                                            style="padding: 5px; background-color: #007bff; color: #fff; border: none"
+                                        />
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
 
-            <div class="row ">
-          
-          <div class="col-12 grid-margin">
-              <div class="card">
-                  <div class="card-body">
-                    <h2 class="card-title" style="text-align: center;">USERS</h2>
-                      <div class="mb-5 ">
-                          <ul class="navbar-nav w-100">
-                              <li class="nav-item w-100">
-                            
-                                  <form id="search-form" style="margin-top: 20px; text-align: center;">
-                                    <input type="text" name="search" placeholder="Search Users" style="padding: 5px; width: 300px; border: none;">
-                                    <input type="submit" value="Search" style="padding: 5px; background-color: #007bff; color: #fff;border: none;">
-                                </form>
-                                
-                              </li>
-                          </ul>
-                      </div>
-
-
-
-                      <div id="hot" class="alert" role="alert" style="text-align: center; color: white"></div>
-                    
-
-
-                    
-                      <div class="table-responsive">
-                          <table class="table" id="user-table">
-                              <thead>
-                                  <tr>
-
-                                      <th> First Name </th>
-                                      <th> Last Name </th>
-                                      <th> Email </th>
-                                      <th> Mobile No.</th>
-                                      <th> Status </th>
-                                      <th> Joined On</th>
-                                      <th> Action</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                <% if (users.length > 0) { %>
-                                  <% for (var i = 0; i < users.length; i++) { %>
-                                      <!-- list -->
-                                      <tr>
-                                          <td> <%= users[i].first_name %> </td>
-                                          <td> <%= users[i].last_name %> </td>
-                                          <td> <%= users[i].email %> </td>
-                                          <td> <%= users[i].mobile %> </td>
-                                          <td>
-                                              <% if(users[i].isVerified==false){ %>
-                                                  <span class="pl-2 text-danger">Not verified</span>
-                                              <% } else { %> 
-                                                  <span class="pl-2 text-success">verified</span>
-                                              <% } %>
-                                          </td>
-                                          <td> <%= new Date(users[i].createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %> </td>
-                                          <td>
-                                              <!-- Add a data-id attribute with the user's _id -->
-                                              <% if (users[i].isBlock === false) { %>
-                                                <a href="/admin/block-user?id=<%= users[i]._id %>">
-                                                    <button data-user-id="<%= users[i]._id %>" class="btn btn-danger">Block</button>
-                                                </a>
+                        <div class="table-responsive">
+                            <table class="table" id="user-table">
+                                <thead>
+                                    <tr>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email</th>
+                                        <th>Mobile No.</th>
+                                        <th>Status</th>
+                                        <th>Joined On</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (users.length > 0) { %> <% for (var i = 0; i < users.length; i++) { %>
+                                    <!-- list -->
+                                    <tr>
+                                        <td><%= users[i].first_name %></td>
+                                        <td><%= users[i].last_name %></td>
+                                        <td><%= users[i].email %></td>
+                                        <td><%= users[i].mobile %></td>
+                                        <td>
+                                            <% if(users[i].isVerified==false){ %>
+                                            <span class="pl-2 text-danger">Not verified</span>
                                             <% } else { %>
-                                                <a href="/admin/block-user?id=<%= users[i]._id %>">
-                                                    <button data-user-id="<%= users[i]._id %>" class="btn btn-success">Unblock</button>
-                                                </a>
+                                            <span class="pl-2 text-success">verified</span>
                                             <% } %>
-                                            
-                                          </td>
-                                      </tr>
-                                  <% } %>
-                              <% } else { %>
-                                  <tr>
-                                      <td colspan="7">User not Found</td>
-                                  </tr>
-                              <% } %>
-                                                                                        
-                              </tbody>
+                                        </td>
+                                        <td>
+                                            <%= new Date(users[i].createdAt).toLocaleDateString('en-US', { year: 'numeric',
+                                            month: 'short', day: 'numeric' }) %>
+                                        </td>
+                                        <td>
+                                            <!-- Add a data-id attribute with the user's _id -->
+                                            <% if (users[i].isBlock === false) { %>
+                                            <a href="/admin/block-user?id=<%= users[i]._id %>">
+                                                <button data-user-id="<%= users[i]._id %>" class="btn btn-danger">
+                                                    Block
+                                                </button>
+                                            </a>
+                                            <% } else { %>
+                                            <a href="/admin/block-user?id=<%= users[i]._id %>">
+                                                <button data-user-id="<%= users[i]._id %>" class="btn btn-success">
+                                                    Unblock
+                                                </button>
+                                            </a>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                    <% } %> <% } else { %>
+                                    <tr>
+                                        <td colspan="7">User not Found</td>
+                                    </tr>
+                                    <% } %>
+                                </tbody>
                             </table>
 
-                             <!-- ------------Adding Pagination -------------- -->
+                            <!-- ------------Adding Pagination -------------- -->
 
-                     <% if (typeof totalPages !== 'undefined') { %>
-                      <div class="pagination-container">
-                          <% for(let j=1; j <= totalPages; j++){ %>
-                              <a href="?page=<%= j %>"><%= j %></a>
-                          <% } %>
-                      </div>
-                  <% } %>
-                    
+                            <% if (typeof totalPages !== 'undefined') { %>
+                            <div class="pagination-container">
+                                <% for(let j=1; j <= totalPages; j++){ %>
+                                <a href="?page=<%= j %>"><%= j %></a>
+                                <% } %>
+                            </div>
+                            <% } %>
 
-  <!-- ------------------------------------------------------- -->
-
+                            <!-- ------------------------------------------------------- -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-            <!-- content-wrapper ends -->
-          </div>
-        <!-- main-panel ends -->
-      </div>
+        <!-- content-wrapper ends -->
+    </div>
+    <!-- main-panel ends -->
+</div>
 
-      <script>
- document.addEventListener("DOMContentLoaded", () => {
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
     const userTable = document.getElementById("user-table");
 
     userTable.addEventListener("click", async (event) => {
         if (event.target.classList.contains("btn")) {
             event.preventDefault(); // Prevent the default behavior of the anchor tag
-            
+
             const userId = event.target.getAttribute("data-user-id");
 
             try {
@@ -131,37 +128,63 @@
                     },
                 });
 
-                
-
                 const data = await response.json();
-                console.log(data);
-                console.log(data.message);
-
-                const messageElement = document.getElementById('hot');
-                
 
                 if (response.ok) {
                     const button = event.target;
                     button.textContent = button.textContent === "Block" ? "Unblock" : "Block";
                     button.classList.toggle("btn-danger");
                     button.classList.toggle("btn-success");
-                    messageElement.innerHTML = data.message;
-                } else {
-                    console.error("Error updating user status:", response.statusText);
-                }
 
-                setTimeout(() => {
-                    messageElement.textContent = ""; // Clear the message after 3 seconds
-                }, 3000);
+                    // Show SweetAlert notification on successful action
+                    Swal.fire({
+                        title: data.message,
+                        icon: "success",
+                      
+                        showConfirmButton: true,
+                        customClass: {
+                            popup: "animate__animated animate__fadeInDown",
+                            content: "your-custom-class",
+                        },
+                    });
+                } else {
+                    // Handle server error or unexpected response
+                    console.error("Error updating user status:", response.statusText);
+
+                    // Show SweetAlert error notification
+                    Swal.fire({
+                        title: "Error",
+                        text: "Failed to update user status.",
+                        icon: "error",
+                        timer: 3000,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: "animate__animated animate__fadeInDown",
+                            content: "your-custom-class",
+                        },
+                    });
+                }
             } catch (error) {
-                console.error("Network error:", error);
+                // Handle network error or JSON parsing error
+                console.error("Error:", error);
+
+                // Show SweetAlert network error notification
+                Swal.fire({
+                    title: "Network Error",
+                    text: "Failed to communicate with the server.",
+                    icon: "error",
+                    timer: 3000,
+                    showConfirmButton: false,
+                    customClass: {
+                        popup: "animate__animated animate__fadeInDown",
+                        content: "your-custom-class",
+                    },
+                });
             }
         }
     });
 });
 
-        </script>
-        
-    
+</script>
 
-    <%- include('../adminLayouts/footer.ejs') %>
+<%- include('../adminLayouts/footer.ejs') %>

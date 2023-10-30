@@ -12,7 +12,7 @@ include('../adminLayouts/navbar.ejs') %>
                         action=""
                         method="post"
                         enctype="multipart/form-data"
-                        onsubmit="return productValidForm()"
+                        onsubmit="return productValiddForm()"
                     >
                         <div class="form-row">
                             <div class="col-md-6 form-group">
@@ -25,6 +25,7 @@ include('../adminLayouts/navbar.ejs') %>
                                     placeholder="ProductName"
                                     value="<%= data.productname %>"
                                 />
+                                <p id="productname-error" style="color: red;" class="error-message"></p>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label for="size">Size</label>
@@ -36,7 +37,7 @@ include('../adminLayouts/navbar.ejs') %>
                                     placeholder="Size"
                                     value="<%= data.size %>"
                                 />
-                                <p id="size-error" class="error-message"></p>
+                                <p id="size-error" style="color: red;" class="error-message"></p>
                             </div>
                         </div>
 
@@ -59,7 +60,7 @@ include('../adminLayouts/navbar.ejs') %>
                                     placeholder="Price"
                                     value="<%= data.price %>"
                                 />
-                                <p id="price-error" class="error-message"></p>
+                                <p id="price-error" style="color: red;" class="error-message"></p>
                             </div>
                             <div class="col-md-4 form-group">
                                 <label for="quantity">Quantity</label>
@@ -71,7 +72,7 @@ include('../adminLayouts/navbar.ejs') %>
                                     placeholder="Quantity"
                                     value="<%= data.quantity %>"
                                 />
-                                <p id="quantity-error" class="error-message"></p>
+                                <p id="quantity-error"  style="color: red;" class="error-message"></p>
                             </div>
                         </div>
 
@@ -80,7 +81,7 @@ include('../adminLayouts/navbar.ejs') %>
                             <textarea class="form-control" id="description" rows="4" name="description">
 <%= data.description %></textarea
                             >
-                            <p id="description-error" class="error-message"></p>
+                            <p id="description-error" style="color: red;" class="error-message"></p>
                         </div>
 
                         <!-- ... other form fields ... -->
@@ -126,6 +127,7 @@ include('../adminLayouts/navbar.ejs') %>
 </div>
 
 <script>
+    
   document.addEventListener("DOMContentLoaded", function () {
       const addImageButton = document.querySelector(".add-image-input");
       const dynamicImageInputs = document.querySelector(".dynamic-image-inputs");

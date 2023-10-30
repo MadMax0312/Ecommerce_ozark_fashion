@@ -1,7 +1,6 @@
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
-const Cart = require("../models/cartModel");
-const Wishlist = require("../models/wishlistModel");
+const Category = require("../models/categoryModel");
 const bcrypt = require("bcrypt");
 const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
@@ -354,16 +353,8 @@ const updatePassword = async (req, res) => {
 
 const loadShop = async (req, res) => {
     try {
-        var search = "";
-        if (req.query.search) {
-            search = req.query.search;
-        }
-
-        var page = 1;
-        if (req.query.page) {
-            page = parseInt(req.query.page);
-        }
-
+        const page = req.query.page ? parseInt(req.query.page) : 1;
+        const search = req.query.search ? req.query.search : "";
         const limit = 6;
 
         let sortOption = {};
@@ -373,33 +364,54 @@ const loadShop = async (req, res) => {
             sortOption = { price: -1 };
         }
 
+        const category = await Category.find();
+        const categoryNames = category.map((categoryObj) => categoryObj.categoryname);
+        const cname = categoryNames.join("\n");
+        console.log(cname);
 
+        let categoryFilter = {};
+        if (req.query.gender) {
+            categoryFilter = { "category.categoryname": req.query.gender };
+        }
 
-        console.log("fdjdsljldjkl", sortOption);
-
+        console.log(categoryFilter);
 
         const count = await Product.countDocuments({
-            $or: [
-                { productname: { $regex: ".*" + search + ".*", $options: "i" } },
-                { size: { $regex: ".*" + search + ".*", $options: "i" } },
-                { price: { $regex: ".*" + search + ".*", $options: "i" } },
+            $and: [
+                {
+                    $or: [
+                        { productname: { $regex: ".*" + search + ".*", $options: "i" } },
+                        { size: { $regex: ".*" + search + ".*", $options: "i" } },
+                        { price: { $regex: ".*" + search + ".*", $options: "i" } },
+                    ],
+                },
+                { status: true }, // Only get products with status true
             ],
-            status: true, // Only get products with status true
         });
 
         const totalPages = Math.ceil(count / limit);
 
         const productData = await Product.find({
-            $or: [
-                { productname: { $regex: ".*" + search + ".*", $options: "i" } },
-                { size: { $regex: ".*" + search + ".*", $options: "i" } },
-                { price: { $regex: ".*" + search + ".*", $options: "i" } },
+            $and: [
+                {
+                    $or: [
+                        { productname: { $regex: ".*" + search + ".*", $options: "i" } },
+                        { size: { $regex: ".*" + search + ".*", $options: "i" } },
+                        { price: { $regex: ".*" + search + ".*", $options: "i" } },
+                    ],
+                },
+                { status: true }, // Only get products with status true
             ],
-            status: true, // Only get products with status true
         })
-            .sort(sortOption) // Apply sorting here
+            .populate("category")
+            .sort(sortOption)
             .skip((page - 1) * limit)
             .limit(limit);
+
+        productData.forEach((product) => {
+            product.price = parseFloat(product.price); // or parseInt(product.price) for integer values
+            console.log(product.price);
+        });
 
         res.render("shop", {
             user: req.session.user_id,
@@ -407,7 +419,7 @@ const loadShop = async (req, res) => {
             totalPages: totalPages,
             currentPage: page,
             search: search,
-            sortOption: req.query.sort, // Pass the sort option back to the template for indicating active sorting
+            sortOption: req.query.sort,
         });
     } catch (error) {
         console.log(error.message);
