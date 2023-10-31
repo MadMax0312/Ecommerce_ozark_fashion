@@ -25,7 +25,7 @@ include('../adminLayouts/navbar.ejs') %>
                                     placeholder="ProductName"
                                     value="<%= data.productname %>"
                                 />
-                                <p id="productname-error" style="color: red;" class="error-message"></p>
+                                <p id="productname-error" style="color: red" class="error-message"></p>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label for="size">Size</label>
@@ -37,7 +37,7 @@ include('../adminLayouts/navbar.ejs') %>
                                     placeholder="Size"
                                     value="<%= data.size %>"
                                 />
-                                <p id="size-error" style="color: red;" class="error-message"></p>
+                                <p id="size-error" style="color: red" class="error-message"></p>
                             </div>
                         </div>
 
@@ -60,7 +60,7 @@ include('../adminLayouts/navbar.ejs') %>
                                     placeholder="Price"
                                     value="<%= data.price %>"
                                 />
-                                <p id="price-error" style="color: red;" class="error-message"></p>
+                                <p id="price-error" style="color: red" class="error-message"></p>
                             </div>
                             <div class="col-md-4 form-group">
                                 <label for="quantity">Quantity</label>
@@ -72,7 +72,7 @@ include('../adminLayouts/navbar.ejs') %>
                                     placeholder="Quantity"
                                     value="<%= data.quantity %>"
                                 />
-                                <p id="quantity-error"  style="color: red;" class="error-message"></p>
+                                <p id="quantity-error" style="color: red" class="error-message"></p>
                             </div>
                         </div>
 
@@ -81,121 +81,86 @@ include('../adminLayouts/navbar.ejs') %>
                             <textarea class="form-control" id="description" rows="4" name="description">
 <%= data.description %></textarea
                             >
-                            <p id="description-error" style="color: red;" class="error-message"></p>
+                            <p id="description-error" style="color: red" class="error-message"></p>
                         </div>
 
                         <!-- ... other form fields ... -->
                         <div class="container-fluid">
-                          <label for="">File upload (Multiple Images)</label>
-                          <div class="row dynamic-image-inputs">
-                              <!-- Existing images -->
-                              <% data.image.forEach((image, index) => { %>
-                              <div class="col-md-3 mb-2 existing-image">
-                                  <img src="/static/admin/Assets/images/products/<%= image %>"
-                                      style="width: 100px; height: 100px" alt="Existing Image" class="product-image" />
-                                  <input type="hidden" name="existingImages" value="<%= image %>">
-                                  <button class="btn btn-secondary replace-image-button" data-index="<%= index %>">
-                                      Replace
-                                  </button>
-                              </div>
-                              <% }); %>
-                              <!-- New image inputs will be added here -->
-                          </div>
-                          <div class="col-md-12 mt-2">
-                              <button class="btn btn-primary add-image-input" type="button">Add Image</button>
-                          </div>
-                          <p id="image-error" class="error-message"></p>
-                      </div>
+                            <label for="">File upload (Multiple Images)</label>
+                            <div class="row dynamic-image-inputs">
+                                <% data.image.forEach((image, index) => { %>
+                                <div class="col-md-3 mb-2 existing-image">
+                                    <img
+                                        src="/static/admin/Assets/images/products/<%= image %>"
+                                        style="width: 100px; height: 100px"
+                                        alt="Image"
+                                        class="product-image"
+                                        data-image-name="<%= image %>"
+                            
+                                    />
+                                    <input type="hidden" class="existing-image-input" name="existingImageName" value="<%= image %>" />
+                                    <button class="remove-image-btn" data-image="<%= image %>" data-product-id="<%= data._id %>">Remove</button>
+                                    <!-- <button class="btn btn-primary change-image-button">Change</button>
+                                    <input type="file" class="hidden file-input" name="newImage" accept="image/*" />
+                                  -->
+                                </div>
+                                <% }); %>
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <button class="btn btn-primary add-image-input" type="button">Add Image</button>
+                            </div>
+                        </div>
 
-                      <!-- ... rest of the form ... -->
+                        <!-- ... rest of the form ... -->
 
-                      <div class="row mt-5">
-                          <div class="col-md-12 text-center">
-                              <button type="submit" class="btn btn-primary mr-2">Submit</button>
-                              <button class="btn btn-dark">Cancel</button>
-                          </div>
-                      </div>
+                        <div class="row mt-5">
+                            <div class="col-md-12 text-center">
+                                <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                <button class="btn btn-dark">Cancel</button>
+                            </div>
+                        </div>
 
-                      <div class="input-container">
-                          <input type="hidden" name="id" value="<%= data._id %>" />
-                      </div>
-                  </form>
-              </div>
-          </div>
-      </div>
-  </div>
+                        <div class="input-container">
+                            <input type="hidden" name="id" value="<%= data._id %>" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    
-  document.addEventListener("DOMContentLoaded", function () {
-      const addImageButton = document.querySelector(".add-image-input");
-      const dynamicImageInputs = document.querySelector(".dynamic-image-inputs");
+  document.addEventListener("DOMContentLoaded", () => {
+        const removeButtons = document.querySelectorAll(".remove-image-btn");
 
-      addImageButton.addEventListener("click", function () {
-          // Check if there are no existing image inputs before adding a new one
-          const existingInputs = dynamicImageInputs.querySelectorAll('.new-image-input input[type="file"]');
-          if (existingInputs.length === 0) {
-              // Create new image input field
-              const inputGroup = document.createElement("div");
-              inputGroup.className = "col-md-3 mb-2 new-image-input";
-              const inputFile = document.createElement("input");
-              inputFile.type = "file";
-              inputFile.name = "images";
-              inputFile.className = "form-control";
-              inputFile.required = true;
-              const removeButton = document.createElement("button");
-              removeButton.className = "btn btn-danger remove-image-input";
-              removeButton.type = "button";
-              removeButton.textContent = "Remove";
-              removeButton.addEventListener("click", function () {
-                  // Remove the image input field
-                  inputGroup.remove();
-              });
-              inputGroup.appendChild(inputFile);
-              inputGroup.appendChild(removeButton);
-              dynamicImageInputs.appendChild(inputGroup);
-          }
-      });
+        removeButtons.forEach(button => {
+            button.addEventListener("click", async (event) => {
+                const productId = event.target.getAttribute("data-product-id");
+                const imageName = event.target.getAttribute("data-image");
 
-      // Handle existing image replacement
-      dynamicImageInputs.addEventListener("click", function (event) {
-        if (event.target.classList.contains("replace-image-button") && !event.target.disabled) {
-            const index = event.target.getAttribute("data-index");
-            const inputFile = document.createElement("input");
-            inputFile.type = "file";
-            inputFile.name = "images";
-            inputFile.className = "form-control";
-            inputFile.required = true;
-            inputFile.addEventListener("change", function (e) {
-                const newImageFile = e.target.files[0];
-                if (newImageFile) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        const newImageSrc = e.target.result;
-                        const newImageElement = document.createElement("img");
-                        newImageElement.src = newImageSrc;
-                        newImageElement.style.width = "100px";
-                        newImageElement.style.height = "100px";
-                        // Replace the old image with the new one
-                        const existingImageContainer = event.target.parentElement;
-                        // Remove the existing image before adding the new one
-                        existingImageContainer.querySelector(".product-image").remove();
-                        existingImageContainer.insertBefore(newImageElement, event.target);
-                        // Disable the replace button after replacement
-                        event.target.disabled = true;
-                        // Add a class to mark the image as replaced
-                        existingImageContainer.classList.add("replaced-image");
-                    };
-                    reader.readAsDataURL(newImageFile);
+                try {
+                    const response = await fetch(`/admin/delete-image?productId=${productId}&imageName=${imageName}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+
+                    if (response.ok) {
+                        // Remove the image element from the DOM without reloading the page
+                        event.target.parentElement.remove();
+                    } else {
+                        // Handle error response
+                        console.error("Error removing image:", response.statusText);
+                    }
+                } catch (error) {
+                    // Handle network error or JSON parsing error
+                    console.error("Error:", error);
                 }
             });
-            // Insert file input before the "Replace" button
-            const existingImageContainer = event.target.parentElement;
-            existingImageContainer.insertBefore(inputFile, event.target);
-        }
+        });
     });
-});
 </script>
 
 <%- include('../adminLayouts/footer.ejs') %>

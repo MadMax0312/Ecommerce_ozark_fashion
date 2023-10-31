@@ -39,7 +39,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+
+const productController = require("../controllers/productController");
+
 const adminController = require("../controllers/adminController");
+
 
 admin_route.get("/", auth.isLogout, adminController.loadLogin);
 
@@ -53,17 +57,21 @@ admin_route.get("/users", auth.isLogin, adminController.loadUsers);
 
 admin_route.post("/block-user", auth.isLogin, adminController.blockUsers);
 
-admin_route.get("/view-products", auth.isLogin, adminController.viewProducts);
+admin_route.get("/view-products", auth.isLogin, productController.viewProducts);
 
-admin_route.get("/add-products", adminController.loadaddProducts);
+admin_route.get("/add-products", productController.loadaddProducts);
 
-admin_route.post("/add-products", upload.array("images", 4), adminController.addProducts);
+admin_route.post("/add-products", upload.array("images", 4), productController.addProducts);
 
-admin_route.post("/unlist-product", auth.isLogin, adminController.unlistProduct);
+admin_route.post("/unlist-product", auth.isLogin, productController.unlistProduct);
 
-admin_route.get("/edit-product", auth.isLogin, adminController.loadEditProducts);
+admin_route.get("/edit-product", auth.isLogin, productController.loadEditProducts);
 
-admin_route.post("/edit-product", upload.array("images", 4), adminController.editProduct);
+admin_route.post("/edit-product", upload.array("images", 4), productController.editProduct);
+
+admin_route.post("/delete-image", productController.deleteImage);
+
+admin_route.post("/update-image", upload.single('newImage'), productController.updateImage);
 
 admin_route.get("/categories", auth.isLogin, adminController.loadCatogories);
 
