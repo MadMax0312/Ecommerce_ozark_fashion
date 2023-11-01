@@ -260,6 +260,28 @@ const updateImage = async(req, res) => {
 }
 }
 
+const addImages = async (req, res) => {
+  try {
+      const productId = req.body.productId;
+      const images = req.files.map(file => file.filename);
+
+      // Find the product by ID and push new images to the product's image array
+      const product = await Product.findByIdAndUpdate(productId, {
+          $push: { image: images }
+      }, { new: true });
+
+      if (product) {
+          res.status(200).json({ images }); // Send the added image filenames in the response
+      } else {
+          res.status(404).send('Product not found.');
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal server error.');
+  }
+};
+
+
 
 
 
@@ -272,6 +294,7 @@ module.exports = {
   editProduct,
   deleteImage,
   updateImage,
+  addImages, 
   loadEditProducts,
 
 };

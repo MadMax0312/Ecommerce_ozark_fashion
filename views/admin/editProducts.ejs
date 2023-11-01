@@ -96,9 +96,10 @@ include('../adminLayouts/navbar.ejs') %>
                                         alt="Image"
                                         class="product-image"
                                         data-image-name="<%= image %>"
+
                             
                                     />
-                                    <input type="hidden" class="existing-image-input" name="existingImageName" value="<%= image %>" />
+                                    <input type="hidden" class="existing-image-input" name="existingImageName" value="<%= image %>" required/>
                                     <button class="remove-image-btn" data-image="<%= image %>" data-product-id="<%= data._id %>">Remove</button>
                                     <!-- <button class="btn btn-primary change-image-button">Change</button>
                                     <input type="file" class="hidden file-input" name="newImage" accept="image/*" />
@@ -107,6 +108,7 @@ include('../adminLayouts/navbar.ejs') %>
                                 <% }); %>
                             </div>
                             <div class="col-md-12 mt-2">
+                                <input type="file" class="hidden file-input" id="newImageInput" accept="image/*" multiple />
                                 <button class="btn btn-primary add-image-input" type="button">Add Image</button>
                             </div>
                         </div>
@@ -132,35 +134,133 @@ include('../adminLayouts/navbar.ejs') %>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-        const removeButtons = document.querySelectorAll(".remove-image-btn");
+    const form = document.querySelector(".forms-sample");
+    const removeButtons = document.querySelectorAll(".remove-image-btn");
+    const newImageInput = document.getElementById("newImageInput");
 
-        removeButtons.forEach(button => {
-            button.addEventListener("click", async (event) => {
-                const productId = event.target.getAttribute("data-product-id");
-                const imageName = event.target.getAttribute("data-image");
+    form.addEventListener("submit", async function (event) {
+        
 
-                try {
-                    const response = await fetch(`/admin/delete-image?productId=${productId}&imageName=${imageName}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    });
+        // Your validation logic here
+        if (!productValidForm()) {
+            return;
+        }
 
-                    if (response.ok) {
-                        // Remove the image element from the DOM without reloading the page
-                        event.target.parentElement.remove();
-                    } else {
-                        // Handle error response
-                        console.error("Error removing image:", response.statusText);
-                    }
-                } catch (error) {
-                    // Handle network error or JSON parsing error
-                    console.error("Error:", error);
-                }
+        // Handle form submission
+        try {
+            const formData = new FormData(form);
+            const response = await fetch("/admin/edit-product", {
+                method: "POST",
+                body: formData,
             });
+
+            if (response.ok) {
+                // Redirect after successful form submission
+                window.location.href = "/admin/view-products";
+            } else {
+                // Handle error response
+                console.error("Error submitting form:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            // Handle network error or JSON parsing error
+        }
+    });
+
+    // Event listener for removing images
+    removeButtons.forEach(button => {
+        button.addEventListener("click", async (event) => {
+            event.preventDefault(); 
+
+            const productId = event.target.getAttribute("data-product-id");
+            const imageName = event.target.getAttribute("data-image");
+
+            try {
+                const response = await fetch(`/admin/delete-image?productId=${productId}&imageName=${imageName}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (response.ok) {
+                    // After successful image removal, remove the image element from the DOM
+                    event.target.parentElement.remove();
+                } else {
+                    // Handle error response
+                    console.error("Error removing image:", response.statusText);
+                }
+            } catch (error) {
+                console.error("Error removing image:", error);
+                // Handle network error or JSON parsing error
+            }
         });
     });
+
+newImageInput.addEventListener("change", async (event) => {
+    const productId = document.querySelector("[name='id']").value;
+    const formData = new FormData();
+    formData.append("productId", productId);
+
+    // Append selected images to FormData
+    for (const file of event.target.files) {
+        formData.append("images", file);
+    }
+
+    try {
+        const response = await fetch("/admin/add-images", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (response.ok) {
+            const imagesContainer = document.querySelector(".dynamic-image-inputs");
+            const responseData = await response.json();
+
+            // Create and append new image elements to the DOM
+            responseData.images.forEach((image) => {
+                const imageDiv = document.createElement("div");
+                imageDiv.className = "col-md-3 mb-2 existing-image";
+                const img = document.createElement("img");
+                img.src = `/static/admin/Assets/images/products/${image}`;
+                img.style.width = "100px";
+                img.style.height = "100px";
+                img.alt = "Image";
+                img.className = "product-image";
+                const hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.className = "existing-image-input";
+                hiddenInput.name = "existingImageName";
+                hiddenInput.value = image;
+                const removeBtn = document.createElement("button");
+                removeBtn.className = "remove-image-btn";
+                removeBtn.innerText = "Remove";
+                removeBtn.setAttribute("data-image", image);
+                removeBtn.setAttribute("data-product-id", productId);
+                removeBtn.addEventListener("click", async (event) => {
+                    event.preventDefault();
+                    // Add your image removal logic here
+                });
+
+                imageDiv.appendChild(img);
+                imageDiv.appendChild(hiddenInput);
+                imageDiv.appendChild(removeBtn);
+                imagesContainer.appendChild(imageDiv);
+            });
+
+            // Handle successful addition of images (if needed)
+            console.log("Images added successfully.");
+        } else {
+            // Handle error response
+            console.error("Error adding images:", response.statusText);
+        }
+    } catch (error) {
+        console.error("Error adding images:", error);
+        // Handle network error or JSON parsing error
+    }
+});
+  })
+
 </script>
 
 <%- include('../adminLayouts/footer.ejs') %>

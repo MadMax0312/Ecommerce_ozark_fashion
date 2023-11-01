@@ -27,12 +27,12 @@ include('../adminLayouts/navbar.ejs') %>
                                   name="productname"
                                   placeholder="ProductName"
                               />
-                              <p id="productname-error" class="error-message"></p>
+                              <p id="productname-error" class="error-message" style="color: red;"></p>
                           </div>
                           <div class="col-md-6 form-group">
                               <label for="size">Size</label>
                               <input type="text" class="form-control" id="size" name="size" placeholder="Size">
-                              <p id="size-error" class="error-message"></p>
+                              <p id="size-error" class="error-message" style="color: red ;"></p>
                           </div>
                       </div>
 
@@ -54,7 +54,7 @@ include('../adminLayouts/navbar.ejs') %>
                                   name="price"
                                   placeholder="Price"
                               />
-                              <p id="price-error" class="error-message"></p>
+                              <p id="price-error" class="error-message" style="color: red;"></p>
                           </div>
                           <div class="col-md-4 form-group">
                               <label for="quantity">Quantity</label>
@@ -65,14 +65,14 @@ include('../adminLayouts/navbar.ejs') %>
                                   name="quantity"
                                   placeholder="Quantity"
                               />
-                              <p id="quantity-error" class="error-message"></p>
+                              <p id="quantity-error" class="error-message" style="color: red;"></p>
                           </div>
                       </div>
 
                       <div class="form-group">
                           <label for="description">Description</label>
                           <textarea class="form-control" id="description" rows="4" name="description"></textarea>
-                          <p id="description-error" class="error-message"></p>
+                          <p id="description-error" class="error-message" style="color: red;"></p>
                       </div>
 
                       <div class="container-fluid">
@@ -81,7 +81,7 @@ include('../adminLayouts/navbar.ejs') %>
                               <div class="col-md-6 mb-0">
                                   <div class="dynamic-image-inputs">
                                       <div class="input-group">
-                                          <input type="file" name="images" id="image" class="form-control"/>
+                                          <input type="file" name="image" id="image" class="form-control"/>
                                           <div class="input-group-append">
                                               <button class="btn btn-primary add-image-input" type="button">
                                                   Add Image
@@ -90,9 +90,11 @@ include('../adminLayouts/navbar.ejs') %>
                                       </div>
                                   </div>
                               </div>
-                              <p id="image-error" class="error-message"></p>
+                              <p id="image-error" class="error-message" style="color: red;"></p>
                           </div>
                       </div>
+
+                      
                       <div class="row mt-5">
                         <div class="col-md-12 text-center">
                           <button type="submit" class="btn btn-primary mr-2">Submit</button>
@@ -109,43 +111,51 @@ include('../adminLayouts/navbar.ejs') %>
 <!-- page-body-wrapper ends -->
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const addImageButton = document.querySelector(".add-image-input");
-        const dynamicImageInputs = document.querySelector(".dynamic-image-inputs");
+   document.addEventListener("DOMContentLoaded", function () {
+    const addImageButton = document.querySelector(".add-image-input");
+    const dynamicImageInputs = document.querySelector(".dynamic-image-inputs");
 
-        // Track the number of added images
-        let imageCount = 1;
+    // Track the number of added images
+    let imageCount = 1;
 
-        addImageButton.addEventListener("click", function () {
-            if (imageCount < 4) {
-                const inputGroup = document.createElement("div");
-                inputGroup.className = "input-group";
-                const inputFile = document.createElement("input");
-                inputFile.type = "file";
-                inputFile.name = "images";
-                inputFile.className = "form-control";
-                inputFile.required = true;
-                const inputGroupAppend = document.createElement("div");
-                inputGroupAppend.className = "input-group-append";
-                const removeButton = document.createElement("button");
-                removeButton.className = "btn btn-danger remove-image-input";
-                removeButton.type = "button";
-                removeButton.textContent = "Remove";
-                removeButton.addEventListener("click", function () {
-                    inputGroup.remove();
-                    imageCount--; // Decrease the image count when removing an input
-                });
-                inputGroupAppend.appendChild(removeButton);
-                inputGroup.appendChild(inputFile);
-                inputGroup.appendChild(inputGroupAppend);
-                dynamicImageInputs.appendChild(inputGroup);
+    addImageButton.addEventListener("click", function () {
+        if (imageCount < 4) {
+            const inputGroup = document.createElement("div");
+            inputGroup.className = "input-group";
+            const inputFile = document.createElement("input");
+            inputFile.type = "file";
+            inputFile.name = "image";
+            inputFile.className = "form-control";
+           
+            const inputGroupAppend = document.createElement("div");
+            inputGroupAppend.className = "input-group-append";
+            const removeButton = document.createElement("button");
+            removeButton.className = "btn btn-danger remove-image-input";
+            removeButton.type = "button";
+            removeButton.textContent = "Remove";
+            removeButton.addEventListener("click", function () {
+                inputGroup.remove();
+                imageCount--; // Decrease the image count when removing an input
+            });
+            inputGroupAppend.appendChild(removeButton);
+            inputGroup.appendChild(inputFile);
+            inputGroup.appendChild(inputGroupAppend);
+            dynamicImageInputs.appendChild(inputGroup);
 
-                imageCount++; // Increase the image count when adding an input
-            } else {
-                alert("You can add only 4 images.");
-            }
-        });
+            imageCount++; // Increase the image count when adding an input
+        } else {
+            // Show SweetAlert modal instead of the regular alert
+            Swal.fire({
+                title: "Oops!",
+                text: "You can add only 4 images.",
+                icon: "warning",
+                showCancelButton: false,
+                confirmButtonText: "OK",
+            });
+        }
     });
+});
+
 </script>
 
 <%- include('../adminLayouts/footer.ejs') %>

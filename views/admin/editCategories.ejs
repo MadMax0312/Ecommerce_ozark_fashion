@@ -22,12 +22,12 @@
                     <div class="form-group">
                       <label for="exampleInputName1">Category Name</label>
                       <input type="text" class="form-control" id="exampleInputName1" name="categoryname" placeholder=" Category Name" value="<%= data.categoryname %>">
-                      <p id="categoryname-error" class="error-message"></p>
+                      <p id="categoryname-error" class="error-message" style="color: red;"></p>
                     </div>      
                     <div class="form-group">
                       <label for="exampleTextarea1">Category Description</label>
                       <textarea class="form-control" id="exampleTextarea1" rows="4" name="categorydes" placeholder="Category Description"><%= data.description %></textarea>
-                      <p id="categorydes-error" class="error-message"></p>
+                      <p id="categorydes-error" class="error-message" style="color: red;"></p>
                     </div>
                     <div class="input-container">
                       <input type="hidden" name="id" value="<%= data._id %>">

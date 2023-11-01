@@ -42,6 +42,8 @@ const upload = multer({ storage: storage });
 
 const productController = require("../controllers/productController");
 
+const categoryController = require("../controllers/categoryController")
+
 const adminController = require("../controllers/adminController");
 
 
@@ -57,6 +59,8 @@ admin_route.get("/users", auth.isLogin, adminController.loadUsers);
 
 admin_route.post("/block-user", auth.isLogin, adminController.blockUsers);
 
+//=================================  P R O D U C T === S E C T I O N  =================================================================================//
+
 admin_route.get("/view-products", auth.isLogin, productController.viewProducts);
 
 admin_route.get("/add-products", productController.loadaddProducts);
@@ -71,19 +75,25 @@ admin_route.post("/edit-product", upload.array("images", 4), productController.e
 
 admin_route.post("/delete-image", productController.deleteImage);
 
+admin_route.post('/add-images', upload.array('images', 4), productController.addImages);
+
 admin_route.post("/update-image", upload.single('newImage'), productController.updateImage);
 
-admin_route.get("/categories", auth.isLogin, adminController.loadCatogories);
+//================================== C A T E G O R Y == S E C T I ON ================================================================================//
 
-admin_route.get("/editCategories", auth.isLogin, adminController.loadEditCatogories);
+admin_route.get("/categories", auth.isLogin, categoryController.loadCatogories);
 
-admin_route.post("/editCategories", adminController.editCategory);
+admin_route.get("/editCategories", auth.isLogin, categoryController.loadEditCatogories);
 
-admin_route.get("/addCategories", auth.isLogin, adminController.loadAddCategories);
+admin_route.post("/editCategories", categoryController.editCategory);
 
-admin_route.post("/addCategories", adminController.addCategory);
+admin_route.get("/addCategories", auth.isLogin, categoryController.loadAddCategories);
 
-admin_route.get("/unlist-category", auth.isLogin, adminController.unlistCategory);
+admin_route.post("/addCategories", categoryController.addCategory);
+
+admin_route.get("/unlist-category", auth.isLogin, categoryController.unlistCategory);
+
+//=====================================================================================================================================//
 
 admin_route.get("/banner", auth.isLogin, adminController.loadBanner);
 

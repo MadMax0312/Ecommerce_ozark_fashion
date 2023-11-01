@@ -25,6 +25,9 @@ user_route.use(express.urlencoded({ extended: true }));
 const userController = require("../controllers/userController");
 const wishlistController = require("../controllers/wishlistController");
 const cartController = require("../controllers/cartController");
+const addressController = require("../controllers/addressController");
+const checkoutController = require("../controllers/checkoutController");
+const profileController = require("../controllers/profileController");
 
 user_route.get("/register", userController.loadRegister);
 user_route.post("/register", userController.verifyOtp);
@@ -48,23 +51,38 @@ user_route.get("/changePassword", userController.loadChangePassword);
 
 user_route.post("/changePassword", userController.updatePassword);
 
+//======================= H O M E === S E C T I O N  ============================================================
+
 user_route.get("/", userController.login);
 
 user_route.get("/shop", userController.loadShop);
 
-user_route.get("/userProfile", userController.loadUser);
+//====================== P R O F I L E == S E C T I O N ==================================
 
-user_route.get("/userProfile-Edit", auth.isLogin, userController.loadEditUser);
 
-user_route.post("/userProfile-Edit", userController.updateProfile);
+user_route.get('/userProfile',auth.isLogin,profileController.loadProfile);
+user_route.get('/address',auth.isLogin,profileController.loadAddress);
+user_route.post('/addAddress',auth.isLogin,profileController.addAddress);
+user_route.get('/editAddress',auth.isLogin,profileController.loadEditAddress);
+user_route.post('/editAddress',auth.isLogin,profileController.editAddress);
+user_route.delete('/deleteAddress',profileController.deleteAddress);
+user_route.post('/updateUser',auth.isLogin,profileController.updateUser);
+user_route.post('/resetPassword',auth.isLogin,profileController.resetPassword);
+
+
+//======================================================================
 
 user_route.get("/product-info", userController.loadProductInfo);
+
+//======================== W I S H L I S T == S E C T I O N ============================================
 
 user_route.get("/wishlist", wishlistController.loadWishlist);
 
 user_route.post("/addToWishlist", wishlistController.addToWishlist);
 
 user_route.get("/remove-wishlist", wishlistController.removeProduct);
+
+//===================== C A R T == S E C T I O N ===================================
 
 user_route.get("/remove-cart", cartController.removeProduct);
 
@@ -75,5 +93,9 @@ user_route.post("/addToCart", cartController.addToCart);
 user_route.post("/update-cart", cartController.updateCart);
 
 user_route.get("/about", userController.loadAbout);
+
+//================== C H E C K O U T == S E C T I O N  ======================
+
+user_route.get("/checkout", checkoutController.loadCheckout);
 
 module.exports = user_route;
