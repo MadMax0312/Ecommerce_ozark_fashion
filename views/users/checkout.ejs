@@ -1,5 +1,15 @@
 <%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
+<style>
+    .form-label {
+        margin-bottom: 0px;
+    }
+    .modal-dialog {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+</style>
+
 <div class="site-wrap">
     <div class="bg-light py-3">
         <div class="container">
@@ -23,11 +33,13 @@
                         <div class="col-md-6 col-12 mb-3 mt-3" id="address-card-<%= address.address[i]._id %>">
                             <div class="card p-2" style="background: #f3f3f9; border-radius: 10px">
                                 <div class="card-body">
-                                    <h6 class="card-title data-full-name " style="font-size: 15px">Name:<%= address.address[i].fullName %></h6>
-                                    <p class="card-text  data-mobile">Number: <%= address.address[i].mobile %></p>
-                                    <p class="card-text  data-district">District: <%= address.address[i].district %></p>
-                                    <p class="card-text  data-city">City:<%= address.address[i].city %></p>
-                                    <p class="card-text  data-state">State: <%= address.address[i].state %></p>
+                                    <h6 class="card-title data-full-name" style="font-size: 15px">
+                                        Name:<%= address.address[i].fullName %>
+                                    </h6>
+                                    <p class="card-text data-mobile">Number: <%= address.address[i].mobile %></p>
+                                    <p class="card-text data-district">District: <%= address.address[i].district %></p>
+                                    <p class="card-text data-city">City:<%= address.address[i].city %></p>
+                                    <p class="card-text data-state">State: <%= address.address[i].state %></p>
                                     <p class="card-text">Pincode: <%= address.address[i].pincode %></p>
 
                                     <hr class="my-3" />
@@ -56,24 +68,193 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <a href=""
-                                    ><button type="submit" class="btn btn-sm" style="background-color: black; color: white">
-                                        Set as default
-                                    </button></a
-                                >
+                            <div style="color: black">
+                                <input
+                                    type="radio"
+                                    name="defaultAddress"
+                                    id="defaultAddress_<%= address.address[i]._id %>"
+                                />
+                                &nbsp; Set as default
                             </div>
                         </div>
 
                         <% } %> <% } else { %> <% } %>
                     </div>
 
-                    <div>
-                        <a href="/address">
-                            <button type="submit" class="btn btn-primary btn-sm">Add Address</button>
-                        </a>
+                    <div class="form-group" id="addAddressForm">
+                        <label
+                            for="c_ship_different_address"
+                            class="text-black"
+                            data-toggle="collapse"
+                            href="#ship_different_address"
+                            role="button"
+                            aria-expanded="false"
+                            aria-controls="ship_different_address"
+                            ><input type="checkbox" value="1" id="c_ship_different_address" /> Ship To A Different
+                            Address?</label
+                        >
+                        <div class="collapse" id="ship_different_address">
+                            <div class="py-2">
+                                <div class="form-group row">
+                                    <div class="col-md-12">
+                                        <label for="c_diff_fname" class="text-black"
+                                            >Full Name <span class="text-danger">*</span></label
+                                        >
+                                        <input type="text" class="form-control" id="c_diff_fname" name="c_diff_fname" />
+                                        <span id="names-error" class="error-message" style="color: red"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <label for="c_diff_country" class="text-black"
+                                            >Mobile Number <span class="text-danger">*</span></label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="c_diff_mobile"
+                                            name="c_diff_mobile"
+                                           
+                                        />
+                                        <span id="mobiles-error" class="error-message" style="color: red"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="c_diff_city" class="text-black"
+                                            >City <span class="text-danger">*</span></label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="c_diff_city"
+                                            name="c_diff_city"
+                                          
+                                        />
+                                        <span id="citys-error" class="error-message" style="color: red"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <label for="c_diff_state_district" class="text-black"
+                                            >District<span class="text-danger">*</span></label
+                                        >
+                                        <select
+                                            class="form-control"
+                                            id="c_diff_state_district"
+                                            name="c_diff_state_district"
+                                            required
+                                        >
+                                            <option value="" disabled selected>Select District</option>
+                                            <option value="Alappuzha">Alappuzha</option>
+                                            <option value="Ernakulam">Ernakulam</option>
+                                            <option value="Idukki">Idukki</option>
+                                            <option value="Kannur">Kannur</option>
+                                            <option value="Kasaragod">Kasaragod</option>
+                                            <option value="Kollam">Kollam</option>
+                                            <option value="Kottayam">Kottayam</option>
+                                            <option value="Kozhikode">Kozhikode</option>
+                                            <option value="Malappuram">Malappuram</option>
+                                            <option value="Palakkad">Palakkad</option>
+                                            <option value="Pathanamthitta">Pathanamthitta</option>
+                                            <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                                            <option value="Thrissur">Thrissur</option>
+                                            <option value="Wayanad">Wayanad</option>
+                                        </select>
+                                    </div>
+                                    <span id="districts-error" class="error-message" style="color: red"></span>
+
+                                    <div class="col-md-6">
+                                        <label for="c_diff_postal_state" class="text-black"
+                                            >State<span class="text-danger">*</span></label
+                                        >
+                                        <select class="form-control" id="c_diff_postal_state" name="c_diff_postal_state" required>
+                                            <option value="" disabled selected>Select State</option>
+                                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                            <option value="Assam">Assam</option>
+                                            <option value="Bihar">Bihar</option>
+                                            <option value="Chhattisgarh">Chhattisgarh</option>
+                                            <option value="Goa">Goa</option>
+                                            <option value="Gujarat">Gujarat</option>
+                                            <option value="Haryana">Haryana</option>
+                                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                            <option value="Jharkhand">Jharkhand</option>
+                                            <option value="Karnataka">Karnataka</option>
+                                            <option value="Kerala">Kerala</option>
+                                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                            <option value="Maharashtra">Maharashtra</option>
+                                            <option value="Manipur">Manipur</option>
+                                            <option value="Meghalaya">Meghalaya</option>
+                                            <option value="Mizoram">Mizoram</option>
+                                            <option value="Nagaland">Nagaland</option>
+                                            <option value="Odisha">Odisha</option>
+                                            <option value="Punjab">Punjab</option>
+                                            <option value="Rajasthan">Rajasthan</option>
+                                            <option value="Sikkim">Sikkim</option>
+                                            <option value="Tamil Nadu">Tamil Nadu</option>
+                                            <option value="Telangana">Telangana</option>
+                                            <option value="Tripura">Tripura</option>
+                                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                            <option value="Uttarakhand">Uttarakhand</option>
+                                            <option value="West Bengal">West Bengal</option>
+                                            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                            <option value="Chandigarh">Chandigarh</option>
+                                            <option value="Dadra and Nagar Haveli">Dadra and Nagar Haveli</option>
+                                            <option value="Daman and Diu">Daman and Diu</option>
+                                            <option value="Lakshadweep">Lakshadweep</option>
+                                            <option value="Delhi">Delhi</option>
+                                            <option value="Puducherry">Puducherry</option>
+                                        </select>
+                                    </div>
+                                    <span id="states-error" class="error-message" style="color: red"></span>
+                                </div>
+                              
+
+                                <div class="form-group row mb-5">
+                                    <div class="col-md-6">
+                                        <label for="c_diff_country" class="text-black"
+                                            >Country <span class="text-danger">*</span></label
+                                        >
+                                        <select id="c_diff_country" class="form-control">
+                                            <option value="1">Select a country</option>
+                                            <option value="2">Bangladesh</option>
+                                            <option value="3">Algeria</option>
+                                            <option value="4">Afghanistan</option>
+                                            <option value="5">India</option>
+                                            <option value="6">Albania</option>
+                                            <option value="7">Bahrain</option>
+                                            <option value="8">Colombia</option>
+                                            <option value="9">Dominican Republic</option>
+                                        </select>
+                                        <span id="countrys-error" class="error-message" style="color: red"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="c_diff_pincode" class="text-black"
+                                            >Pin Code <span class="text-danger">*</span></label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="c_diff_pincode"
+                                            name="c_diff_pincode"
+                                        
+                                          
+                                        />
+                                        <span id="pincodes-error" class="error-message" style="color: red"></span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <button type="button" class="btn btn-primary btn-sm" id="addAddressBtn">
+                                        Add Address
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <br />
 
                     <div class="form-group">
                         <label for="c_order_notes" class="text-black">Order Notes</label>
@@ -88,12 +269,12 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="row mb-5">
-                        <div class="col-md-12">
+                    <div class="row mb-5 ml-5 mt-4">
+                        <div class="col-md-10">
                             <h2 class="h3 mb-3 text-black">Coupon Code</h2>
                             <div class="p-3 p-lg-5 border">
                                 <label for="c_code" class="text-black mb-3">Enter your coupon code if you have one</label>
-                                <div class="input-group w-75">
+                                <div class="input-group w-100">
                                     <input
                                         type="text"
                                         class="form-control"
@@ -112,10 +293,10 @@
                         </div>
                     </div>
 
-                    <div class="row mb-5">
-                        <div class="col-md-12">
+                    <div class="row mb-5 ml-5">
+                        <div class="col-md-10">
                             <h2 class="h3 mb-3 text-black">Your Order</h2>
-                            <div class="p-3 p-lg-5 border">
+                            <div class="p-1 p-lg-1 border">
                                 <table class="table site-block-order-table mb-5">
                                     <thead>
                                         <th>Product</th>
@@ -159,247 +340,454 @@
                                     </tbody>
                                 </table>
 
-                              //==========================================================
-
-                              <button type="button" class="btn btn-primary edit-address-btn" data-bs-toggle="modal" data-bs-target="#editAddressModal" data-address-id="your-address-id">Edit Address</button>
-
-                              ===================================================
-
-                              <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <div class="p-3 mb-1">
+                                    <h6>
+                                        <div class="d-flex justify-content-between">
+                                            <div style="display: inline-block">
+                                                <p style="color: black">SubTotal Amount :</p>
+                                            </div>
+                                            <div style="display: inline-block">
+                                                <p style="color: black">₹ <%= totalAmount.toFixed(2) %></p>
+                                            </div>
                                         </div>
-                                        <div class="modal-body">
-                                            <!-- Edit address form goes here -->
-                                            <input type="hidden" id="addressId">
-                                            <div class="mb-3">
-                                                <label for="editFullName" class="form-label">Full Name</label>
-                                                <input type="text" class="form-control" id="editFullName" name="editFullName" required>
+                                    </h6>
+                                    <div>
+                                        <h6>
+                                            <div class="d-flex justify-content-between">
+                                                <div style="display: inline-block">
+                                                    <p style="color: black">Delivery Charges :</p>
+                                                </div>
+                                                <div style="display: inline-block">
+                                                    <p style="color: black">₹ 0.00</p>
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="editMobile" class="form-label">Mobile Number</label>
-                                                <input type="tel" class="form-control" id="editMobile" name="editMobile" required>
+                                        </h6>
+                                    </div>
+                                    <div>
+                                        <h6>
+                                            <div class="d-flex justify-content-between">
+                                                <div style="display: inline-block">
+                                                    <p style="color: black">Coupon Discount :</p>
+                                                </div>
+                                                <div style="display: inline-block">
+                                                    <p style="color: black">₹ 0.00</p>
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="editState" class="form-label">State</label>
-                                                <input type="text" class="form-control" id="editState" name="editState" required>
+                                        </h6>
+                                    </div>
+                                    <div>
+                                        <h6>
+                                            <div class="d-flex justify-content-between">
+                                                <div style="display: inline-block">
+                                                    <p style="color: black">Total Amount :</p>
+                                                </div>
+                                                <div style="display: inline-block">
+                                                    <p style="color: black">₹ <%= totalAmount.toFixed(2) %></p>
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="editDistrict" class="form-label">District</label>
-                                                <input type="text" class="form-control" id="editDistrict" name="editDistrict" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editCity" class="form-label">City</label>
-                                                <input type="text" class="form-control" id="editCity" name="editCity" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="editPincode" class="form-label">Pincode</label>
-                                                <input type="text" class="form-control" id="editPincode" name="editPincode" required>
-                                            </div>
-                                            <button type="button" class="btn btn-primary" onclick="saveChanges()">Save Changes</button>
-                                        </div>
+                                        </h6>
                                     </div>
                                 </div>
-                            </div>
-                            
-                              
 
-                              //===========================================================
+                                <div class="col-md-12">
+                                    <div class="border p-3 mb-1">
+                                        <h6 style="color: black">Payment Options</h6>
+                                        <div class="form-check mb-3">
+                                            <input
+                                                class="form-check-input"
+                                                type="radio"
+                                                name="paymentOption"
+                                                id="cashOnDelivery"
+                                                value="cashOnDelivery"
+                                            />
+                                            <label class="form-check-label" for="cashOnDelivery"> Cash on Delivery </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input
+                                                class="form-check-input"
+                                                type="radio"
+                                                name="paymentOption"
+                                                id="onlinePayment"
+                                                value="onlinePayment"
+                                            />
+                                            <label class="form-check-label" for="onlinePayment"> Online Payment </label>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input
+                                                class="form-check-input"
+                                                type="radio"
+                                                name="paymentOption"
+                                                id="bankTransfer"
+                                                value="bankTransfer"
+                                            />
+                                            <label class="form-check-label" for="bankTransfer"> Bank Transfer </label>
+                                        </div>
+                                    </div>
 
-                                <div class="border p-3 mb-3">
-                                    <h3 class="h6 mb-0">
-                                        <a
-                                            class="d-block"
-                                            data-toggle="collapse"
-                                            href="#collapsebank"
-                                            role="button"
-                                            aria-expanded="false"
-                                            aria-controls="collapsebank"
-                                            >Direct Bank Transfer</a
+                                    <div class="form-group">
+                                        <button
+                                            class="btn btn-primary btn-lg py-3 btn-block"
+                                            onclick="window.location='thankyou.html'"
                                         >
-                                    </h3>
-
-                                    <div class="collapse" id="collapsebank">
-                                        <div class="py-2">
-                                            <p class="mb-0">
-                                                Make your payment directly into our bank account. Please use your Order ID
-                                                as the payment reference. Your order won’t be shipped until the funds have
-                                                cleared in our account.
-                                            </p>
-                                        </div>
+                                            Place Order
+                                        </button>
                                     </div>
-                                </div>
-
-                                <div class="border p-3 mb-3">
-                                    <h3 class="h6 mb-0">
-                                        <a
-                                            class="d-block"
-                                            data-toggle="collapse"
-                                            href="#collapsecheque"
-                                            role="button"
-                                            aria-expanded="false"
-                                            aria-controls="collapsecheque"
-                                            >Cheque Payment</a
-                                        >
-                                    </h3>
-
-                                    <div class="collapse" id="collapsecheque">
-                                        <div class="py-2">
-                                            <p class="mb-0">
-                                                Make your payment directly into our bank account. Please use your Order ID
-                                                as the payment reference. Your order won’t be shipped until the funds have
-                                                cleared in our account.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="border p-3 mb-5">
-                                    <h3 class="h6 mb-0">
-                                        <a
-                                            class="d-block"
-                                            data-toggle="collapse"
-                                            href="#collapsepaypal"
-                                            role="button"
-                                            aria-expanded="false"
-                                            aria-controls="collapsepaypal"
-                                            >Paypal</a
-                                        >
-                                    </h3>
-
-                                    <div class="collapse" id="collapsepaypal">
-                                        <div class="py-2">
-                                            <p class="mb-0">
-                                                Make your payment directly into our bank account. Please use your Order ID
-                                                as the payment reference. Your order won’t be shipped until the funds have
-                                                cleared in our account.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <button
-                                        class="btn btn-primary btn-lg py-3 btn-block"
-                                        onclick="window.location='thankyou.html'"
-                                    >
-                                        Place Order
-                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <!-- </form> -->
             </div>
-            <!-- </form> -->
         </div>
     </div>
-</div>
 
-<!-- Bootstrap JS library -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Popper.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
-<!-- Bootstrap JS library -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">X</button>
+                </div>
+                <div class="modal-body py-2">
+                    <form id="editAddressForm" onsubmit="return validsAddress()">
+                        <div class="mb-1">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" name="fullName" />
+                            <span id="name-error" class="error-message" style="color: red"></span>
+                        </div>
+                        <div class="mb-1">
+                            <label for="mobile" class="form-label">Mobile Number</label>
+                            <input type="text" class="form-control" id="mobile" name="mobile" />
+                            <span id="mobile-error" class="error-message" style="color: red"></span>
+                        </div>
+                        <div class="mb-1">
+                            <label for="district" class="form-label">District</label>
+                            <input type="text" class="form-control" id="district" name="district" />
+                            <span id="district-error" class="error-message" style="color: red"></span>
+                        </div>
+                        <div class="mb-1">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city" />
+                            <span id="city-error" class="error-message" style="color: red"></span>
+                        </div>
+                        <div class="mb-1">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" class="form-control" id="state" name="state" />
+                            <span id="state-error" class="error-message" style="color: red"></span>
+                        </div>
+                        <div class="mb-1">
+                            <label for="pincode" class="form-label">Pincode</label>
+                            <input type="text" class="form-control" id="pincode" name="pincode" />
+                            <span id="pincode-error" class="error-message" style="color: red"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
-
-<script>
-    function removeAddress(addressId) {
-        // Remove the address card from the DOM
-        const addressCard = document.getElementById(`address-card-${addressId}`);
-        if (addressCard) {
-            addressCard.remove();
+    <script>
+        function removeAddress(addressId) {
+            // Remove the address card from the DOM
+            const addressCard = document.getElementById(`address-card-${addressId}`);
+            if (addressCard) {
+                addressCard.remove();
+            }
         }
-    }
-</script>
+    </script>
 
-  // Event listener for "Edit" button click
-  <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const editAddressButtons = document.querySelectorAll(".edit-address-btn");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const addAddressBtn = document.getElementById("addAddressBtn");
 
-    editAddressButtons.forEach((button) => {
-        button.addEventListener("click", function () {
-            const addressId = button.getAttribute("data-address-id");
-            const fullName = button.getAttribute("data-full-name");
-            const mobile = button.getAttribute("data-mobile");
-            const state = button.getAttribute("data-state");
-            const district = button.getAttribute("data-district");
-            const city = button.getAttribute("data-city");
-            const pincode = button.getAttribute("data-pincode");
+            addAddressBtn.addEventListener("click", function () {
+                const fullName = document.getElementById("c_diff_fname").value;
+                const mobile = document.getElementById("c_diff_mobile").value;
+                const state = document.getElementById("c_diff_postal_state").value;
+                const district = document.getElementById("c_diff_state_district").value;
+                const city = document.getElementById("c_diff_city").value;
+                const pincode = document.getElementById("c_diff_pincode").value;
+                const country = document.getElementById("c_diff_country").value;
 
-            // Set default values for modal fields
-            document.getElementById("addressId").value = addressId;
-            document.getElementById("editFullName").value = fullName;
-            document.getElementById("editMobile").value = mobile;
-            document.getElementById("editState").value = state;
-            document.getElementById("editDistrict").value = district;
-            document.getElementById("editCity").value = city;
-            document.getElementById("editPincode").value = pincode;
+                // Validate the data
 
-            // Show the modal
-            const editAddressModal = new bootstrap.Modal(document.getElementById("editAddressModal"));
-            editAddressModal.show();
+                const isValid = validateAddressForm(fullName, mobile, country, city, pincode);
+
+                if (isValid) {
+                    // Prepare the request body
+                    const requestBody = {
+                        c_diff_fname: fullName,
+                        c_diff_mobile: mobile,
+                        c_diff_postal_state: state,
+                        c_diff_state_district: district,
+                        c_diff_city: city,
+                        c_diff_country: country,
+                        c_diff_pincode: pincode,
+                    };
+                    console.log(requestBody);
+
+                    // Send a POST request to the server using Fetch API
+                    fetch("/addNewAddress", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(requestBody),
+                    })
+                        .then((response) => {
+                            if (response.ok) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Address Added",
+                                    text: "Your address has been added successfully!",
+                                    timer: 1000,
+                                    showConfirmButton: false,
+                                });
+
+                                return response.json(); // or return response.text() based on the server response
+                            }
+                            throw new Error("Network response was not ok.");
+                        })
+                        .then((data) => {
+                            // Handle data from the server
+                            console.log(data); // Log the response data from the server
+                        })
+                        .catch((error) => {
+                            // Handle errors
+                            console.error("There has been a problem with your fetch operation:", error);
+                        });
+                }
+            });
         });
-    });
-});
 
-function saveChanges() {
-    // Retrieve values from modal fields
-    const addressId = document.getElementById("addressId").value;
-    const fullName = document.getElementById("editFullName").value;
-    const mobile = document.getElementById("editMobile").value;
-    const state = document.getElementById("editState").value;
-    const district = document.getElementById("editDistrict").value;
-    const city = document.getElementById("editCity").value;
-    const pincode = document.getElementById("editPincode").value;
+        function validateAddressForm(fullName, mobile, city, country, pincode) {
+            const nameError = document.getElementById("names-error");
+            const mobileError = document.getElementById("mobiles-error");
+            const cityError = document.getElementById("citys-error");
+            const pincodeError = document.getElementById("pincodes-error");
+            const countryError = document.getElementById("countrys-error");
 
-    // Prepare the data to be sent in the request body
-    const data = {
-        addressId: addressId,
-        fullName: fullName,
-        mobile: mobile,
-        state: state,
-        district: district,
-        city: city,
-        pincode: pincode
-    };
+           
 
-    // Perform an AJAX POST request to save changes
-    fetch("/your-save-endpoint", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Check the response from the server-side logic
-        // If the changes are saved successfully, you can handle it here
-        // For example, close the modal and update the UI if needed
-        if (data.success) {
-            const editAddressModal = new bootstrap.Modal(document.getElementById("editAddressModal"));
-            editAddressModal.hide();
-            // Perform additional actions if necessary, such as updating the UI
-        } else {
-            // Handle error scenarios if changes couldn't be saved
-            console.error("Failed to save changes.");
+
+            if (!fullName) {
+                nameError.textContent = "Name field should not be empty!";
+                setTimeout(function () {
+                    nameError.textContent = "";
+                }, 3000);
+                return false;
+            }
+
+            const mobileRegex = /^[6-9]\d{9}$/;
+
+            if (!mobile || !mobileRegex.test(mobile)) {
+                mobileError.textContent = "Mobile should be a 10-digit valid number";
+                setTimeout(function () {
+                    mobileError.textContent = "";
+                }, 3000);
+                return false;
+            }
+
+            if (new Set(mobile).size === 1) {
+                mobileError.textContent = "Mobile should not consist of same digits";
+                setTimeout(function () {
+                    mobileError.textContent = "";
+                }, 3000);
+                return false;
+            }
+
+            if (!city) {
+                cityError.textContent = "City field should not be empty!";
+                setTimeout(function () {
+                    cityError.textContent = "";
+                }, 3000);
+                return false;
+            }
+
+            if (!country) {
+                countryError.textContent = "Country field should not be empty!";
+                setTimeout(function () {
+                    countryError.textContent = "";
+                }, 3000);
+                return false;
+            }
+         
+
+            const pincodeRegex = /^\d{4}$/;
+
+            if (!pincode) {
+                pincodeError.textContent = "Pincode should be a 6-digit numeric value.";
+                setTimeout(function () {
+                    pincodeError.textContent = "";
+                }, 3000);
+                return false;
+            }
+
+            return true;
         }
-    })
-    .catch(error => {
-        // Handle network errors or other exceptions
-        console.error("Error occurred while saving changes:", error);
-    });
-}
+    </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const editButtons = document.querySelectorAll(".edit-address-btn");
+            let addressId;
 
-  </script>
-<%- include('../userLayouts/footer.ejs') %>
+            editButtons.forEach((button) => {
+                button.addEventListener("click", async function (event) {
+                    addressId = event.target.getAttribute("data-address-id");
+                    console.log(addressId);
+
+                    try {
+                        // Fetch address details based on addressId from your backend API
+                        const response = await fetch(`/address/${addressId}`);
+                        console.log(response);
+                        const selectedAddress = await response.json();
+                        console.log(selectedAddress);
+
+                        // Populate modal fields with address details
+                        document.getElementById("fullName").value = selectedAddress.fullName;
+                        document.getElementById("mobile").value = selectedAddress.mobile;
+                        document.getElementById("district").value = selectedAddress.district;
+                        document.getElementById("city").value = selectedAddress.city;
+                        document.getElementById("state").value = selectedAddress.state;
+                        document.getElementById("pincode").value = selectedAddress.pincode;
+                    } catch (error) {
+                        console.error("Error fetching address:", error);
+                    }
+                });
+            });
+
+            // Save Changes Button Click Event
+            const saveChangesBtn = document.getElementById("saveChangesBtn");
+            saveChangesBtn.addEventListener("click", async function () {
+                console.log(addressId);
+
+                async function handleFormSubmission(event) {
+                    event.preventDefault();
+                    if (!validsAddress(event)) {
+                        return;
+                    }
+
+                    // Get the updated address details from the form fields
+                    const updatedAddress = {
+                        fullName: document.getElementById("fullName").value,
+                        mobile: document.getElementById("mobile").value,
+                        district: document.getElementById("district").value,
+                        city: document.getElementById("city").value,
+                        state: document.getElementById("state").value,
+                        pincode: document.getElementById("pincode").value,
+                    };
+
+                    try {
+                        // Call your backend API endpoint to update the address
+                        const response = await fetch(`/updateAddress/${addressId}`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(updatedAddress),
+                        });
+
+                        console.log(response);
+
+                        if (response.ok) {
+                            // Parse the response JSON data
+                            const updatedAddressData = await response.json();
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Address Updated",
+                                text: "Your address has been updated successfully!",
+                                timer: 1000,
+                                showConfirmButton: false,
+                            }).then(() => {
+                                // Reload the page after showing the notification
+                                location.reload();
+                            });
+
+                            console.log("Address updated successfully on both client and server sides!");
+                        } else {
+                            // Handle errors here, such as network issues or server errors
+                            console.error("Error updating address:", response.statusText);
+                        }
+                    } catch (error) {
+                        // Handle other types of errors, such as network issues
+                        console.error("Error updating address:", error);
+                    }
+
+                    // Close the modal after initiating the save operation
+                    const editAddressModal = new bootstrap.Modal(document.getElementById("editAddressModal"));
+                    editAddressModal.hide();
+                }
+                const editAddressForm = document.getElementById("editAddressForm");
+                editAddressForm.addEventListener("submit", handleFormSubmission);
+            });
+        });
+    </script>
+
+    <script>
+        function validsAddress(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("fullName").value;
+            const mobile = document.getElementById("mobile").value;
+            const state = document.getElementById("state").value;
+            const district = document.getElementById("district").value;
+            const city = document.getElementById("city").value;
+            const pincode = document.getElementById("pincode").value;
+
+            document.getElementById("name-error").textContent = "";
+            document.getElementById("state-error").textContent = "";
+            document.getElementById("mobile-error").textContent = "";
+            document.getElementById("district-error").textContent = "";
+            document.getElementById("city-error").textContent = "";
+            document.getElementById("pincode-error").textContent = "";
+
+            if (!name) {
+                document.getElementById("name-error").textContent = "Name field should not be empty!";
+                return false;
+            }
+
+            if (!state) {
+                document.getElementById("state-error").textContent = "State field should not be empty!";
+                return false;
+            }
+
+            const mobileRegex = /^[6-9]\d{9}$/;
+
+            if (!mobile || !mobileRegex.test(mobile)) {
+                document.getElementById("mobile-error").textContent = "Mobile number should be a 10-digit valid number";
+                return false;
+            }
+
+            if (new Set(mobile).size === 1) {
+                document.getElementById("mobile-error").textContent = "Mobile number should not consist of the same digit.";
+                return false;
+            }
+
+            if (!district) {
+                document.getElementById("district-error").textContent = "District field should not be empty!";
+                return false;
+            }
+
+            if (!city) {
+                document.getElementById("city-error").textContent = "City field should not be empty!";
+                return false;
+            }
+
+            const pincodeRegex = /^\d{6}$/;
+
+            if (!pincode || !pincode.match(pincodeRegex)) {
+                document.getElementById("pincode-error").textContent = "Pincode should be a 6-digit numeric value.";
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+
+    <%- include('../userLayouts/footer.ejs') %>
+</div>

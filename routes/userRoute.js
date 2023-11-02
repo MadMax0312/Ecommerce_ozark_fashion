@@ -98,4 +98,10 @@ user_route.get("/about", userController.loadAbout);
 
 user_route.get("/checkout", checkoutController.loadCheckout);
 
+user_route.get('/address/:id', checkoutController.getAddressById);
+
+user_route.post("/updateAddress/:id", checkoutController.updateAddress);
+
+user_route.post("/addNewAddress", checkoutController.addAddress);
+
 module.exports = user_route;
