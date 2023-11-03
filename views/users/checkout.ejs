@@ -107,16 +107,10 @@
 
                                 <div class="form-group row">
                                     <div class="col-md-6">
-                                        <label for="c_diff_country" class="text-black"
+                                        <label for="c_diff_mobile" class="text-black"
                                             >Mobile Number <span class="text-danger">*</span></label
                                         >
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            id="c_diff_mobile"
-                                            name="c_diff_mobile"
-                                           
-                                        />
+                                        <input type="text" class="form-control" id="c_diff_mobile" name="c_diff_mobile" />
                                         <span id="mobiles-error" class="error-message" style="color: red"></span>
                                     </div>
 
@@ -124,13 +118,7 @@
                                         <label for="c_diff_city" class="text-black"
                                             >City <span class="text-danger">*</span></label
                                         >
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            id="c_diff_city"
-                                            name="c_diff_city"
-                                          
-                                        />
+                                        <input type="text" class="form-control" id="c_diff_city" name="c_diff_city" />
                                         <span id="citys-error" class="error-message" style="color: red"></span>
                                     </div>
                                 </div>
@@ -144,7 +132,6 @@
                                             class="form-control"
                                             id="c_diff_state_district"
                                             name="c_diff_state_district"
-                                            required
                                         >
                                             <option value="" disabled selected>Select District</option>
                                             <option value="Alappuzha">Alappuzha</option>
@@ -162,14 +149,14 @@
                                             <option value="Thrissur">Thrissur</option>
                                             <option value="Wayanad">Wayanad</option>
                                         </select>
+                                        <span id="districts-error" class="error-message" style="color: red"></span>
                                     </div>
-                                    <span id="districts-error" class="error-message" style="color: red"></span>
 
                                     <div class="col-md-6">
                                         <label for="c_diff_postal_state" class="text-black"
                                             >State<span class="text-danger">*</span></label
                                         >
-                                        <select class="form-control" id="c_diff_postal_state" name="c_diff_postal_state" required>
+                                        <select class="form-control" id="c_diff_postal_state" name="c_diff_postal_state">
                                             <option value="" disabled selected>Select State</option>
                                             <option value="Andhra Pradesh">Andhra Pradesh</option>
                                             <option value="Arunachal Pradesh">Arunachal Pradesh</option>
@@ -207,48 +194,36 @@
                                             <option value="Delhi">Delhi</option>
                                             <option value="Puducherry">Puducherry</option>
                                         </select>
+                                        <span id="states-error" class="error-message" style="color: red"></span>
                                     </div>
-                                    <span id="states-error" class="error-message" style="color: red"></span>
                                 </div>
-                              
 
                                 <div class="form-group row mb-5">
                                     <div class="col-md-6">
                                         <label for="c_diff_country" class="text-black"
                                             >Country <span class="text-danger">*</span></label
                                         >
-                                        <select id="c_diff_country" class="form-control">
-                                            <option value="1">Select a country</option>
-                                            <option value="2">Bangladesh</option>
-                                            <option value="3">Algeria</option>
-                                            <option value="4">Afghanistan</option>
-                                            <option value="5">India</option>
-                                            <option value="6">Albania</option>
-                                            <option value="7">Bahrain</option>
-                                            <option value="8">Colombia</option>
-                                            <option value="9">Dominican Republic</option>
-                                        </select>
-                                        <span id="countrys-error" class="error-message" style="color: red"></span>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="c_diff_country"
+                                            name="c_diff_country"
+                                            value="India"
+                                            readonly
+                                        />
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="c_diff_pincode" class="text-black"
                                             >Pin Code <span class="text-danger">*</span></label
                                         >
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            id="c_diff_pincode"
-                                            name="c_diff_pincode"
-                                        
-                                          
-                                        />
+                                        <input type="text" class="form-control" id="c_diff_pincode" name="c_diff_pincode" />
                                         <span id="pincodes-error" class="error-message" style="color: red"></span>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <button type="button" class="btn btn-primary btn-sm" id="addAddressBtn">
+                                    <button type="submit" class="btn btn-primary btn-sm" id="addAddressBtn">
                                         Add Address
                                     </button>
                                 </div>
@@ -511,9 +486,17 @@
                 const pincode = document.getElementById("c_diff_pincode").value;
                 const country = document.getElementById("c_diff_country").value;
 
+                console.log("name", fullName);
+                console.log("mb", mobile);
+                console.log("st", state);
+                console.log("dis", district);
+                console.log("cty", city);
+                console.log("pn", pincode);
+                console.log("ct", country);
+
                 // Validate the data
 
-                const isValid = validateAddressForm(fullName, mobile, country, city, pincode);
+                const isValid = validateAddressForm(fullName, mobile, district, state, city, pincode);
 
                 if (isValid) {
                     // Prepare the request body
@@ -562,17 +545,24 @@
             });
         });
 
-        function validateAddressForm(fullName, mobile, city, country, pincode) {
+        function validateAddressForm(fullNames, mobiles, districts, states, citys, pincodes) {
             const nameError = document.getElementById("names-error");
             const mobileError = document.getElementById("mobiles-error");
             const cityError = document.getElementById("citys-error");
             const pincodeError = document.getElementById("pincodes-error");
-            const countryError = document.getElementById("countrys-error");
 
-           
+            const stateError = document.getElementById("states-error");
+            const districtError = document.getElementById("districts-error");
 
+            console.log("nameEr", nameError);
+            console.log("mber", mobileError);
+            console.log("ctr", cityError);
+            console.log("dtr", districtError);
+            console.log("ster", stateError);
 
-            if (!fullName) {
+            console.log("pnEr", pincodeError);
+
+            if (!fullNames) {
                 nameError.textContent = "Name field should not be empty!";
                 setTimeout(function () {
                     nameError.textContent = "";
@@ -582,7 +572,7 @@
 
             const mobileRegex = /^[6-9]\d{9}$/;
 
-            if (!mobile || !mobileRegex.test(mobile)) {
+            if (!mobiles || !mobileRegex.test(mobiles)) {
                 mobileError.textContent = "Mobile should be a 10-digit valid number";
                 setTimeout(function () {
                     mobileError.textContent = "";
@@ -590,7 +580,7 @@
                 return false;
             }
 
-            if (new Set(mobile).size === 1) {
+            if (new Set(mobiles).size === 1) {
                 mobileError.textContent = "Mobile should not consist of same digits";
                 setTimeout(function () {
                     mobileError.textContent = "";
@@ -598,7 +588,7 @@
                 return false;
             }
 
-            if (!city) {
+            if (!citys) {
                 cityError.textContent = "City field should not be empty!";
                 setTimeout(function () {
                     cityError.textContent = "";
@@ -606,18 +596,25 @@
                 return false;
             }
 
-            if (!country) {
-                countryError.textContent = "Country field should not be empty!";
+            if (!districts) {
+                districtError.textContent = "District field should not be empty!";
                 setTimeout(function () {
-                    countryError.textContent = "";
+                    districtError.textContent = "";
                 }, 3000);
                 return false;
             }
-         
+
+            if (!states) {
+                stateError.textContent = "State field should not be empty!";
+                setTimeout(function () {
+                    stateError.textContent = "";
+                }, 3000);
+                return false;
+            }
 
             const pincodeRegex = /^\d{4}$/;
 
-            if (!pincode) {
+            if (!pincodes || !pincode.match(pincodeRegex)) {
                 pincodeError.textContent = "Pincode should be a 6-digit numeric value.";
                 setTimeout(function () {
                     pincodeError.textContent = "";
