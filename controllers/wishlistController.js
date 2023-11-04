@@ -1,17 +1,20 @@
 const Product = require("../models/productModel");
 const Wishlist = require("../models/wishlistModel");
 const User = require("../models/userModel");
+const { getTotalProductsInCart } = require("../number/cartNumber")
 
 const loadWishlist = async (req, res) => {
     try {
         const product = await Product.find();
+        const userId = req.session.user_id;
+        const totalProductsInCart = await getTotalProductsInCart(userId);
 
         const user = req.session.user_id;
 
         const wishlist = await Wishlist.find({ user_id: user }).populate("product");
         console.log(wishlist);
 
-        res.render("wishlist", { data: wishlist, user: user });
+        res.render("wishlist", { data: wishlist, user: user, count: totalProductsInCart });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal server error");
@@ -28,7 +31,7 @@ const addToWishlist = async (req, res) => {
         if (userWishlist) {
             // Check if the product is already in the wishlist
             if (userWishlist.product.includes(productId)) {
-                return res.json({ success: false, message: "Product is already in the wishlist" });
+                return res.status(400).json({ message: "Product is already in the wishlist" });
             } else {
                 userWishlist.product.push(productId);
                 await userWishlist.save();
@@ -54,13 +57,10 @@ const removeProduct = async (req, res) => {
         const wishlistId = req.query.wishlistId;
         const productId = req.query.productId;
 
-        // Find the wishlist by ID
         const wishlist = await Wishlist.findById(wishlistId);
 
-        // Remove the product from the product array
         wishlist.product.pull(productId);
 
-        // Save the updated wishlist
         await wishlist.save();
 
         res.redirect("/wishlist");

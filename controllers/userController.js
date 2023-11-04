@@ -1,10 +1,12 @@
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
+const Cart = require("../models/cartModel")
 const Category = require("../models/categoryModel");
 const bcrypt = require("bcrypt");
 const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
+const { getTotalProductsInCart } = require("../number/cartNumber")
 
 const securePassword = async (password) => {
     try {
@@ -178,13 +180,8 @@ const insertUser = async (req, res) => {
 
 //Login user methods started
 
-const login = async (req, res) => {
-    try {
-        res.render("home", { user: req.session.user_id });
-    } catch (error) {
-        console.log(error.message);
-    }
-};
+
+
 
 const loginLoad = async (req, res) => {
     try {
@@ -349,12 +346,53 @@ const updatePassword = async (req, res) => {
     }
 };
 
+//==================== H O M E =========================================
+
+const login = async (req, res) => {
+    try {
+        const products = await Product.find().limit(5);
+
+        const getTotalProductsInCart = async (userId) => {
+            try {
+                const userCart = await Cart.findOne({ user_id: userId });
+                if (userCart && userCart.items.length > 0) {
+                    const uniqueProductIds = new Set(userCart.items.map(item => item.product.toString()));
+                    const totalProducts = uniqueProductIds.size;
+                    return totalProducts;
+                } else {
+                    return 0; // No items in the cart
+                }
+            } catch (error) {
+                throw error;
+            }
+        };
+
+        const userId = req.session.user_id;
+        const totalProductsInCart = await getTotalProductsInCart(userId);
+
+        res.render("home", { user: req.session.user_id, products, count: totalProductsInCart });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+};
+
+
+
+
 //-------loading shop page------------//
+
+
 
 const loadShop = async (req, res) => {
     try {
         const page = req.query.page ? parseInt(req.query.page) : 1;
         const search = req.query.search ? req.query.search : "";
+
+        const userId = req.session.user_id;
+        const totalProductsInCart = await getTotalProductsInCart(userId);
+
+     
         const limit = 6;
 
         let sortOption = {};
@@ -420,6 +458,7 @@ const loadShop = async (req, res) => {
             currentPage: page,
             search: search,
             sortOption: req.query.sort,
+            count: totalProductsInCart
         });
     } catch (error) {
         console.log(error.message);
@@ -427,88 +466,6 @@ const loadShop = async (req, res) => {
     }
 };
 
-//========= User Details =======//
-
-const loadUser = async (req, res) => {
-    try {
-        const user = req.session.user_id;
-
-        if (!req.session.user_id) {
-            res.redirect("/login");
-            return;
-        }
-
-        const userData = await User.findById({ _id: user });
-        console.log("ddddd");
-        console.log(userData);
-        if (userData) {
-            res.render("userProfile", { user: userData });
-        } else {
-            res.status(404).send("User not found");
-        }
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
-    }
-};
-
-//=============Edit User Details ====//
-
-const loadEditUser = async (req, res) => {
-    try {
-        console.log("aaaaa");
-        const id = req.query.id;
-        console.log("ID:", id);
-
-        const userData = await User.findById({ _id: id });
-        console.log(userData);
-
-        if (userData) {
-            res.render("editProfile", { user: userData }); // Pass the category object to the template
-        } else {
-            res.redirect("/userProfile");
-        }
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
-    }
-};
-
-const updateProfile = async (req, res) => {
-    try {
-        console.log(req.body);
-        const id = req.body.user_id;
-        console.log("User ID:", id); // Check if user_id is received correctly
-
-        if (!id) {
-            // Handle the case where user_id is undefined or falsy
-            res.status(400).send("Invalid user ID");
-            return;
-        }
-
-        const updatedUserData = await User.findByIdAndUpdate(
-            { _id: id }, // Use id directly here, no need for req.body.user_id
-            {
-                $set: {
-                    first_name: req.body.firstName,
-                    last_name: req.body.lastName,
-                    email: req.body.email,
-                    mobile: req.body.mno,
-                },
-            },
-            { new: true } // Add this option to return the updated document
-        );
-
-        console.log(updatedUserData);
-
-        // Redirect to the user page after successful update
-        res.status(200).redirect("/userProfile");
-    } catch (error) {
-        console.log(error.message);
-        // Handle errors appropriately, e.g., by rendering an error page
-        res.status(500).send("Internal Server Error");
-    }
-};
 
 ///===========Rendering product info page -=-----------//
 
@@ -516,10 +473,12 @@ const loadProductInfo = async (req, res) => {
     try {
         const id = req.query.id;
         const product = await Product.findById(id);
+        const userId = req.session.user_id;
+        const totalProductsInCart = await getTotalProductsInCart(userId);
 
         const pddata = await Product.find();
 
-        res.render("productInfo", { Product: product, data: pddata, user: req.session.user_id });
+        res.render("productInfo", { Product: product, data: pddata, user: req.session.user_id, count: totalProductsInCart });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
@@ -530,7 +489,9 @@ const loadProductInfo = async (req, res) => {
 
 const loadAbout = async (req, res) => {
     try {
-        res.render("about", { user: req.session.user_id });
+        const userId = req.session.user_id;
+        const totalProductsInCart = await getTotalProductsInCart(userId);
+        res.render("about", { user: req.session.user_id , count: totalProductsInCart});
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Internal Server Error");
@@ -554,9 +515,8 @@ module.exports = {
     loadChangePassword,
     updatePassword,
     loadShop,
-    loadUser,
-    loadEditUser,
-    updateProfile,
     loadProductInfo,
     loadAbout,
+
+   
 };

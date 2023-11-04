@@ -1,62 +1,49 @@
 <header class="site-navbar" role="banner">
-    <div class="site-navbar-top">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-6 col-md-4 order-2 order-md-1 site-search-icon text-left">
-                    <form action="" class="site-block-top-search">
-                        <span class="icon icon-search2"></span>
-                        <input type="text" class="form-control border-0" placeholder="Search" />
-                    </form>
+    <div class="container">
+        <div class="row align-items-center py-3">
+            <div class="col-7 col-md-3 order-1">
+                <div class="site-logo">
+                    <a href="/" class="js-logo-clone" style="font-size: 24px; width: 150px;">O Z A R K</a>
                 </div>
-
-                <div class="col-12 mb-3 mb-md-0 col-md-4 order-1 order-md-2 text-center">
-                    <div class="site-logo">
-                        <a href="/" class="js-logo-clone"> O Z A R K</a>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-4 order-3 order-md-3 text-right">
-                    <div class="site-top-icons">
-                        <ul>
-                            <% if (user) { %>
-                                <li><a href="/logout" style="color: red; font-weight: bold;">Logout</a></li>
-                            <% } else { %>
-                                <li><a href="/login" style="color: green; font-weight: bold;">Login</a></li>
-                            <% } %>
-                            <li>
-                                <a href="/userProfile"><span class="icon icon-person"></span></a>
-                            </li>
-                            <li>
-                                <a href="/wishlist"><span class="icon icon-heart-o"></span></a>
-                            </li>
-                            <li>
-                                <a href="/cart" class="site-cart">
-                                    <span class="icon icon-shopping_cart"></span>
-                                    <span class="count">2</span>
-                                </a>
-                            </li>
-                            <li class="d-inline-block d-md-none ml-md-0">
-                                <a href="#" class="site-menu-toggle js-menu-toggle"><span class="icon-menu"></span></a>
-                            </li>
-                        </ul>
-                    </div>
+            </div>
+            <div class="col-12 col-md-6 order-3 order-md-2 text-center">
+                <nav class="site-navigation text-center" role="navigation">
+                    <ul class="site-menu">
+                        <li><a href="/" style="font-size: 18px;">Home</a></li>
+                        <li><a href="/shop" style="font-size: 18px;">Shop</a></li>
+                        <li><a href="/about" style="font-size: 18px;">About</a></li>
+                        <li><a href="/cart" style="font-size: 18px;">Cart</a></li>
+                        <li><a href="/contact" style="font-size: 18px;">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-5 col-md-3 order-2 order-md-3 text-right">
+                <div class="site-top-icons">
+                    <ul>
+                        <% if (user) { %>
+                            <li><a href="/logout" style="color: red; font-weight: bold; font-size: 18px;">Logout</a></li>
+                        <% } else { %>
+                            <li><a href="/login" style="color: green; font-weight: bold; font-size: 18px;">Login</a></li>
+                        <% } %>
+                        <li><a href="/userProfile" style="font-size: 18px;"><span class="icon icon-person"></span></a></li>
+                        <li><a href="/wishlist" style="font-size: 18px;"><span class="icon icon-heart-o"></span></a></li>
+                        <li>
+                            <a href="/cart" class="site-cart" style="font-size: 18px;">
+                                <span class="icon icon-shopping_cart"></span>
+                                <% if (user) { %>
+                                    <span class="count" style="font-size: 14px;"> <%= count %>  </span>
+                                <% } else { %>
+                                    <span class="count" style="font-size: 14px;"> ? </span>
+                                <% } %>
+                                
+                            </a>
+                        </li>
+                        <li class="d-inline-block d-md-none ml-md-0">
+                            <a href="#" class="site-menu-toggle js-menu-toggle" style="font-size: 18px;"><span class="icon-menu"></span></a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-    <nav class="site-navigation text-right text-md-center" role="navigation">
-        <div class="container">
-            <ul class="site-menu js-clone-nav d-none d-md-block">
-                <li>
-                    <a href="/">Home</a>
-                </li>
-                <li><a href="/shop">Shop</a></li>
-                <li>
-                    <a href="/about">About</a>
-                </li>
-                <li><a href="/cart">Cart</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </div>
-    </nav>
 </header>

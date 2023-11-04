@@ -1,6 +1,11 @@
 <%- include('../userLayouts/header.ejs') %>
 <%- include('../userLayouts/navbar.ejs') %>
 
+<style>
+  .text-primary {
+    color: #000 !important;
+  }
+</style>
 
 <div class="site-wrap">
 
@@ -92,7 +97,7 @@
         </div>
       </div>
     </div>
-  </div>
+   </div>
 
   <div class="site-section block-3 site-blocks-2 bg-light">
     <div class="container">
@@ -103,78 +108,44 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <div class="nonloop-block-3 owl-carousel">
-            <div class="item">
-              <div class="block-4 text-center">
-                <a href="/shop">
-                  <figure class="block-4-image">
-                    <img src="/static/user/images/cloth_1.jpg" alt="Image placeholder" class="img-fluid">
-                  </figure>
+
+         <div class="nonloop-block-3 owl-carousel" >
+    <% if (products.length > 0) {
+        products.forEach(product => { %>
+          <div class="item">
+            <div class="card">
+                <a href="/product-info?id=<%= product._id %>">
+                    <img src="/static/admin/Assets/images/products/<%= product.image[0] %>"
+                         alt="Product Image"
+                         class="card-img-top"
+                         style="object-fit: cover; height: 200px;">
                 </a>
-                <div class="block-4-text p-4">
-                  <h3><a href="#">Tank Top</a></h3>
-                  <p class="mb-0">Finding perfect t-shirt</p>
-                  <p class="text-primary font-weight-bold">$50</p>
+                <div class="card-body text-center">
+                    <h5 class="card-title" style="margin-bottom: 6px;"><a href="/product/<%= product._id %>" style="color: black;"><%= product.productname %></a></h5>
+                    <p class="card-text" style="margin-bottom: 6px;"><%= product.description %></p>
+                    <p class="card-text text-primary font-weight-bold">₹ <%= product.price %></p>
+                 
+                    
+                    <div class="d-inline-block" style="text-align: left;">
+                      
+                        <button type="button" class="btn btn-primary p-1 m-1 addToCartBtn" data-product-id="<%= product._id %>">Add to Cart</button>
+
+                      
+                  </div>
+                 
+                 
                 </div>
-              </div>
             </div>
-            <div class="item">
-              <div class="block-4 text-center">
-               <a href="/shop">
-                <figure class="block-4-image">
-                  <img src="/static/user/images/shoe_1.jpg" alt="Image placeholder" class="img-fluid">
-                </figure>
-               </a>
-                <div class="block-4-text p-4">
-                  <h3><a href="#">Corater</a></h3>
-                  <p class="mb-0">Finding perfect products</p>
-                  <p class="text-primary font-weight-bold">$50</p>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <div class="block-4 text-center">
-              <a href="/shop">
-                <figure class="block-4-image">
-                  <img src="/static/user/images/cloth_2.jpg" alt="Image placeholder" class="img-fluid">
-                </figure>
-              </a>
-                <div class="block-4-text p-4">
-                  <h3><a href="#">Polo Shirt</a></h3>
-                  <p class="mb-0">Finding perfect products</p>
-                  <p class="text-primary font-weight-bold">$50</p>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <div class="block-4 text-center">
-            <a href="/shop">
-              <figure class="block-4-image">
-                <img src="/static/user/images/cloth_3.jpg" alt="Image placeholder" class="img-fluid">
-              </figure>
-            </a>
-                <div class="block-4-text p-4">
-                  <h3><a href="#">T-Shirt Mockup</a></h3>
-                  <p class="mb-0">Finding perfect products</p>
-                  <p class="text-primary font-weight-bold">$50</p>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <div class="block-4 text-center">
-              <a href="/shop">
-                <figure class="block-4-image">
-                  <img src="/static/user/images/shoe_1.jpg" alt="Image placeholder" class="img-fluid">
-                </figure>
-              </a>
-                <div class="block-4-text p-4">
-                  <h3><a href="#">Corater</a></h3>
-                  <p class="mb-0">Finding perfect products</p>
-                  <p class="text-primary font-weight-bold">$50</p>
-                </div>
-              </div>
-            </div>
-          </div>
+        </div>
+        
+        
+        
+    <% }); } else { %>
+        <!-- No products available message -->
+    <% } %>
+</div>
+
+        
         </div>
       </div>
     </div>
@@ -204,5 +175,55 @@
   
   
 </div>
+
+<script>
+
+
+document.body.addEventListener("click", async (event) => {
+    if (event.target.matches(".addToCartBtn")) {
+        const productId = event.target.getAttribute("data-product-id");
+        const quantity = 1
+        console.log(quantity);
+
+            try {
+                const response = await fetch("/addToCart", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id: productId, quantity: 1 }),
+                });
+                console.log(response);
+
+                const data = await response.json();
+                console.log(data);
+
+                if (response.ok) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success!",
+                        text: data.message,
+                    });
+                }else{
+
+                  Swal.fire({
+                        icon: "warning",
+                        title: "warning!",
+                        text: data.message,
+                    });
+
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: "An error occurred while adding the product to the cart.",
+                });
+                console.error("There was a problem with the fetch operation:", error);
+            }
+     
+    }
+});
+</script>
 
 <%- include('../userLayouts/footer.ejs') %>

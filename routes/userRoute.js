@@ -92,6 +92,8 @@ user_route.post("/addToCart", cartController.addToCart);
 
 user_route.post("/update-cart", cartController.updateCart);
 
+user_route.get("/get-max-stock/:id", cartController.getMaxStock);
+
 user_route.get("/about", userController.loadAbout);
 
 //================== C H E C K O U T == S E C T I O N  ======================

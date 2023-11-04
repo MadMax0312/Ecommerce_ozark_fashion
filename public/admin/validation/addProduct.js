@@ -5,21 +5,21 @@ function productValidForm() {
   const quantityError = document.getElementById("quantity-error");
   const descriptionError = document.getElementById("description-error");
   const sizeError = document.getElementById("size-error");
-  const imageError = document.getElementById("image-error");
+
 
   priceError.textContent = "";
   nameError.textContent = "";
   quantityError.textContent = "";
   descriptionError.textContent = "";
   sizeError.textContent = "";
-  imageError.textContent = "";
+
 
   const productname = document.getElementById("exampleInputName1").value;
   const size = document.getElementById("size").value;
   const price = document.getElementById("price").value;
   const quantity = document.getElementById("quantity").value;
   const description = document.getElementById("description").value;
-  const image = document.getElementById("image").value;
+
 
   // Regular expressions for validation
   const nameRegex = /^[a-zA-Z ]+$/;
@@ -42,14 +42,6 @@ function productValidForm() {
     nameError.textContent = "Name field should contain only letters and spaces";
     setTimeout(function () {
       nameError.textContent = "";
-  }, 3000);
-    return false;
-  }
-
-  if (!image) {
-    imageError.textContent = "Image field should not be empty";
-    setTimeout(function () {
-      imageError.textContent = "";
   }, 3000);
     return false;
   }

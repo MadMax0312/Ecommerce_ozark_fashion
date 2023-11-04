@@ -90,8 +90,8 @@
                             role="button"
                             aria-expanded="false"
                             aria-controls="ship_different_address"
-                            ><input type="checkbox" value="1" id="c_ship_different_address" /> Ship To A Different
-                            Address?</label
+                            ><input type="radio" name="defaultAddress"  />
+                            Ship To A Different Address?</label
                         >
                         <div class="collapse" id="ship_different_address">
                             <div class="py-2">
@@ -486,15 +486,7 @@
                 const pincode = document.getElementById("c_diff_pincode").value;
                 const country = document.getElementById("c_diff_country").value;
 
-                console.log("name", fullName);
-                console.log("mb", mobile);
-                console.log("st", state);
-                console.log("dis", district);
-                console.log("cty", city);
-                console.log("pn", pincode);
-                console.log("ct", country);
-
-                // Validate the data
+                // Validating the data
 
                 const isValid = validateAddressForm(fullName, mobile, district, state, city, pincode);
 
@@ -553,14 +545,6 @@
 
             const stateError = document.getElementById("states-error");
             const districtError = document.getElementById("districts-error");
-
-            console.log("nameEr", nameError);
-            console.log("mber", mobileError);
-            console.log("ctr", cityError);
-            console.log("dtr", districtError);
-            console.log("ster", stateError);
-
-            console.log("pnEr", pincodeError);
 
             if (!fullNames) {
                 nameError.textContent = "Name field should not be empty!";

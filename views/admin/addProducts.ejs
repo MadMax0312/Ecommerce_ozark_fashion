@@ -2,8 +2,6 @@
 include('../adminLayouts/navbar.ejs') %>
 <!-- partial -->
 
-<!--============================ Adding categories table=============== -->
-
 <div class="main-panel">
   <div class="content-wrapper">
       <div class="col-12 grid-margin stretch-card">
@@ -81,7 +79,7 @@ include('../adminLayouts/navbar.ejs') %>
                               <div class="col-md-6 mb-0">
                                   <div class="dynamic-image-inputs">
                                       <div class="input-group">
-                                          <input type="file" name="image" id="image" class="form-control"/>
+                                          <input type="file" name="images" id="image" class="form-control" required/>
                                           <div class="input-group-append">
                                               <button class="btn btn-primary add-image-input" type="button">
                                                   Add Image
@@ -90,7 +88,7 @@ include('../adminLayouts/navbar.ejs') %>
                                       </div>
                                   </div>
                               </div>
-                              <p id="image-error" class="error-message" style="color: red;"></p>
+                           
                           </div>
                       </div>
 
@@ -124,7 +122,7 @@ include('../adminLayouts/navbar.ejs') %>
             inputGroup.className = "input-group";
             const inputFile = document.createElement("input");
             inputFile.type = "file";
-            inputFile.name = "image";
+            inputFile.name = "images";
             inputFile.className = "form-control";
            
             const inputGroupAppend = document.createElement("div");

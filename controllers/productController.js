@@ -70,6 +70,7 @@ const loadaddProducts = async (req, res) => {
 
 const addProducts = async (req, res) => {
   try {
+    console.log("Enterrrr");
       const productname = req.body.productname;
       const category = req.body.category;
       const size = req.body.size;
@@ -88,7 +89,7 @@ const addProducts = async (req, res) => {
           size: size,
           description: description,
           price: price,
-          // color,
+      
           image: images,
           quantity: quantity,
           status: true,

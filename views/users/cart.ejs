@@ -56,11 +56,16 @@
                                                 data-product-id="<%= item.product._id %>"
                                                 aria-label="Quantity"
                                                 aria-describedby="button-addon1"
+                                                id="minus"
+                                                min="1"
                                                 readonly
-                                                max="10"
                                             />
                                             <div class="input-group-append">
-                                                <button class="btn btn-outline-primary js-btn-plus" type="button">
+                                                <button
+                                                    class="btn btn-outline-primary js-btn-plus"
+                                                    data-products-id="<%= item.product._id %>"
+                                                    type="button"
+                                                >
                                                     &plus;
                                                 </button>
                                             </div>
@@ -76,6 +81,7 @@
                                             href="/remove-cart?cartId=<%= cartItem._id %>&productId=<%= item.product._id %>"
                                             class="buy-now btn btn-sm"
                                             style="background-color: white; color: red; height: 35px; border: none"
+                                            onclick="confirmRemove(event)"
                                         >
                                             Remove
                                         </a>
@@ -151,114 +157,138 @@
     </div>
 </div>
 
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const quantityInputs = document.querySelectorAll(".quantity-input");
-        const totalPriceElements = document.querySelectorAll(".total-price");
-        const productPrices = Array.from(document.querySelectorAll(".product-price"))
+document.addEventListener("DOMContentLoaded", function () {
+    const quantityInputs = document.querySelectorAll(".quantity-input");
+    const totalPriceElements = document.querySelectorAll(".total-price");
+    const productPrices = Array.from(document.querySelectorAll(".product-price"))
             .map((price) => parseFloat(price.textContent))
             .filter((price) => !isNaN(price)); // Filter out NaN values
-        console.log(productPrices);
+    const subtotalElement = document.querySelector(".subtotal");
 
-        const subtotalElement = document.querySelector(".subtotal");
+    quantityInputs.forEach((input, index) => {
+        const minusButton = input.parentElement.querySelector(".js-btn-minus");
+        const plusButton = input.parentElement.querySelector(".js-btn-plus");
+        const productID = input.getAttribute("data-product-id");
 
-        quantityInputs.forEach((input, index) => {
-            const minusButton = input.parentElement.querySelector(".js-btn-minus");
-            const plusButton = input.parentElement.querySelector(".js-btn-plus");
-            const productID = input.getAttribute("data-product-id");
-            console.log(productID);
-
-            function updateMinusButtonStatus() {
-                const quantity = parseInt(input.value, 10);
-                if (quantity == 2) {
-                    minusButton.disabled = true;
-                } else {
-                    minusButton.disabled = false;
-                }
-            }
-
-            function updatePlusButtonStatus() {
-                const quantity = parseInt(input.value, 10);
-                if (quantity == 4) {
-                    plusButton.disabled = true;
-                } else {
-                    plusButton.disabled = false;
-                }
-            }
-
-            minusButton.addEventListener("click", function () {
-                const quantity = parseInt(input.value, 10);
-
-                if (quantity > 1) {
-                    quantitys = quantity - 1;
-                    handleQuantityUpdate(productID, quantitys, index);
-                    const totalPrice = quantitys * productPrices[index];
-                    totalPriceElements[index].textContent = `₹ ${totalPrice.toFixed(2)}`;
-                    updateSubtotal();
-                    updateMinusButtonStatus();
-                    updatePlusButtonStatus();
-                }
-            });
-
-            plusButton.addEventListener("click", function () {
-                const quantity = parseInt(input.value, 10);
-                quantitys = quantity + 1;
-
-                handleQuantityUpdate(productID, quantitys, index);
-
-                const totalPrice = quantitys * productPrices[index];
-                totalPriceElements[index].textContent = `₹ ${totalPrice.toFixed(2)}`;
-                updateSubtotal();
-                updateMinusButtonStatus();
-                updatePlusButtonStatus();
-            });
+        minusButton.addEventListener("click", function () {
+            updateQuantity(input, index, productID, -1);
+            updateSubtotal();
+           
         });
 
-        async function handleQuantityUpdate(productID, quantitys, index) {
-            try {
-                const response = await fetch("/update-cart", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ productID: productID, quantity: quantitys }),
-                });
-
-                const data = await response.json();
-
-                // Check if the response contains valid data
-                if (data && data.items && data.items.length > 0) {
-                    const updatedItem = data.items[0];
-                    const productPrice = parseFloat(updatedItem.product.price);
-                    const quantity = parseInt(updatedItem.quantity, 10);
-
-                    // Check if both quantity and product price are valid numbers
-                    if (!isNaN(productPrice) && !isNaN(quantity)) {
-                        const totalPrice = quantity * productPrice;
-
-                        // Update the total price in the UI
-                        totalPriceElements[index].textContent = `₹ ${totalPrice.toFixed(2)}`;
-                    } else {
-                        console.error("Invalid quantity or product price:", updatedItem);
-                    }
-                } else {
-                    console.error("Invalid response data:", data);
-                }
-
-                // Update the subtotal and other UI elements
-                updateSubtotal();
-            } catch (error) {
-                console.error("Error updating cart quantity:", error);
-            }
-        }
-
-        function updateSubtotal() {
-            const totalPrices = Array.from(totalPriceElements)
-                .map((total) => parseFloat(total.textContent.replace("₹ ", "")))
-                .reduce((acc, val) => acc + val, 0);
-            subtotalElement.textContent = `₹ ${totalPrices.toFixed(2)}`;
-        }
+        plusButton.addEventListener("click", function () {
+            updateQuantity(input, index, productID, 1);
+            updateSubtotal();
+           
+        });
     });
+
+    async function updateQuantity(input, index, productID, quantityChange) {
+        const quantity = parseInt(input.value, 10);
+        const newQuantity = quantity + quantityChange;
+
+        try {
+            const maxStockResponse = await fetch(`/get-max-stock/${productID}`);
+            const maxStockData = await maxStockResponse.json();
+
+            if (newQuantity < 1) {
+                showError("Quantity cannot be less than 1.");
+                input.value = 1;
+               
+            } else if (newQuantity > 9) {
+                showError("Cannot order more than 9 items at a time!");
+                input.value = 9;
+               
+            } else if (newQuantity > maxStockData.maxStock) {
+                showError(`Cannot order more than ${maxStockData.maxStock} items for this product!`);
+                input.value = maxStockData.maxStock;
+              
+            } else {
+                input.value = newQuantity;
+                await handleQuantityUpdate(productID, newQuantity, index);
+                location.reload();
+            }
+        } catch (error) {
+            console.error("Error updating cart quantity:", error);
+        }
+    }
+
+    async function handleQuantityUpdate(productID, quantity, index) {
+    try {
+        const response = await fetch("/update-cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ productID: productID, quantity: quantity }),
+        });
+
+        const data = await response.json();
+
+        if (data && data.items && data.items.length > 0) {
+            const updatedItem = data.items[0];
+            const productPrice = parseFloat(updatedItem.product.price);
+            const quantity = parseInt(updatedItem.quantity, 10);
+
+            if (!isNaN(productPrice) && !isNaN(quantity)) {
+                const totalPrice = quantity * productPrice;
+                totalPriceElements[index].textContent = `₹ ${totalPrice.toFixed(2)}`;
+            } else {
+                console.error("Invalid product price or quantity:", updatedItem);
+            }
+        } else {
+            console.error("Invalid response data:", data);
+        }
+
+        updateSubtotal();
+    } catch (error) {
+        console.error("Error updating cart quantity:", error);
+    }
+}
+
+
+    function updateSubtotal() {
+        const totalPrices = Array.from(totalPriceElements)
+            .map((total) => parseFloat(total.textContent.replace("₹ ", "")))
+            .reduce((acc, val) => acc + val, 0);
+        subtotalElement.textContent = `₹ ${totalPrices.toFixed(2)}`;
+    }
+
+    function showError(message) {
+        Swal.fire({
+            title: "Oops",
+            text: message,
+            icon: "error",
+            confirmButtonText: "OK",
+        });
+    }
+});
+
+
+</script>
+
+<script>
+    function confirmRemove(event) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You are about to remove this product. Continue?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "OK",
+            cancelButtonText: "Cancel",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If user clicks "OK", proceed with the removal
+                window.location.href = event.target.href;
+            }
+        });
+    }
 </script>
 
 <%- include('../userLayouts/footer.ejs') %>
