@@ -71,7 +71,7 @@ const verifyOtp = async (req, res) => {
 
         const userCheck = await User.findOne({ email: req.body.email });
         if (userCheck) {
-            res.send("User Already Exists");
+            res.render("registration", { message: "User already exists" });
         } else {
             const spassword = await securePassword(req.body.password);
             req.session.firstname = req.body.firstname;
@@ -464,7 +464,7 @@ const loadShop = async (req, res) => {
         console.log(error.message);
         // Handle error and send appropriate response
     }
-};
+}; 
 
 
 ///===========Rendering product info page -=-----------//

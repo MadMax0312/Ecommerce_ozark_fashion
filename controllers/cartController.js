@@ -14,7 +14,7 @@ const loadCart = async (req, res) => {
         if (cartItems.length > 0) {
             subtotal = cartItems.reduce((total, cartItem) => {
                 const productTotalPrice = cartItem.items.reduce((itemTotal, item) => {
-                    const productPrice = item.product.price; 
+                    const productPrice = item.product.price;
                     const quantity = item.quantity;
                     return itemTotal + productPrice * quantity;
                 }, 0);
@@ -65,43 +65,48 @@ const getMaxStock = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
-        console.log("dfjlds");
-        const productId = req.body.id;
-        console.log(productId);
+       
         const user_id = req.session.user_id;
+        if (user_id) {
         const quantity = req.body.quantity;
-        console.log(quantity);
+        const productId = req.body.id;
+ 
 
-        let cartItem = await Cart.findOne({ user_id });
+  
+            let cartItem = await Cart.findOne({ user_id });
 
-        const product = await Product.findById(productId);
-        const maxStock = product.quantity;
+            const product = await Product.findById(productId);
+            const maxStock = product.quantity;
 
-        if (cartItem) {
-            // Check if the product is already in the cart
-            const existingProductIndex = cartItem.items.findIndex((item) => item.product.equals(productId));
+            if (cartItem) {
+                // Check if the product is already in the cart
+                const existingProductIndex = cartItem.items.findIndex((item) => item.product.equals(productId));
 
-            if (existingProductIndex !== -1) {
-                return res.status(400).json({ message: "Product already in cart" });
+                if (existingProductIndex !== -1) {
+                    return res.status(400).json({ message: "Product already in cart" });
+                } else {
+                    // If the product is not in the cart, add it with the given quantity
+                    cartItem.items.push({ product: productId, quantity: parseInt(quantity, 10) });
+                }
+
+                if (quantity > maxStock) {
+                    return res.status(400).json({ success: false, message: "Exceeded maximum stock limit" });
+                }
+
+                await cartItem.save();
+                return res.status(200).json({ message: "Product added to cart successfully" });
             } else {
-                // If the product is not in the cart, add it with the given quantity
-                cartItem.items.push({ product: productId, quantity: parseInt(quantity, 10) });
+                // If the user doesn't have a cart, create one and add the product
+                const newCartItem = new Cart({
+                    user_id,
+                    items: [{ product: productId, quantity: parseInt(quantity, 10) }],
+                });
+                await newCartItem.save();
+                return res.status(200).json({ message: "Product added to cart successfully" });
             }
-
-            if (quantity > maxStock) {
-                return res.status(400).json({ success: false, message: "Exceeded maximum stock limit" });
-            }
-
-            await cartItem.save();
-            return res.status(200).json({ message: "Product added to cart successfully" });
-        } else {
-            // If the user doesn't have a cart, create one and add the product
-            const newCartItem = new Cart({
-                user_id,
-                items: [{ product: productId, quantity: parseInt(quantity, 10) }],
-            });
-            await newCartItem.save();
-            return res.status(200).json({ message: "Product added to cart successfully" });
+        }else {
+            // Send response indicating the user needs to log in
+            return res.status(401).json({ message: "User not logged in, please log in first" });
         }
     } catch (error) {
         console.error(error.message);

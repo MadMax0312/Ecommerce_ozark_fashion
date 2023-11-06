@@ -1,7 +1,7 @@
 const Product = require("../models/productModel");
 const Wishlist = require("../models/wishlistModel");
 const User = require("../models/userModel");
-const { getTotalProductsInCart } = require("../number/cartNumber")
+const { getTotalProductsInCart } = require("../number/cartNumber");
 
 const loadWishlist = async (req, res) => {
     try {
@@ -23,26 +23,30 @@ const loadWishlist = async (req, res) => {
 
 const addToWishlist = async (req, res) => {
     try {
-        const productId = req.body.id;
         const user_id = req.session.user_id;
+        if (user_id) {
+            const productId = req.body.id;
 
-        const userWishlist = await Wishlist.findOne({ user_id });
+            const userWishlist = await Wishlist.findOne({ user_id });
 
-        if (userWishlist) {
-            // Check if the product is already in the wishlist
-            if (userWishlist.product.includes(productId)) {
-                return res.status(400).json({ message: "Product is already in the wishlist" });
+            if (userWishlist) {
+                // Check if the product is already in the wishlist
+                if (userWishlist.product.includes(productId)) {
+                    return res.status(400).json({ message: "Product is already in the wishlist" });
+                } else {
+                    userWishlist.product.push(productId);
+                    await userWishlist.save();
+                }
             } else {
-                userWishlist.product.push(productId);
-                await userWishlist.save();
+                // If the user doesn't have a wishlist, create one
+                const newWishlist = new Wishlist({
+                    user_id,
+                    product: [productId],
+                });
+                await newWishlist.save();
             }
         } else {
-            // If the user doesn't have a wishlist, create one
-            const newWishlist = new Wishlist({
-                user_id,
-                product: [productId],
-            });
-            await newWishlist.save();
+            return res.status(401).json({ message: "User not logged in, please log in first" });
         }
 
         return res.json({ success: true, message: "Product added to the wishlist successfully" });

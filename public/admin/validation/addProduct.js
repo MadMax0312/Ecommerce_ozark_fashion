@@ -38,13 +38,29 @@ function productValidForm() {
     return false;
 }
 
-  if (!productname.match(nameRegex)) {
-    nameError.textContent = "Name field should contain only letters and spaces";
+if (!productname) {
+    document.getElementById("nameError").textContent = "Product name should not be empty";
     setTimeout(function () {
-      nameError.textContent = "";
-  }, 3000);
+        document.getElementById("nameError").textContent = "";
+    }, 3000);
     return false;
-  }
+}
+
+if (productname.length > 15) {
+    document.getElementById("nameError").textContent = "Product name must be maximum 15 characters long";
+    setTimeout(function () {
+        document.getElementById("nameError").textContent = "";
+    }, 3000);
+    return false;
+}
+
+if (!nameRegex.test(productname)) {
+    document.getElementById("nameError").textContent = "Product name should contain only letters and spaces";
+    setTimeout(function () {
+        document.getElementById("nameError").textContent = "";
+    }, 3000);
+    return false;
+}
 
   if (!size.match(sizeRegex)) {
     sizeError.textContent = "Size field should contain only letters, numbers, and spaces";

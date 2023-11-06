@@ -8,6 +8,12 @@
         margin-top: 0px;
         margin-bottom: 0px;
     }
+    /* Add this CSS to your stylesheet */
+.card-text span {
+    display: inline; /* or inline-block, depending on your layout preferences */
+    margin-right: 10px; /* Adjust the margin as needed */
+}
+
 </style>
 
 <div class="site-wrap">
@@ -33,14 +39,24 @@
                         <div class="col-md-6 col-12 mb-3 mt-3" id="address-card-<%= address.address[i]._id %>">
                             <div class="card p-2" style="background: #f3f3f9; border-radius: 10px">
                                 <div class="card-body">
-                                    <h6 class="card-title data-full-name" style="font-size: 15px">
-                                        Name:<%= address.address[i].fullName %>
+                                    <h6 class="card-title"style="font-size: 15px">
+                                        Name: <span class="card-title data-full-name" id="data-full-name"><%= address.address[i].fullName %></span>
                                     </h6>
-                                    <p class="card-text data-mobile">Number: <%= address.address[i].mobile %></p>
-                                    <p class="card-text data-district">District: <%= address.address[i].district %></p>
-                                    <p class="card-text data-city">City:<%= address.address[i].city %></p>
-                                    <p class="card-text data-state">State: <%= address.address[i].state %></p>
-                                    <p class="card-text">Pincode: <%= address.address[i].pincode %></p>
+                                    <p class="card-text">
+                                        Number: <span class="data-mobile" id="data-mobile"><%= address.address[i].mobile %></span>
+                                    </p>
+                                    <p class="card-text">
+                                        District: <span class="data-district" id="data-district"><%= address.address[i].district %></span>
+                                    </p>
+                                    <p class="card-text">
+                                        City: <span class="data-city" id="data-city"><%= address.address[i].city %></span>
+                                    </p>
+                                    <p class="card-text">
+                                        State: <span class="data-state" id="data-state"><%= address.address[i].state %></span>
+                                    </p>
+                                    <p class="card-text">
+                                        Pincode: <span class="data-pincode" id="data-pincode"><%= address.address[i].pincode %></span>
+                                    </p>
 
                                     <hr class="my-3" />
                                     <div class="d-flex justify-content-between">
@@ -90,8 +106,8 @@
                             role="button"
                             aria-expanded="false"
                             aria-controls="ship_different_address"
-                            ><input type="radio" name="defaultAddress"  />
-                            Ship To A Different Address?</label
+                            ><input type="radio" name="defaultAddress" id="defaultAddress" /> Ship To A Different
+                            Address?</label
                         >
                         <div class="collapse" id="ship_different_address">
                             <div class="py-2">
@@ -289,9 +305,10 @@
                                                         <img
                                                             src="<%= item.product.image %>"
                                                             alt="<%= item.product.name %>"
+                                                            product-id = "<%= item.product._id %>"
                                                         />
                                                     </div>
-                                                    <div class="product-details">
+                                                    <div class="product-details" >
                                                         <h6 class="product-title"><%= item.product.name %></h6>
                                                         <p class="product-description"><%= item.product.description %></p>
                                                     </div>
@@ -373,9 +390,9 @@
                                                 type="radio"
                                                 name="paymentOption"
                                                 id="cashOnDelivery"
-                                                value="cashOnDelivery"
+                                                value="Cash on Delivery"
                                             />
-                                            <label class="form-check-label" for="cashOnDelivery"> Cash on Delivery </label>
+                                            <label class="form-check-label" for="cashOnDelivery">Cash on Delivery </label>
                                         </div>
                                         <div class="form-check mb-3">
                                             <input
@@ -383,7 +400,7 @@
                                                 type="radio"
                                                 name="paymentOption"
                                                 id="onlinePayment"
-                                                value="onlinePayment"
+                                                value="Online Payment"
                                             />
                                             <label class="form-check-label" for="onlinePayment"> Online Payment </label>
                                         </div>
@@ -393,16 +410,17 @@
                                                 type="radio"
                                                 name="paymentOption"
                                                 id="bankTransfer"
-                                                value="bankTransfer"
+                                                value="Bank Transfer"
                                             />
                                             <label class="form-check-label" for="bankTransfer"> Bank Transfer </label>
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
+                                    <div>
                                         <button
-                                            class="btn btn-primary btn-lg py-3 btn-block"
-                                            onclick="window.location='thankyou.html'"
+                                            type="button"
+                                            class="btn btn-primary btn-lg py-3 btn-block placeOrderBtns"
+                                            id="placeOrderBtn"
                                         >
                                             Place Order
                                         </button>
@@ -462,313 +480,424 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        function removeAddress(addressId) {
-            // Remove the address card from the DOM
-            const addressCard = document.getElementById(`address-card-${addressId}`);
-            if (addressCard) {
-                addressCard.remove();
-            }
+<script>
+ document.body.addEventListener("click", async (event) => {
+    console.log("clicked");
+    if (event.target.matches(".placeOrderBtns")) {
+        try {
+            const response = await fetch("/order", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+
+            if (response.ok) {
+                window.location.href = "/order";
+            } 
+        } catch (error) {
+          
+            console.error("There was a problem with the fetch operation:", error);
         }
-    </script>
+    }
+});
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const addAddressBtn = document.getElementById("addAddressBtn");
+</script>
 
-            addAddressBtn.addEventListener("click", function () {
-                const fullName = document.getElementById("c_diff_fname").value;
-                const mobile = document.getElementById("c_diff_mobile").value;
-                const state = document.getElementById("c_diff_postal_state").value;
-                const district = document.getElementById("c_diff_state_district").value;
-                const city = document.getElementById("c_diff_city").value;
-                const pincode = document.getElementById("c_diff_pincode").value;
-                const country = document.getElementById("c_diff_country").value;
+<script>
+   document.getElementById("placeOrderBtn").addEventListener("click", async function () {
+    try {
+        const selectedAddress = document.querySelector('input[name="defaultAddress"]:checked');
+       
+    const selectedAddressId = selectedAddress.id.split("_")[1];
+ 
 
-                // Validating the data
 
-                const isValid = validateAddressForm(fullName, mobile, district, state, city, pincode);
+        const fullName = document.getElementById("data-full-name").textContent
+        const mobile = document.getElementById("data-mobile").textContent;
+        const city = document.getElementById("data-city").textContent;
+        const district = document.getElementById("data-district").textContent;
+        const state = document.getElementById("data-state").textContent;
+        const pincode = document.getElementById("data-pincode").textContent;
 
-                if (isValid) {
-                    // Prepare the request body
-                    const requestBody = {
-                        c_diff_fname: fullName,
-                        c_diff_mobile: mobile,
-                        c_diff_postal_state: state,
-                        c_diff_state_district: district,
-                        c_diff_city: city,
-                        c_diff_country: country,
-                        c_diff_pincode: pincode,
-                    };
-                    console.log(requestBody);
+        console.log(district);
 
-                    // Send a POST request to the server using Fetch API
-                    fetch("/addNewAddress", {
+        const paymentMethod = document.querySelector('input[name="paymentOption"]:checked').value;
+
+        console.log("dsfljsfhlkjdsf", paymentMethod);
+        const notes = document.getElementById("c_order_notes").value;
+
+        const products = [];
+        const cartItems = document.querySelectorAll(".site-block-order-table tbody tr");
+
+        cartItems.forEach((item) => {
+            const productId = item.querySelector(".product-image img").getAttribute("product-id"); 
+            const quantity = parseInt(item.querySelector("td:nth-child(3)").textContent.trim());
+            const price = parseFloat(item.querySelector("td:nth-child(4)").textContent.trim().substring(2)); // Remove '₹ ' and parse as float
+            const subtotal = quantity * price;
+
+            products.push({
+                productId: productId,
+                quantity: quantity,
+                price: price,
+                subtotal: subtotal,
+            });
+        });
+
+        console.log(products);
+
+        const address = {
+            fullName: fullName,
+            mobile: mobile,
+            city: city,
+            district: district,
+            state: state,
+            pincode: pincode,
+            country: "India"
+        };
+
+        const orderData = {
+            address: address,
+            paymentMethod: paymentMethod,
+            notes: notes,
+            productsData: products,
+            totalAmount: products.reduce((total, product) => total + product.subtotal, 0),
+        };
+
+        console.log(orderData);
+
+        const response = await fetch("/place-order", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(orderData),
+        });
+
+        console.log(response);
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData.message);
+        } else {
+            console.error("Failed to place order");
+        }
+    } catch (error) {
+        console.error("Error occurred while placing the order", error);
+    }
+});
+
+
+</script>
+
+<script>
+    function removeAddress(addressId) {
+        // Remove the address card from the DOM
+        const addressCard = document.getElementById(`address-card-${addressId}`);
+        if (addressCard) {
+            addressCard.remove();
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addAddressBtn = document.getElementById("addAddressBtn");
+
+        addAddressBtn.addEventListener("click", function () {
+            const fullName = document.getElementById("c_diff_fname").value;
+            const mobile = document.getElementById("c_diff_mobile").value;
+            const state = document.getElementById("c_diff_postal_state").value;
+            const district = document.getElementById("c_diff_state_district").value;
+            const city = document.getElementById("c_diff_city").value;
+            const pincode = document.getElementById("c_diff_pincode").value;
+            const country = document.getElementById("c_diff_country").value;
+
+            // Validating the data
+
+            const isValid = validateAddressForm(fullName, mobile, district, state, city, pincode);
+
+            if (isValid) {
+                // Prepare the request body
+                const requestBody = {
+                    c_diff_fname: fullName,
+                    c_diff_mobile: mobile,
+                    c_diff_postal_state: state,
+                    c_diff_state_district: district,
+                    c_diff_city: city,
+                    c_diff_country: country,
+                    c_diff_pincode: pincode,
+                };
+                console.log(requestBody);
+
+                // Send a POST request to the server using Fetch API
+                fetch("/addNewAddress", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(requestBody),
+                })
+                    .then((response) => {
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Address Added",
+                                text: "Your address has been added successfully!",
+                                timer: 1000,
+                                showConfirmButton: false,
+                            });
+
+                            return response.json(); // or return response.text() based on the server response
+                        }
+                        throw new Error("Network response was not ok.");
+                    })
+                    .then((data) => {
+                        // Handle data from the server
+                        console.log(data); // Log the response data from the server
+                    })
+                    .catch((error) => {
+                        // Handle errors
+                        console.error("There has been a problem with your fetch operation:", error);
+                    });
+            }
+        });
+    });
+
+    function validateAddressForm(fullNames, mobiles, districts, states, citys, pincodes) {
+        const nameError = document.getElementById("names-error");
+        const mobileError = document.getElementById("mobiles-error");
+        const cityError = document.getElementById("citys-error");
+        const pincodeError = document.getElementById("pincodes-error");
+
+        const stateError = document.getElementById("states-error");
+        const districtError = document.getElementById("districts-error");
+
+        if (!fullNames) {
+            nameError.textContent = "Name field should not be empty!";
+            setTimeout(function () {
+                nameError.textContent = "";
+            }, 3000);
+            return false;
+        }
+
+        const mobileRegex = /^[6-9]\d{9}$/;
+
+        if (!mobiles || !mobileRegex.test(mobiles)) {
+            mobileError.textContent = "Mobile should be a 10-digit valid number";
+            setTimeout(function () {
+                mobileError.textContent = "";
+            }, 3000);
+            return false;
+        }
+
+        if (new Set(mobiles).size === 1) {
+            mobileError.textContent = "Mobile should not consist of same digits";
+            setTimeout(function () {
+                mobileError.textContent = "";
+            }, 3000);
+            return false;
+        }
+
+        if (!citys) {
+            cityError.textContent = "City field should not be empty!";
+            setTimeout(function () {
+                cityError.textContent = "";
+            }, 3000);
+            return false;
+        }
+
+        if (!districts) {
+            districtError.textContent = "District field should not be empty!";
+            setTimeout(function () {
+                districtError.textContent = "";
+            }, 3000);
+            return false;
+        }
+
+        if (!states) {
+            stateError.textContent = "State field should not be empty!";
+            setTimeout(function () {
+                stateError.textContent = "";
+            }, 3000);
+            return false;
+        }
+
+        const pincodeRegex = /^\d{4}$/;
+
+        if (!pincodes || !pincode.match(pincodeRegex)) {
+            pincodeError.textContent = "Pincode should be a 6-digit numeric value.";
+            setTimeout(function () {
+                pincodeError.textContent = "";
+            }, 3000);
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editButtons = document.querySelectorAll(".edit-address-btn");
+        let addressId;
+
+        editButtons.forEach((button) => {
+            button.addEventListener("click", async function (event) {
+                addressId = event.target.getAttribute("data-address-id");
+                console.log(addressId);
+
+                try {
+                    // Fetch address details based on addressId from your backend API
+                    const response = await fetch(`/address/${addressId}`);
+                    console.log(response);
+                    const selectedAddress = await response.json();
+                    console.log(selectedAddress);
+
+                    // Populate modal fields with address details
+                    document.getElementById("fullName").value = selectedAddress.fullName;
+                    document.getElementById("mobile").value = selectedAddress.mobile;
+                    document.getElementById("district").value = selectedAddress.district;
+                    document.getElementById("city").value = selectedAddress.city;
+                    document.getElementById("state").value = selectedAddress.state;
+                    document.getElementById("pincode").value = selectedAddress.pincode;
+                } catch (error) {
+                    console.error("Error fetching address:", error);
+                }
+            });
+        });
+
+        // Save Changes Button Click Event
+        const saveChangesBtn = document.getElementById("saveChangesBtn");
+        saveChangesBtn.addEventListener("click", async function () {
+            console.log(addressId);
+
+            async function handleFormSubmission(event) {
+                event.preventDefault();
+                if (!validsAddress(event)) {
+                    return;
+                }
+
+                // Get the updated address details from the form fields
+                const updatedAddress = {
+                    fullName: document.getElementById("fullName").value,
+                    mobile: document.getElementById("mobile").value,
+                    district: document.getElementById("district").value,
+                    city: document.getElementById("city").value,
+                    state: document.getElementById("state").value,
+                    pincode: document.getElementById("pincode").value,
+                };
+
+                try {
+                    // Call your backend API endpoint to update the address
+                    const response = await fetch(`/updateAddress/${addressId}`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify(requestBody),
-                    })
-                        .then((response) => {
-                            if (response.ok) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Address Added",
-                                    text: "Your address has been added successfully!",
-                                    timer: 1000,
-                                    showConfirmButton: false,
-                                });
+                        body: JSON.stringify(updatedAddress),
+                    });
 
-                                return response.json(); // or return response.text() based on the server response
-                            }
-                            throw new Error("Network response was not ok.");
-                        })
-                        .then((data) => {
-                            // Handle data from the server
-                            console.log(data); // Log the response data from the server
-                        })
-                        .catch((error) => {
-                            // Handle errors
-                            console.error("There has been a problem with your fetch operation:", error);
-                        });
-                }
-            });
-        });
+                    console.log(response);
 
-        function validateAddressForm(fullNames, mobiles, districts, states, citys, pincodes) {
-            const nameError = document.getElementById("names-error");
-            const mobileError = document.getElementById("mobiles-error");
-            const cityError = document.getElementById("citys-error");
-            const pincodeError = document.getElementById("pincodes-error");
+                    if (response.ok) {
+                        // Parse the response JSON data
+                        const updatedAddressData = await response.json();
 
-            const stateError = document.getElementById("states-error");
-            const districtError = document.getElementById("districts-error");
-
-            if (!fullNames) {
-                nameError.textContent = "Name field should not be empty!";
-                setTimeout(function () {
-                    nameError.textContent = "";
-                }, 3000);
-                return false;
-            }
-
-            const mobileRegex = /^[6-9]\d{9}$/;
-
-            if (!mobiles || !mobileRegex.test(mobiles)) {
-                mobileError.textContent = "Mobile should be a 10-digit valid number";
-                setTimeout(function () {
-                    mobileError.textContent = "";
-                }, 3000);
-                return false;
-            }
-
-            if (new Set(mobiles).size === 1) {
-                mobileError.textContent = "Mobile should not consist of same digits";
-                setTimeout(function () {
-                    mobileError.textContent = "";
-                }, 3000);
-                return false;
-            }
-
-            if (!citys) {
-                cityError.textContent = "City field should not be empty!";
-                setTimeout(function () {
-                    cityError.textContent = "";
-                }, 3000);
-                return false;
-            }
-
-            if (!districts) {
-                districtError.textContent = "District field should not be empty!";
-                setTimeout(function () {
-                    districtError.textContent = "";
-                }, 3000);
-                return false;
-            }
-
-            if (!states) {
-                stateError.textContent = "State field should not be empty!";
-                setTimeout(function () {
-                    stateError.textContent = "";
-                }, 3000);
-                return false;
-            }
-
-            const pincodeRegex = /^\d{4}$/;
-
-            if (!pincodes || !pincode.match(pincodeRegex)) {
-                pincodeError.textContent = "Pincode should be a 6-digit numeric value.";
-                setTimeout(function () {
-                    pincodeError.textContent = "";
-                }, 3000);
-                return false;
-            }
-
-            return true;
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const editButtons = document.querySelectorAll(".edit-address-btn");
-            let addressId;
-
-            editButtons.forEach((button) => {
-                button.addEventListener("click", async function (event) {
-                    addressId = event.target.getAttribute("data-address-id");
-                    console.log(addressId);
-
-                    try {
-                        // Fetch address details based on addressId from your backend API
-                        const response = await fetch(`/address/${addressId}`);
-                        console.log(response);
-                        const selectedAddress = await response.json();
-                        console.log(selectedAddress);
-
-                        // Populate modal fields with address details
-                        document.getElementById("fullName").value = selectedAddress.fullName;
-                        document.getElementById("mobile").value = selectedAddress.mobile;
-                        document.getElementById("district").value = selectedAddress.district;
-                        document.getElementById("city").value = selectedAddress.city;
-                        document.getElementById("state").value = selectedAddress.state;
-                        document.getElementById("pincode").value = selectedAddress.pincode;
-                    } catch (error) {
-                        console.error("Error fetching address:", error);
-                    }
-                });
-            });
-
-            // Save Changes Button Click Event
-            const saveChangesBtn = document.getElementById("saveChangesBtn");
-            saveChangesBtn.addEventListener("click", async function () {
-                console.log(addressId);
-
-                async function handleFormSubmission(event) {
-                    event.preventDefault();
-                    if (!validsAddress(event)) {
-                        return;
-                    }
-
-                    // Get the updated address details from the form fields
-                    const updatedAddress = {
-                        fullName: document.getElementById("fullName").value,
-                        mobile: document.getElementById("mobile").value,
-                        district: document.getElementById("district").value,
-                        city: document.getElementById("city").value,
-                        state: document.getElementById("state").value,
-                        pincode: document.getElementById("pincode").value,
-                    };
-
-                    try {
-                        // Call your backend API endpoint to update the address
-                        const response = await fetch(`/updateAddress/${addressId}`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(updatedAddress),
+                        Swal.fire({
+                            icon: "success",
+                            title: "Address Updated",
+                            text: "Your address has been updated successfully!",
+                            timer: 1000,
+                            showConfirmButton: false,
+                        }).then(() => {
+                            // Reload the page after showing the notification
+                            location.reload();
                         });
 
-                        console.log(response);
-
-                        if (response.ok) {
-                            // Parse the response JSON data
-                            const updatedAddressData = await response.json();
-
-                            Swal.fire({
-                                icon: "success",
-                                title: "Address Updated",
-                                text: "Your address has been updated successfully!",
-                                timer: 1000,
-                                showConfirmButton: false,
-                            }).then(() => {
-                                // Reload the page after showing the notification
-                                location.reload();
-                            });
-
-                            console.log("Address updated successfully on both client and server sides!");
-                        } else {
-                            // Handle errors here, such as network issues or server errors
-                            console.error("Error updating address:", response.statusText);
-                        }
-                    } catch (error) {
-                        // Handle other types of errors, such as network issues
-                        console.error("Error updating address:", error);
+                        console.log("Address updated successfully on both client and server sides!");
+                    } else {
+                        // Handle errors here, such as network issues or server errors
+                        console.error("Error updating address:", response.statusText);
                     }
-
-                    // Close the modal after initiating the save operation
-                    const editAddressModal = new bootstrap.Modal(document.getElementById("editAddressModal"));
-                    editAddressModal.hide();
+                } catch (error) {
+                    // Handle other types of errors, such as network issues
+                    console.error("Error updating address:", error);
                 }
-                const editAddressForm = document.getElementById("editAddressForm");
-                editAddressForm.addEventListener("submit", handleFormSubmission);
-            });
+
+                // Close the modal after initiating the save operation
+                const editAddressModal = new bootstrap.Modal(document.getElementById("editAddressModal"));
+                editAddressModal.hide();
+            }
+            const editAddressForm = document.getElementById("editAddressForm");
+            editAddressForm.addEventListener("submit", handleFormSubmission);
         });
-    </script>
+    });
+</script>
 
-    <script>
-        function validsAddress(event) {
-            event.preventDefault();
+<script>
+    function validsAddress(event) {
+        event.preventDefault();
 
-            const name = document.getElementById("fullName").value;
-            const mobile = document.getElementById("mobile").value;
-            const state = document.getElementById("state").value;
-            const district = document.getElementById("district").value;
-            const city = document.getElementById("city").value;
-            const pincode = document.getElementById("pincode").value;
+        const name = document.getElementById("fullName").value;
+        const mobile = document.getElementById("mobile").value;
+        const state = document.getElementById("state").value;
+        const district = document.getElementById("district").value;
+        const city = document.getElementById("city").value;
+        const pincode = document.getElementById("pincode").value;
 
-            document.getElementById("name-error").textContent = "";
-            document.getElementById("state-error").textContent = "";
-            document.getElementById("mobile-error").textContent = "";
-            document.getElementById("district-error").textContent = "";
-            document.getElementById("city-error").textContent = "";
-            document.getElementById("pincode-error").textContent = "";
+        document.getElementById("name-error").textContent = "";
+        document.getElementById("state-error").textContent = "";
+        document.getElementById("mobile-error").textContent = "";
+        document.getElementById("district-error").textContent = "";
+        document.getElementById("city-error").textContent = "";
+        document.getElementById("pincode-error").textContent = "";
 
-            if (!name) {
-                document.getElementById("name-error").textContent = "Name field should not be empty!";
-                return false;
-            }
-
-            if (!state) {
-                document.getElementById("state-error").textContent = "State field should not be empty!";
-                return false;
-            }
-
-            const mobileRegex = /^[6-9]\d{9}$/;
-
-            if (!mobile || !mobileRegex.test(mobile)) {
-                document.getElementById("mobile-error").textContent = "Mobile number should be a 10-digit valid number";
-                return false;
-            }
-
-            if (new Set(mobile).size === 1) {
-                document.getElementById("mobile-error").textContent = "Mobile number should not consist of the same digit.";
-                return false;
-            }
-
-            if (!district) {
-                document.getElementById("district-error").textContent = "District field should not be empty!";
-                return false;
-            }
-
-            if (!city) {
-                document.getElementById("city-error").textContent = "City field should not be empty!";
-                return false;
-            }
-
-            const pincodeRegex = /^\d{6}$/;
-
-            if (!pincode || !pincode.match(pincodeRegex)) {
-                document.getElementById("pincode-error").textContent = "Pincode should be a 6-digit numeric value.";
-                return false;
-            }
-
-            return true;
+        if (!name) {
+            document.getElementById("name-error").textContent = "Name field should not be empty!";
+            return false;
         }
-    </script>
 
-    <%- include('../userLayouts/footer.ejs') %>
-</div>
+        if (!state) {
+            document.getElementById("state-error").textContent = "State field should not be empty!";
+            return false;
+        }
+
+        const mobileRegex = /^[6-9]\d{9}$/;
+
+        if (!mobile || !mobileRegex.test(mobile)) {
+            document.getElementById("mobile-error").textContent = "Mobile number should be a 10-digit valid number";
+            return false;
+        }
+
+        if (new Set(mobile).size === 1) {
+            document.getElementById("mobile-error").textContent = "Mobile number should not consist of the same digit.";
+            return false;
+        }
+
+        if (!district) {
+            document.getElementById("district-error").textContent = "District field should not be empty!";
+            return false;
+        }
+
+        if (!city) {
+            document.getElementById("city-error").textContent = "City field should not be empty!";
+            return false;
+        }
+
+        const pincodeRegex = /^\d{6}$/;
+
+        if (!pincode || !pincode.match(pincodeRegex)) {
+            document.getElementById("pincode-error").textContent = "Pincode should be a 6-digit numeric value.";
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+<%- include('../userLayouts/footer.ejs') %>

@@ -6,6 +6,11 @@ const Cart = require("../models/cartModel");
 const loadCheckout = async (req, res) => {
     try {
         const userId = req.session.user_id;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Please log in to continue." });
+        }
+      
         const userData = await User.findById({ _id: userId });
         const userAddress = await Address.findOne({ userId });
         const cartData = await Cart.findOne({ user_id: userId }).populate("items.product");
@@ -14,8 +19,10 @@ const loadCheckout = async (req, res) => {
         const totalAmount = cartData.items.reduce((total, item) => {
             return total + item.product.price * item.quantity;
         }, 0);
-
-        res.render("checkout", { user: userData, address: userAddress, cart: cartData, totalAmount, count: totalProductsInCart });
+      
+            res.render("checkout", { user: userData, address: userAddress, cart: cartData, totalAmount, count: totalProductsInCart });
+        
+        
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Internal Server Error");

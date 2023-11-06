@@ -142,11 +142,13 @@
 
                             <div class="row">
                                 <div class="col-md-12">
-                                    <a href="/checkout">
-                                        <button class="btn btn-primary btn-lg py-3 btn-block">
+                                   
+                                        <button type="button"
+                                        class="btn btn-primary btn-lg py-3 btn-block buyNowBtn"
+                                       >
                                             Proceed To Checkout
-                                        </button></a
-                                    >
+                                        </button>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -156,6 +158,60 @@
         </div>
     </div>
 </div>
+
+<script>
+ document.body.addEventListener("click", async (event) => {
+    console.log("clicked");
+    if (event.target.matches(".buyNowBtn")) {
+        try {
+            const response = await fetch("/checkout", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.ok) {
+                // User is logged in, redirect to the checkout page
+                window.location.href = "/checkout";
+            } else {
+                // Check if the response status is 401 (Unauthorized)
+                if (response.status === 401) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning!",
+                        text: "Please log in to continue.",
+                        showCancelButton: true,
+                        confirmButtonText: "Log In",
+                        cancelButtonText: "Cancel",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Redirect the user to the login page or handle the login action here
+                            window.location.href = "/login";
+                        }
+                    });
+                } else {
+                    // Handle other error cases
+                    const data = await response.json();
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning!",
+                        text: data.message,
+                    });
+                }
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error!",
+                text: "An error occurred.",
+            });
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    }
+});
+
+</script>
 
 
 <script>

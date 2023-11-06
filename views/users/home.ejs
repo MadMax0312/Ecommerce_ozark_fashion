@@ -126,12 +126,24 @@
                     <p class="card-text text-primary font-weight-bold">₹ <%= product.price %></p>
                  
                     
-                    <div class="d-inline-block" style="text-align: left;">
+                    <div class="d-inline-block">
                       
                         <button type="button" class="btn btn-primary p-1 m-1 addToCartBtn" data-product-id="<%= product._id %>">Add to Cart</button>
 
                       
                   </div>
+                  <div class="d-inline-block">
+                      
+                    <button type="button" class="btn p-1 m-1 addToWishlistBtn" data-product-id="<%= product._id %>" style="background-color: orange;">Add to Wishlist</button>
+
+                  
+              </div>
+              <div class="d-inline-block">
+                      
+                <button type="button" class="btn p-1 m-1 buyNowBtn" data-product-id="<%= product._id %>" style="background-color: black; color: white;">Buy now</button>
+
+              
+          </div>
                  
                  
                 </div>
@@ -199,20 +211,36 @@ document.body.addEventListener("click", async (event) => {
                 console.log(data);
 
                 if (response.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: data.message,
+                });
+            } else {
+                // Check if the response status is 401 (Unauthorized)
+                if (response.status === 401) {
                     Swal.fire({
-                        icon: "success",
-                        title: "Success!",
-                        text: data.message,
-                    });
-                }else{
-
-                  Swal.fire({
                         icon: "warning",
-                        title: "warning!",
+                        title: "Warning!",
+                        text: "Please log in to continue.",
+                        showCancelButton: true,
+                        confirmButtonText: "Log In",
+                        cancelButtonText: "Cancel",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Redirect the user to the login page or handle the login action here
+                            window.location.href = "/login";
+                        }
+                    });
+                } else {
+                    // Handle other error cases
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning!",
                         text: data.message,
                     });
-
                 }
+            }
             } catch (error) {
                 Swal.fire({
                     icon: "error",
@@ -224,6 +252,121 @@ document.body.addEventListener("click", async (event) => {
      
     }
 });
+
+document.body.addEventListener("click", async (event) => {
+    if (event.target.matches(".addToWishlistBtn")) {
+        const productId = event.target.getAttribute("data-product-id");
+
+            try {
+                const response = await fetch("/addToWishlist", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id: productId }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: data.message,
+                });
+            } else {
+                // Check if the response status is 401 (Unauthorized)
+                if (response.status === 401) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning!",
+                        text: "Please log in to continue.",
+                        showCancelButton: true,
+                        confirmButtonText: "Log In",
+                        cancelButtonText: "Cancel",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Redirect the user to the login page or handle the login action here
+                            window.location.href = "/login";
+                        }
+                    });
+                } else {
+                    // Handle other error cases
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning!",
+                        text: data.message,
+                    });
+                }
+            }
+            } catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: "An error occurred while adding the product to the cart.",
+                });
+                console.error("There was a problem with the fetch operation:", error);
+            }
+     
+    }
+});
+
+document.body.addEventListener("click", async (event) => {
+    if (event.target.matches(".buyNowBtn")) {
+        const productId = event.target.getAttribute("data-product-id");
+
+        try {
+            const response = await fetch(`/checkout?id=${productId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: data.message,
+                });
+            } else {
+                // Check if the response status is 401 (Unauthorized)
+                if (response.status === 401) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning!",
+                        text: "Please log in to continue.",
+                        showCancelButton: true,
+                        confirmButtonText: "Log In",
+                        cancelButtonText: "Cancel",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Redirect the user to the login page or handle the login action here
+                            window.location.href = "/login";
+                        }
+                    });
+                } else {
+                    // Handle other error cases
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Warning!",
+                        text: data.message,
+                    });
+                }
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error!",
+                text: "An error occurred while adding the product to the cart.",
+            });
+            console.error("There was a problem with the fetch operation:", error);
+        }
+    }
+});
+
 </script>
 
 <%- include('../userLayouts/footer.ejs') %>

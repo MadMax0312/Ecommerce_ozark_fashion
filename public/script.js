@@ -41,34 +41,51 @@ function validateForm() {
         return false;
     }
 
+    const nameRegex = /^[A-Za-z]+$/;
+
     if (!name1) {
         document.getElementById("name1-error").textContent = "Name field should not be empty";
         setTimeout(function () {
             nameError.textContent = "";
         }, 3000);
-
         return false;
     }
 
-    // Regular expression to match exactly 10 digits
-    const mobileRegex = /^\d{10}$/;
+    if (name1.length > 10) {
+        document.getElementById("name1-error").textContent = "Name must be maximum 10 characters long";
+        setTimeout(function () {
+            nameError.textContent = "";
+        }, 3000);
+        return false;
+    }
+
+    if (!nameRegex.test(name1)) {
+        document.getElementById("name1-error").textContent = "Name must contain only letters";
+        setTimeout(function () {
+            nameError.textContent = "";
+        }, 3000);
+        return false;
+    }
+    
+    const mobileRegex = /^[6-9]\d{9}$/;
 
     if (!mobile) {
         document.getElementById("mobile-error").textContent = "Mobile number field should not be empty";
         setTimeout(function () {
-            mobileError.textContent = "";
+            document.getElementById("mobile-error").textContent = "";
         }, 3000);
 
         return false;
     }
 
     if (!mobile.match(mobileRegex)) {
-        document.getElementById("mobile-error").textContent = "Invalid mobile number (must be exactly 10 digits)";
+        document.getElementById("mobile-error").textContent = "Invalid mobile number";
         setTimeout(function () {
-            mobileError.textContent = "";
+            document.getElementById("mobile-error").textContent = "";
         }, 3000);
         return false;
     }
+
 
     if (!password || password.length < 4) {
         document.getElementById("password-error").textContent = "Password must be at least 4 characters";

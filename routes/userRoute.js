@@ -28,6 +28,7 @@ const cartController = require("../controllers/cartController");
 const addressController = require("../controllers/addressController");
 const checkoutController = require("../controllers/checkoutController");
 const profileController = require("../controllers/profileController");
+const orderContoller = require("../controllers/orderContoller");
 
 user_route.get("/register", userController.loadRegister);
 user_route.post("/register", userController.verifyOtp);
@@ -80,30 +81,38 @@ user_route.get("/wishlist", wishlistController.loadWishlist);
 
 user_route.post("/addToWishlist", wishlistController.addToWishlist);
 
-user_route.get("/remove-wishlist", wishlistController.removeProduct);
+user_route.get("/remove-wishlist", auth.isLogin, wishlistController.removeProduct);
 
 //===================== C A R T == S E C T I O N ===================================
 
-user_route.get("/remove-cart", cartController.removeProduct);
+user_route.get("/remove-cart", auth.isLogin, cartController.removeProduct);
 
 user_route.get("/cart", cartController.loadCart);
 
 user_route.post("/addToCart", cartController.addToCart);
 
-user_route.post("/update-cart", cartController.updateCart);
+user_route.post("/update-cart", auth.isLogin, cartController.updateCart);
 
-user_route.get("/get-max-stock/:id", cartController.getMaxStock);
+user_route.get("/get-max-stock/:id", auth.isLogin, cartController.getMaxStock);
 
-user_route.get("/about", userController.loadAbout);
 
 //================== C H E C K O U T == S E C T I O N  ======================
 
 user_route.get("/checkout", checkoutController.loadCheckout);
 
-user_route.get('/address/:id', checkoutController.getAddressById);
+user_route.get('/address/:id', auth.isLogin, checkoutController.getAddressById);
 
-user_route.post("/updateAddress/:id", checkoutController.updateAddress);
+user_route.post("/updateAddress/:id", auth.isLogin, checkoutController.updateAddress);
 
-user_route.post("/addNewAddress", checkoutController.addAddress);
+user_route.post("/addNewAddress", auth.isLogin, checkoutController.addAddress);
+
+//===================== O R D E R ========================================
+
+user_route.get("/order", orderContoller.loadOrder);
+
+user_route.post("/place-order", orderContoller.placeOrder);
+
+
+user_route.get("/about", userController.loadAbout);
 
 module.exports = user_route;

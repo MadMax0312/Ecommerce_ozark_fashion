@@ -1,5 +1,24 @@
 <%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
+<style>
+.block-4-image {
+    max-height: 300px; 
+    overflow: hidden; 
+    margin-bottom: 0px;
+}
+
+.block-4-image img {
+    max-width: 100%; /* Set a maximum width for the images */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.btn.btn-sm {
+    font-size: 14px !important;
+    padding: 3px 20px !important;
+}
+
+</style>
+
 <div class="site-wrap">
     <div class="bg-light py-3">
         <div class="container">
@@ -16,48 +35,40 @@
             <div class="row mb-5">
                 <div class="col-md-12 order-2">
                     <div class="row">
-                        <% if (data.length > 0) { for (let i = 0; i < data.length; i++) { const products = data[i].product;
+                        <% if (data.length > 0) { 
+                            for (let i = 0; i < data.length; i++) { 
+                                const products = data[i].product;
                         %>
                         <!-- Loop through products in the wishlist -->
                         <% products.forEach(product => { %>
                         <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
-                            <div class="block-4 text-center border">
-                                <figure class="block-4-image">
-                                    <a href="/product-info?id=<%= product._id %>">
-                                        <img
-                                            src="/static/admin/Assets/images/products/<%= product.image?.[0] %>"
-                                            alt="Product Image"
-                                            class="img-fluid"
-                                        />
-                                    </a>
-                                </figure>
-                                <div class="block-4-text p-4" style="height: 200px">
-                                    <h3><a href="#" style="color: gray"><%= product.productname %></a></h3>
-                                    <p class="text-black font-weight-semibold"><%= product.description %></p>
-                                    <p class="text-black font-weight-semibold" style="margin: 0">₹<%= product.price %></p>
-                                    <p style="margin: 0">
-
-                                        <a
-                                        href="#"
-                                        class="addToCartBtn buy-now btn btn-sm"
-                                        id="hot"
-                                        style="background-color: white; color: blue; padding-bottom: 0"
-                                        data-product-id="<%= product._id %>"
-                                    >
-                                        Add To Cart
-                                    </a>
-
-
-                                    </p>
-                                    <p style="margin: 0; height: 35px">
-                                        <a
-                                            href="/remove-wishlist?wishlistId=<%= data[i]._id %>&productId=<%= data[i].product[0]._id %>"
-                                            class="buy-now btn btn-sm"
-                                            style="background-color: white; color: red; height: 35px; border: none"
-                                        >
+                            <div class="card h-100">
+                                <a href="/product-info?id=<%= product._id %>">
+                                    <img
+                                        src="/static/admin/Assets/images/products/<%= product.image?.[0] %>"
+                                        alt="Product Image"
+                                        class="card-img-top img-fluid"
+                                        style="object-fit: cover; max-height: 200px;"
+                                    />
+                                </a>
+                                <div class="text-center">
+                                    <div>
+                                        <h5 class="card-title" style="margin-bottom: 5px; color: black;"><%= product.productname %></h5>
+                                        <p class="card-text text-black font-weight-semibold" style="margin-bottom: 5px;"><%= product.description %></p>
+                                        <p class="card-text text-black font-weight-semibold">₹ <%= product.price %></p>
+                                    </div>
+                                    <div class="text-center">
+                                        <a href="#"
+                                            class="addToCartBtn buy-now btn btn-sm btn-primary"
+                                            data-product-id="<%= product._id %>">
+                                            Add To Cart
+                                        </a>
+                                        <a href="/remove-wishlist?wishlistId=<%= data[i]._id %>&productId=<%= product._id %>"
+                                            class="buy-now btn btn-sm btn-danger mt-2"
+                                            style="width: 100%;">
                                             Remove
                                         </a>
-                                    </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -67,6 +78,8 @@
                         </div>
                         <% } %>
                     </div>
+                    
+                    
                 </div>
             </div>
         </div>
