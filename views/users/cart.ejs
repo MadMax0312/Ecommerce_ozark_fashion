@@ -28,6 +28,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+
+                                <% if (count > 0) { %> 
+                               
+                               
                                 <% data.forEach(cartItem => { %> <% cartItem.items.forEach(item => { %>
                                 <tr>
                                     <td class="product-thumbnail">
@@ -87,13 +91,24 @@
                                         </a>
                                     </td>
                                 </tr>
-                                <% }); %> <% }); %> <% if (!data.length) { %>
+                                <% }); %>
+                                <% }); %>
+                                <!-- <% if (data.length = []) { %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="6">
+                                        <p class="text-center">No products in your cart.</p>
+                                    </td>
+                                </tr>
+                            <% } %> -->
+                           <% } else { %>
                                 <tr>
                                     <td colspan="6">
                                         <p class="text-center">No products available.</p>
                                     </td>
                                 </tr>
                                 <% } %>
+                                
                             </tbody>
                         </table>
                     </div>
@@ -159,7 +174,10 @@
     </div>
 </div>
 
+
+
 <script>
+
  document.body.addEventListener("click", async (event) => {
     console.log("clicked");
     if (event.target.matches(".buyNowBtn")) {
@@ -172,10 +190,10 @@
             });
 
             if (response.ok) {
-                // User is logged in, redirect to the checkout page
+           
                 window.location.href = "/checkout";
             } else {
-                // Check if the response status is 401 (Unauthorized)
+
                 if (response.status === 401) {
                     Swal.fire({
                         icon: "warning",
@@ -186,7 +204,6 @@
                         cancelButtonText: "Cancel",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Redirect the user to the login page or handle the login action here
                             window.location.href = "/login";
                         }
                     });

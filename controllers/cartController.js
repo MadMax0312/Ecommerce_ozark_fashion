@@ -10,6 +10,8 @@ const loadCart = async (req, res) => {
 
         const cartItems = await Cart.find({ user_id: user }).populate("items.product");
 
+        console.log(cartItems);
+
         let subtotal = 0;
         if (cartItems.length > 0) {
             subtotal = cartItems.reduce((total, cartItem) => {

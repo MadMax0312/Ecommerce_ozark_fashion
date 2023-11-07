@@ -1,135 +1,201 @@
 <%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
+<style>
+    .fork {
+        color: black;
+        font-weight: 400;
+    }
+    .d-block{
+        color: black;
+        font-weight: 500;
+    }
+    .c-block{
+        color: black;
+        font-weight: 400;
+    }
+</style>
+
+<div class="bg-light py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 mb-0">
+                <a href="/">Home</a> <span class="mx-2 mb-0">/</span> <a href="/cart">Cart</a><span class="mx-2 mb-0">/</span><a href="/checkout">Checkout</a>
+                <span class="mx-2 mb-0">/</span> <strong class="text-black">Order</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="container mt-5 mb-5">
     <div class="row d-flex justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-8 p-0">
             <div class="card">
-                <div class="invoice p-5">
+                <div class="invoice p-5" style="color: black;">
                     <h5>Your Order Confirmed!</h5>
-                    <span class="font-weight-bold d-block mt-4">Hello, Chris</span>
+                    <span class="font-weight-bold d-block mt-4"
+                        >Hello, <%= userData.first_name %> <%= userData.last_name %></span
+                    >
                     <span>Your order has been confirmed and will be shipped in the next two days!</span>
                     <div class="payment border-top mt-3 mb-3 border-bottom table-responsive">
                         <table class="table table-borderless">
                             <tbody>
+                                <% data.forEach(function(order) { %>
                                 <tr>
                                     <td>
                                         <div class="py-2">
-                                            <span class="d-block text-muted">Order Date</span>
-                                            <span>12 Jan, 2018</span>
+                                            <span class="d-block">Order Date</span>
+                                            <span style="color: black"
+                                                ><%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
+                                                'short', day: '2-digit' }).replace(/\//g, '-') %></span
+                                            >
                                         </div>
                                     </td>
                                     <td>
                                         <div class="py-2">
-                                            <span class="d-block text-muted">Order No</span>
-                                            <span>MT12332345</span>
+                                            <span class="d-block">Order No</span>
+                                            <span style="color: black"><%= order._id %></span>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="py-2">
-                                            <span class="d-block text-muted">Payment</span>
-                                            <span>
-                                                <img
-                                                    src="https://img.icons8.com/color/48/000000/mastercard.png"
-                                                    width="20"
-                                                    alt="Payment Icon"
-                                                />
-                                            </span>
+                                            <span class="d-block">Payment</span>
+                                            <span> <%= order.paymentMethod %> </span>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="py-2">
-                                            <span class="d-block text-muted">Shipping Address</span>
-                                            <span>414 Advert Avenue, NY, USA</span>
+                                            <span class="d-block">Expected Delivery</span>
+                                            <% 
+                                            // Get the order date from the server response (assuming order.createdAt is a valid Date object)
+                                            const orderDate = new Date(order.createdAt);
+                                    
+                                            // Calculate the expected delivery date (7 days later)
+                                            const expectedDeliveryDate = new Date(orderDate);
+                                            expectedDeliveryDate.setDate(orderDate.getDate() + 7);
+                                    
+                                            // Format the expected delivery date and display it
+                                            const formattedDeliveryDate = expectedDeliveryDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-');
+                                        %>
+                                        <span><%= formattedDeliveryDate %></span>
                                         </div>
                                     </td>
                                 </tr>
+                                <% }); %>
                             </tbody>
                         </table>
                     </div>
                     <div class="product border-bottom table-responsive">
-                      <table class="table table-borderless">
-                        <tbody>
-                            <% if (data && data.length > 0) { %> <% data.forEach(order => { %> <%
-                            order.products.forEach(item => { %>
-                            <tr>
-                                <td width="20%">
-                                    <img src="/static/admin/Assets/images/products/<%= item.productId.image[0] %>" width="90" alt="Product Image" />
-                                </td>
-                                <td width="60%">
-                                  <span class="font-weight-bold"><%= item.productId.productname %></span>
-                                  <div class="product-qty">
-                                      <span class="d-block">Quantity: <%= item.quantity %></span>
-                                      <span>Price: $ <%= item.price %></span>
-                                  </div>
-                              </td>
-                              
-                              <td width="20%">
-                                  <div class="text-right">
-                                      <span class="font-weight-bold">$<%= (item.quantity * item.price).toFixed(2) %></span>
-                                  </div>
-                              </td>
-                              
-                            </tr>
-                            <% }); %> <% }); %> <% } else { %>
-                            <tr>
-                                <td colspan="3">
-                                    <p class="text-center">No products available.</p>
-                                </td>
-                            </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                    
+                        <table class="table table-borderless">
+                            <tbody>
+                                <% if (data && data.length > 0) { %> <% data.forEach(order => { %> <%
+                                order.products.forEach(item => { %>
+                                <tr>
+                                    <td width="20%">
+                                        <img
+                                            src="/static/admin/Assets/images/products/<%= item.productId.image[0] %>"
+                                            width="90"
+                                            alt="Product Image"
+                                        />
+                                    </td>
+                                    <td width="60%">
+                                        <span class="font-weight-bold"><%= item.productId.productname %></span>
+                                        <div class="product-qty">
+                                            <span class="d-block">Quantity: <%= item.quantity %></span>
+                                            <span class="c-block">Price: ₹ <%= item.productId.price %></span>
+                                        </div>
+                                    </td>
+
+                                    <td width="20%">
+                                        <div class="text-right">
+                                            <span class="font-weight-bold"
+                                                >₹ <%= (item.quantity * item.productId.price).toFixed(2) %></span
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }); %> <% }); %> <% } else { %>
+                                <tr>
+                                    <td colspan="3">
+                                        <p class="text-center">No products available.</p>
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="row d-flex justify-content-end">
-                        <div class="col-md-5">
+                    <div class="row d-flex">
+                        <div class="col-md-6">
+                            <h3 style="color: black">Shipping Address</h3>
                             <table class="table table-borderless">
                                 <tbody class="totals">
+                                    <% data.forEach(function(order) { %>
+                                    <div class="fork">
+                                        <span><%= order.address.fullName %></span>
+                                    </div>
+                                    <div class="fork">
+                                        <span><%= order.address.city %></span>
+                                    </div>
+
+                                    <div class="fork">
+                                        <span><%= order.address.district %></span>
+                                    </div>
+
+                                    <div class="fork">
+                                        <span><%= order.address.state %></span>
+                                    </div>
+                                    <div class="fork">
+                                        <span><%= order.address.country %></span>
+                                    </div>
+                                    <div class="fork">
+                                        <span>PIN: <%= order.address.pincode %></span>
+                                    </div>
+                                    <div class="fork">
+                                        <span>Mobile Number: <%= order.address.mobile %></span>
+                                    </div>
+
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h3 style="color: black; padding-left: 10px;">Billing Details</h3>
+                            <table class="table table-borderless">
+                                <tbody class="totals">
+                                    <% data.forEach(function(product) { %>
                                     <tr>
                                         <td>
                                             <div class="text-left">
-                                                <span class="text-muted">Subtotal</span>
+                                                <span class="d-block">Subtotal</span>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                <span>$145.00</span>
+                                                <span class="c-block">₹ <%= product.totalAmount.toFixed(2) %></span>
                                             </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
                                             <div class="text-left">
-                                                <span class="text-muted">Shipping Fee</span>
+                                                <span class="d-block">Shipping Fee</span>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                <span>$10.00</span>
+                                                <span class="c-block">₹0.00</span>
                                             </div>
                                         </td>
                                     </tr>
+                                
                                     <tr>
                                         <td>
                                             <div class="text-left">
-                                                <span class="text-muted">Tax Fee</span>
+                                                <span class="d-block">Discount</span>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                <span>$3.50</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="text-left">
-                                                <span class="text-muted">Discount</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="text-right">
-                                                <span class="text-success">-$25.00</span>
+                                                <span class="c-block">₹0.00</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -141,17 +207,30 @@
                                         </td>
                                         <td>
                                             <div class="text-right">
-                                                <span class="font-weight-bold">$133.50</span>
+                                                <span class="font-weight-bold">₹ <%= product.totalAmount.toFixed(2) %></span>
                                             </div>
                                         </td>
                                     </tr>
+                                    <% }); %>
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                   <div>
                     <p>We will be sending a shipping confirmation email when the item is successfully shipped!</p>
                     <p class="font-weight-bold mb-0">Thanks for shopping with us!</p>
                     <span>Ozark Team</span>
+                   </div>
+                   <br>
+                
+                   <div class="row">
+                    <div class="col-md-6">
+                        <a href="/shop"><button>Continue Shopping</button></a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/shop"><button>View Details</button></a>
+                    </div>
+                   </div>
                 </div>
             </div>
         </div>

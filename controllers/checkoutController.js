@@ -7,14 +7,21 @@ const loadCheckout = async (req, res) => {
     try {
         const userId = req.session.user_id;
 
+        const totalProductsInCart = await getTotalProductsInCart(userId);
+        console.log(totalProductsInCart)
+
         if (!userId) {
             return res.status(401).json({ message: "Please log in to continue." });
+        }
+
+        if(totalProductsInCart == 0){
+            return res.status(402).json({ message: "Please add items in cart" });
         }
       
         const userData = await User.findById({ _id: userId });
         const userAddress = await Address.findOne({ userId });
         const cartData = await Cart.findOne({ user_id: userId }).populate("items.product");
-        const totalProductsInCart = await getTotalProductsInCart(userId);
+   
 
         const totalAmount = cartData.items.reduce((total, item) => {
             return total + item.product.price * item.quantity;

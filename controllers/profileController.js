@@ -2,6 +2,9 @@ const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const Address = require("../models/addressModel");
 const { ObjectId } = require("mongodb");
+const Cart = require("../models/cartModel");
+const Order = require("../models/orderModel");
+const { getTotalProductsInCart } = require("../number/cartNumber");
 
 // ========== rendering user profile ===========
 const loadProfile = async (req, res) => {
@@ -173,6 +176,53 @@ const resetPassword = async (req, res) => {
     }
 };
 
+//=======================================================
+
+const loadOrderPage = async (req, res) => {
+    try {
+        const userId = req.session.user_id;
+        const cart = await Cart.findOne({ user_id: userId });
+        const userData = await User.findById({ _id: userId });
+        const totalProductsInCart = await getTotalProductsInCart(userId);
+        let cartCount = 0;
+
+        if (cart) {
+            cartCount = cart.products.length;
+        }
+
+        const orderData = await Order.find({ user: userId }).sort({ createdAt: -1 });
+
+        // Modify orderData to include formatted delivery date for each order
+        const ordersWithFormattedDeliveryDate = orderData.map((order) => {
+            const orderDate = new Date(order.createdAt);
+            const expectedDeliveryDate = new Date(orderDate);
+            expectedDeliveryDate.setDate(orderDate.getDate() + 7);
+
+            const formattedDeliveryDate = expectedDeliveryDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit'
+            }).replace(/\//g, '-');
+
+            return {
+                ...order.toObject(), // Convert Mongoose document to plain JavaScript object
+                formattedDeliveryDate: formattedDeliveryDate
+            };
+        });
+
+        res.render('viewOrders', {
+            user: userData,
+            orders: ordersWithFormattedDeliveryDate, // Use the modified orderData array
+            cartCount,
+            count: totalProductsInCart
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
 module.exports = {
     loadProfile,
     loadAddress,
@@ -182,4 +232,5 @@ module.exports = {
     deleteAddress,
     updateUser,
     resetPassword,
+    loadOrderPage,
 };
