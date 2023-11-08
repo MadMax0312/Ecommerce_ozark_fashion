@@ -348,7 +348,7 @@
                                     <h6>
                                         <div class="d-flex justify-content-between">
                                             <div style="display: inline-block">
-                                                <p style="color: black">SubTotal Amount :</p>
+                                                <p style="color: black;">SubTotal Amount :</p>
                                             </div>
                                             <div style="display: inline-block">
                                                 <p style="color: black">₹ <%= totalAmount.toFixed(2) %></p>
@@ -433,6 +433,7 @@
                                             type="button"
                                             class="btn btn-primary btn-lg py-3 btn-block placeOrderBtns"
                                             id="placeOrderBtn"
+                                            onclick="confirmorder(event)"
                                         >
                                             Place Order
                                         </button>
@@ -495,6 +496,24 @@
 </div>
 
 <script>
+    function confirmorder(event) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: "Yeahh!!!!",
+            text: "Your Order is Succesfull",
+            icon: "sucess",
+            confirmButtonColor: "#28a745",
+            confirmButtonText: "View Details",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/order";
+            }
+        });
+    }
+</script>
+
+<!-- <script>
     document.body.addEventListener("click", async (event) => {
         console.log("clicked");
         if (event.target.matches(".placeOrderBtns")) {
@@ -514,7 +533,7 @@
             }
         }
     });
-</script>
+</script> -->
 
 <script>
     document.getElementById("placeOrderBtn").addEventListener("click", async function () {

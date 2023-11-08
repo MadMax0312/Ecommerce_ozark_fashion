@@ -184,11 +184,6 @@ const loadOrderPage = async (req, res) => {
         const cart = await Cart.findOne({ user_id: userId });
         const userData = await User.findById({ _id: userId });
         const totalProductsInCart = await getTotalProductsInCart(userId);
-        let cartCount = 0;
-
-        if (cart) {
-            cartCount = cart.products.length;
-        }
 
         const orderData = await Order.find({ user: userId }).sort({ createdAt: -1 });
 
@@ -198,30 +193,57 @@ const loadOrderPage = async (req, res) => {
             const expectedDeliveryDate = new Date(orderDate);
             expectedDeliveryDate.setDate(orderDate.getDate() + 7);
 
-            const formattedDeliveryDate = expectedDeliveryDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: '2-digit'
-            }).replace(/\//g, '-');
+            const formattedDeliveryDate = expectedDeliveryDate
+                .toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                })
+                .replace(/\//g, "-");
 
             return {
                 ...order.toObject(), // Convert Mongoose document to plain JavaScript object
-                formattedDeliveryDate: formattedDeliveryDate
+                formattedDeliveryDate: formattedDeliveryDate,
             };
         });
 
-        res.render('viewOrders', {
+        res.render("viewOrders", {
             user: userData,
             orders: ordersWithFormattedDeliveryDate, // Use the modified orderData array
-            cartCount,
-            count: totalProductsInCart
+        
+            count: totalProductsInCart,
         });
-
     } catch (error) {
         console.log(error);
     }
 };
 
+const viewDetails = async (req, res) => {
+    try {
+        const userId = req.session.user_id;
+        const totalProductsInCart = await getTotalProductsInCart(userId);
+        const userData = await User.findById({ _id: userId });
+
+        const orderId = req.query.id;
+
+        const latestOrder = await Order.findById({ _id: orderId })
+            .populate({
+                path: "address",
+            })
+            .populate({
+                path: "products.productId",
+            });
+
+        res.render("order", {
+            user: userId,
+            userData: userData,
+            count: totalProductsInCart,
+            data: [latestOrder],
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
+};
 
 module.exports = {
     loadProfile,
@@ -233,4 +255,5 @@ module.exports = {
     updateUser,
     resetPassword,
     loadOrderPage,
+    viewDetails,
 };

@@ -1,11 +1,12 @@
 <%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
 <style>
+
     .fork {
         color: black;
         font-weight: 400;
     }
-    .d-block{
+    .d-block, .a-block{
         color: black;
         font-weight: 500;
     }
@@ -13,14 +14,15 @@
         color: black;
         font-weight: 400;
     }
+    
 </style>
 
 <div class="bg-light py-3">
     <div class="container">
         <div class="row">
             <div class="col-md-12 mb-0">
-                <a href="/">Home</a> <span class="mx-2 mb-0">/</span> <a href="/cart">Cart</a><span class="mx-2 mb-0">/</span><a href="/checkout">Checkout</a>
-                <span class="mx-2 mb-0">/</span> <strong class="text-black">Order</strong>
+                <a href="/">Home</a> <span class="mx-2 mb-0">/</span>
+              <strong class="text-black">Order</strong>
             </div>
         </div>
     </div>
@@ -30,9 +32,9 @@
     <div class="row d-flex justify-content-center">
         <div class="col-md-8 p-0">
             <div class="card">
-                <div class="invoice p-5" style="color: black;">
-                    <h5>Your Order Confirmed!</h5>
-                    <span class="font-weight-bold d-block mt-4"
+                <div class="invoice p-1" style="color: black;">
+                    <h2 class="text-center">Your Order Confirmed!</h5>
+                    <span class=" d-block mt-4"
                         >Hello, <%= userData.first_name %> <%= userData.last_name %></span
                     >
                     <span>Your order has been confirmed and will be shipped in the next two days!</span>
@@ -44,7 +46,7 @@
                                     <td>
                                         <div class="py-2">
                                             <span class="d-block">Order Date</span>
-                                            <span style="color: black"
+                                            <span class="c-block"
                                                 ><%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
                                                 'short', day: '2-digit' }).replace(/\//g, '-') %></span
                                             >
@@ -53,15 +55,10 @@
                                     <td>
                                         <div class="py-2">
                                             <span class="d-block">Order No</span>
-                                            <span style="color: black"><%= order._id %></span>
+                                            <span class="c-block"><%= order._id %></span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="py-2">
-                                            <span class="d-block">Payment</span>
-                                            <span> <%= order.paymentMethod %> </span>
-                                        </div>
-                                    </td>
+                                   
                                     <td>
                                         <div class="py-2">
                                             <span class="d-block">Expected Delivery</span>
@@ -76,43 +73,88 @@
                                             // Format the expected delivery date and display it
                                             const formattedDeliveryDate = expectedDeliveryDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-');
                                         %>
-                                        <span><%= formattedDeliveryDate %></span>
+                                        <span class="c-block"><%= formattedDeliveryDate %></span>
                                         </div>
                                     </td>
                                 </tr>
+
+                               
+
+
                                 <% }); %>
                             </tbody>
                         </table>
                     </div>
                     <div class="product border-bottom table-responsive">
-                        <table class="table table-borderless">
+                        <table class="table" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+                            <thead>
+                                <td class="a-block" style="border: 1px solid black;">Product</td>
+                                <td class="a-block" style="border: 1px solid black;">Product Details</td>
+                                <td class="a-block" style="border: 1px solid black;">Payment Method</td>
+                                <td class="a-block" style="border: 1px solid black;">Payment Status</td>
+                                <td class="a-block" style="border: 1px solid black;">Amount</td>
+                                <td class="a-block" style="border: 1px solid black;">Action</td>
+                            </thead>
                             <tbody>
                                 <% if (data && data.length > 0) { %> <% data.forEach(order => { %> <%
                                 order.products.forEach(item => { %>
                                 <tr>
-                                    <td width="20%">
+                                    <td width="20%" >
+                                     
+                                        
                                         <img
                                             src="/static/admin/Assets/images/products/<%= item.productId.image[0] %>"
                                             width="90"
                                             alt="Product Image"
                                         />
+                                        <br>
+                                        <span class="c-block"><%= item.productId.productname %></span>
+                              
+                                       
                                     </td>
-                                    <td width="60%">
-                                        <span class="font-weight-bold"><%= item.productId.productname %></span>
-                                        <div class="product-qty">
+                                    <td width="20%">
+                                        <div class="text-center align-center">
                                             <span class="d-block">Quantity: <%= item.quantity %></span>
                                             <span class="c-block">Price: ₹ <%= item.productId.price %></span>
                                         </div>
                                     </td>
+                                    
+                                    
 
                                     <td width="20%">
-                                        <div class="text-right">
-                                            <span class="font-weight-bold"
+                                        <div class="text-center align-center">
+                                            <span class="c-block"
+                                                ><%= order.paymentMethod %></span
+                                            >
+                                        </div>
+                                    </td>
+                                    <td width="20%">
+                                        <div class="text-center align-center">
+                                            <span class="c-block"
+                                                ><%= order.paymentStatus %></span
+                                            >
+                                        </div>
+                                    </td>
+
+                                    <td width="20%">
+                                        <div class="text-center align-center">
+                                            <span class="c-block"
                                                 >₹ <%= (item.quantity * item.productId.price).toFixed(2) %></span
                                             >
                                         </div>
                                     </td>
+                                    <td width="20%">
+                                        <div>
+                                            <a href="/invoice?productId=<%= item.productId._id %>&orderId=<%= order._id %>">
+                                                <button class="btn sm" style="background-color: grey;">Details</button>
+                                            </a>
+                                            
+                                        </div>
+                                    </td>
                                 </tr>
+
+                               
+                              
                                 <% }); %> <% }); %> <% } else { %>
                                 <tr>
                                     <td colspan="3">
@@ -120,6 +162,7 @@
                                     </td>
                                 </tr>
                                 <% } %>
+                           
                             </tbody>
                         </table>
                     </div>
@@ -222,15 +265,10 @@
                     <span>Ozark Team</span>
                    </div>
                    <br>
+
+                   <div class="btn lg"><a href="/shop">Continue Shopping</a></div>
                 
-                   <div class="row">
-                    <div class="col-md-6">
-                        <a href="/shop"><button>Continue Shopping</button></a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="/shop"><button>View Details</button></a>
-                    </div>
-                   </div>
+              
                 </div>
             </div>
         </div>

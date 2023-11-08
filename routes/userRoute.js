@@ -70,6 +70,7 @@ user_route.delete('/deleteAddress',profileController.deleteAddress);
 user_route.post('/updateUser',auth.isLogin,profileController.updateUser);
 user_route.post('/resetPassword',auth.isLogin,profileController.resetPassword);
 user_route.get('/viewOrder',auth.isLogin,profileController.loadOrderPage);
+user_route.get('/orderDetails', profileController.viewDetails);
 
 
 //======================================================================
@@ -115,5 +116,7 @@ user_route.post("/place-order", orderContoller.placeOrder);
 
 
 user_route.get("/about", userController.loadAbout);
+
+user_route.get('/invoice', orderContoller.orderDetails);
 
 module.exports = user_route;

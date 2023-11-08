@@ -8,53 +8,53 @@ const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 
 const clearCart = async (userId) => {
-  try {
-
-      await Cart.findOneAndUpdate(
-          {  user_id: userId },
-          { items: [] },
-          { new: true } 
-      );
-  } catch (error) {
-      console.error(error.message);
-      throw error; 
-  }
+    try {
+        await Cart.findOneAndUpdate({ user_id: userId }, { items: [] }, { new: true });
+    } catch (error) {
+        console.error(error.message);
+        throw error;
+    }
 };
-
 
 const loadOrder = async (req, res) => {
-  try {
-      const userId = req.session.user_id;
-      const totalProductsInCart = await getTotalProductsInCart(userId);
-      const userData = await User.findById({ _id: userId });
+    try {
+        const userId = req.session.user_id;
+        const totalProductsInCart = await getTotalProductsInCart(userId);
+        const userData = await User.findById({ _id: userId });
 
-      // Find the latest order for the user based on the order creation timestamp
-      const latestOrder = await Order.findOne({ user: userId })
-          .sort({ createdAt: -1 }) // Sort in descending order to get the latest order first
-          .populate({
-              path: "address",
-          })
-          .populate({
-              path: "products.productId",
-          });
+        // Find the latest order for the user based on the order creation timestamp
+        const latestOrder = await Order.findOne({ user: userId })
+            .sort({ createdAt: -1 }) // Sort in descending order to get the latest order first
+            .populate({
+                path: "address",
+            })
+            .populate({
+                path: "products.productId",
+            });
 
-      res.render("order", {
-          user: userId,
-          userData: userData,
-          count: totalProductsInCart,
-          data: [latestOrder], 
-      });
-  } catch (error) {
-      console.error(error.message);
-      res.status(500).send("Internal Server Error");
-  }
+        res.render("order", {
+            user: userId,
+            userData: userData,
+            count: totalProductsInCart,
+            data: [latestOrder],
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
+    }
 };
-
 
 const placeOrder = async (req, res) => {
     try {
         const { productsData, totalAmount, address, paymentMethod, notes } = req.body;
         const user_id = req.session.user_id;
+        var payment = "";
+
+        if (paymentMethod == "Cash on Delivery") {
+            payment = "Pending";
+        } else {
+            payment = "Paid";
+        }
 
         const order = new Order({
             user: user_id,
@@ -64,25 +64,19 @@ const placeOrder = async (req, res) => {
             paymentMethod: paymentMethod,
             createdAt: Date.now(),
             notes: notes,
+            paymentStatus: payment,
         });
 
         await order.save();
 
         for (const productData of productsData) {
-          const productId = productData.productId;
-          const orderedQuantity = productData.quantity;
+            const productId = productData.productId;
+            const orderedQuantity = productData.quantity;
 
-       
-          await Product.findByIdAndUpdate(
-              productId,
-              { $inc: { quantity: -orderedQuantity } }, 
-              { new: true } 
-          );
-      }
+            await Product.findByIdAndUpdate(productId, { $inc: { quantity: -orderedQuantity } }, { new: true });
+        }
 
-
-      await Cart.findOneAndDelete({ user_id: user_id });
-
+        await Cart.findOneAndDelete({ user_id: user_id });
 
         res.status(200).json({ message: "Order placed successfully!" });
     } catch (error) {
@@ -91,7 +85,44 @@ const placeOrder = async (req, res) => {
     }
 };
 
+const orderDetails = async (req, res) => {
+    try {
+        const userId = req.session.user_id;
+        const totalProductsInCart = await getTotalProductsInCart(userId);
+        const userData = await User.findById({ _id: userId });
+
+        const productId = req.query.productId; // Get productId from query parameters
+
+        const orderData = await Order.findOne({
+            user: userId,
+            'products.productId': productId
+        }).populate({
+            path: 'products.productId',
+        });
+
+        const productInOrder = orderData.products.find(product => product.productId.toString() === productId);
+
+        console.log(productInOrder)
+
+        res.render('invoice', {
+            user: userId,
+            userData: userData,
+            count: totalProductsInCart,
+            data: {
+                order: orderData,
+                product: productInOrder
+            }
+        });
+    } catch (error) {
+        console.log(error.message);
+        // Handle the error and send an appropriate response to the client
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
 module.exports = {
     loadOrder,
     placeOrder,
+    orderDetails,
 };
