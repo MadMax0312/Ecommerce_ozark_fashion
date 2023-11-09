@@ -46,6 +46,8 @@ const categoryController = require("../controllers/categoryController")
 
 const adminController = require("../controllers/adminController");
 
+const adminOrderController = require("../controllers/adminOrderContoller");
+
 
 admin_route.get("/", auth.isLogout, adminController.loadLogin);
 
@@ -99,9 +101,16 @@ admin_route.get("/banner", auth.isLogin, adminController.loadBanner);
 
 admin_route.get("/coupons", auth.isLogin, adminController.loadCoupons);
 
-admin_route.get("/orders", auth.isLogin, adminController.loadOrder);
+admin_route.get("/orders", auth.isLogin, adminOrderController.loadOrder);
+
+admin_route.get('/orderDetailss', adminOrderController.viewDetails);
+
+admin_route.post('/updateProductStatus', adminOrderController.updateProductStatus);
 
 admin_route.get("/sales", auth.isLogin, adminController.loadSales);
+
+//============================================================================================
+
 
 admin_route.get("*", function (req, res) {
     res.redirect("/admin");

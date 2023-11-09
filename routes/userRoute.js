@@ -114,9 +114,10 @@ user_route.get("/order", orderContoller.loadOrder);
 
 user_route.post("/place-order", orderContoller.placeOrder);
 
-
 user_route.get("/about", userController.loadAbout);
 
 user_route.get('/invoice', orderContoller.orderDetails);
+
+user_route.post('/updateProductStatus', orderContoller.updateStatus);
 
 module.exports = user_route;

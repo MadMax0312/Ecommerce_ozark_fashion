@@ -1,18 +1,77 @@
 <%- include('../adminLayouts/header.ejs') %>
 <%- include('../adminLayouts/sidebar.ejs') %>
 <%- include('../adminLayouts/navbar.ejs') %>
-        <!-- partial -->
-        <div class="main-panel">
-          <div class="content-wrapper">
-          </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:../../partials/_footer.html -->
-       
-          <!-- partial -->
-        </div>
-        <!-- main-panel ends -->
-      </div>
-      <!-- page-body-wrapper ends -->
-    </div>
 
-    <%- include('../adminLayouts/footer.ejs') %>
+<style>
+    .table,
+    .jsgrid .jsgrid-table {
+        color: #fff;
+    }
+
+    .table th, .table td {
+        white-space: nowrap;
+    }
+</style>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 grid-margin">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title text-center mb-4">ORDERS</h2>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Order Id</th>
+                                            <th>Order Date</th>
+                                            <th>Amount</th>
+                                            <th>Payment</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (orders.length > 0) { %> 
+                                            <% for (let i = 0; i < orders.length; i++) { %>
+                                                <tr>
+                                                    <td><%= i + 1 %></td>
+                                                    <td><%= orders[i]._id %></td>
+                                                    <td><%= orders[i].createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></td>
+                                                    <td>₹ <%= orders[i].totalAmount %></td>
+                                                    <td><%= orders[i].paymentMethod %></td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <a href="/admin/orderDetailss?id=<%= orders[i]._id %>" class="btn btn-info btn-sm">Manage</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <% } %> 
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="6" class="text-center">
+                                                    <div class="error-content text-center">
+                                                        <h1 class="error-title">No Orders</h1>
+                                                        <p>You have not placed any orders yet.</p>
+                                                        <a href="/products" class="btn btn-outline-primary btn-lg">
+                                                            <span>SHOPPING</span>
+                                                            <i class="icon-long-arrow-right"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../adminLayouts/footer.ejs') %>

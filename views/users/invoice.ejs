@@ -2,18 +2,22 @@
 
 <style>
 
+  .hot{
+    color: black;
+  }
+
 </style>
 
-<section class="vh-100 gradient-custom-2">
-  <div class="container py-5 h-100">
+<section class="gradient-custom-2">
+  <div class="container py-2 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-md-10 col-lg-8 col-xl-6">
         <div class="card card-stepper" style="border-radius: 16px;">
           <div class="card-header p-4">
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                <p class="text-muted mb-2"> Order ID: &nbsp; <span class="fw-bold text-body"><%= data.order._id %></span></p>
-                <p class="text-muted mb-0"> Placed On:  &nbsp;<span class="fw-bold text-body"> <%= data.order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
+                <p class="text-muted mb-2"> Order ID: &nbsp; <span class="fw-bold text-body"><%= order._id %></span></p>
+                <p class="text-muted mb-0"> Placed On:  &nbsp;<span class="fw-bold text-body"> <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
                   'short', day: '2-digit' }).replace(/\//g, '-') %></span> </p>
               </div>
               <div>
@@ -24,38 +28,112 @@
           <div class="card-body p-4">
             <div class="d-flex flex-row mb-4 pb-2">
               <div class="flex-fill">
-                <h5 class="bold"><%= product.productId.productname %></h5>
-                <p class="text-muted"><%= product.quantity %></p>
-                <h4 class="mb-3"> $ 299 <span class="small text-muted"> via (COD) </span></h4>
+                <h3 class="hot"><%= product.productId.productname %></h3>
+                <h6 class="hot"><%= product.productId.description %></h5>
+                <p class="hot">Qty: <%= product.quantity %></p>
+                <h5 class="hot" style="font-weight: 600;">Total: <%= product.subtotal %></h5>
+                <h6 class="hot"><span class="hot"><%= order.paymentMethod %> </span></h6>
+                <h5 class="hot">Payment: <span class="hot"><%= order.paymentStatus %> </span></h5>
                 <p class="text-muted">Tracking Status on: <span class="text-body">11:30pm, Today</span></p>
               </div>
               <div>
                 <img class="align-self-center img-fluid"
-                  src="https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/6.webp" width="250">
+                src="/static/admin/Assets/images/products/<%= product.productId.image[0] %>" width="150">
               </div>
             </div>
-            <ul id="progressbar-1" class="mx-0 mt-0 mb-5 px-0 pt-0 pb-4">
-              <li class="step0 active" id="step1"><span
-                  style="margin-left: 22px; margin-top: 12px;">PLACED</span></li>
-              <li class="step0 active text-center" id="step2"><span>SHIPPED</span></li>
-              <li class="step0 text-muted text-end" id="step3"><span
-                  style="margin-right: 22px;">DELIVERED</span></li>
-            </ul>
+
+            <div class="progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status %>">
+              <ul id="progressbar">
+                <li style="font-size: 12px;" class="step0 <%= product.status >= 1 ? 'active' : '' %>" id="step1">Order Placed</li>
+                <li style="font-size: 12px;" class="step0 text-center <%= product.status >= 2 ? 'active' : '' %>" id="step2">Shipped</li>
+                <li style="font-size: 12px;" class="step0 text-right <%= product.status >= 3 ? 'active' : '' %>" id="step3">Out for Delivery</li>
+                <li style="font-size: 12px;" class="step0 text-right text-success <%= product.status >= 4 ? 'active' : '' %>" id="step4">Delivered</li>
+              </ul>
+            </div>
+         
+  
+              
+            
+            
+
+
           </div>
+
           <div class="card-footer p-4">
             <div class="d-flex justify-content-between">
-              <h5 class="fw-normal mb-0"><a href="#!">Track</a></h5>
+              <h5 class="fw-normal mb-0">
+                <a href="#!" id="trackLink">Track</a>
+              </h5>
               <div class="border-start h-100"></div>
-              <h5 class="fw-normal mb-0"><a href="#!">Cancel</a></h5>
+              <% if (product.status < 2) { %>
+              <h5 class="fw-normal mb-0 disabled-link">Cancel</h5>
               <div class="border-start h-100"></div>
-              <h5 class="fw-normal mb-0"><a href="#!">Pre-pay</a></h5>
+              <h5 class="fw-normal mb-0 disabled-link">Return</h5>
+              <% } else { %>
+              <h5 class="fw-normal mb-0"><a href="#!" id="cancelLink">Cancel</a></h5>
               <div class="border-start h-100"></div>
-              <h5 class="fw-normal mb-0"><a href="#!" class="text-muted"><i class="fas fa-ellipsis-v"></i></a>
+              <h5 class="fw-normal mb-0"><a href="#!" id="returnLink">Return</a></h5>
+              <% } %>
+              <div class="border-start h-100"></div>
+              <h5 class="fw-normal mb-0">
+                <a href="#!" class="text-muted"><i class="fas fa-ellipsis-v"></i></a>
               </h5>
             </div>
           </div>
+
+
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  const progressBar = document.querySelector('.progress-track');
+  const orderId = progressBar.dataset.orderId;
+  const productId = progressBar.dataset.productId;
+  const initialProductStatus = progressBar.dataset.productStatus;
+
+  function updateProductStatus(orderId, productId, productStatus) {
+  fetch('/updateProductStatus', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      orderId: orderId,
+      productId: productId,
+      productStatus: productStatus,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        const updatedProduct = data.product;
+        // Update the progress bar based on updatedProduct.status
+        updateProgressBar(updatedProduct.status);
+      } else {
+        // Handle error (show an error message, etc.)
+        console.error('Error updating product status:', data.error);
+      }
+    })
+    .catch((error) => {
+      console.error('Error updating product status:', error);
+    });
+}
+
+// Function to update progress bar steps based on product status
+function updateProgressBar(productStatus) {
+  // Remove active class from all steps
+  const progressBarSteps = document.querySelectorAll('.progress-track .step0');
+  progressBarSteps.forEach((step) => {
+    step.classList.remove('active');
+  });
+
+  // Add active class to steps based on productStatus
+  for (let i = 1; i <= productStatus; i++) {
+    progressBarSteps[i - 1].classList.add('active');
+  }
+}
+
+</script>

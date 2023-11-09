@@ -91,38 +91,71 @@ const orderDetails = async (req, res) => {
         const totalProductsInCart = await getTotalProductsInCart(userId);
         const userData = await User.findById({ _id: userId });
 
-        const productId = req.query.productId; // Get productId from query parameters
+        const productId = req.query.productId;
+        const productsObjectId = req.query.productIdss;
 
         const orderData = await Order.findOne({
             user: userId,
-            'products.productId': productId
+            'products': {
+                $elemMatch: {
+                    productId: productId,
+                    '_id': productsObjectId
+                }
+            }
         }).populate({
-            path: 'products.productId',
+            path: 'products.productId'
         });
 
-        const productInOrder = orderData.products.find(product => product.productId.toString() === productId);
+        console.log(orderData);
 
-        console.log(productInOrder)
+        const product = orderData.products.find(item => {
+            return item._id.toString() === productsObjectId.toString();
+        });
+        
+        console.log("Found product:", product);
 
         res.render('invoice', {
             user: userId,
             userData: userData,
             count: totalProductsInCart,
-            data: {
-                order: orderData,
-                product: productInOrder
-            }
+            order: orderData,
+            product: product,
         });
     } catch (error) {
         console.log(error.message);
-        // Handle the error and send an appropriate response to the client
         res.status(500).send('Internal Server Error');
     }
 };
+
+const updateStatus = async(req, res) => {
+    try {
+        console.log("enterredddddd")
+        const { orderId, productId, productStatus } = req.body;
+    
+        // Update the product status in the database
+        const updatedProduct = await Product.findOneAndUpdate(
+          { orderId, _id: productId },
+          { $set: { status: productStatus } },
+          { new: true }
+        );
+
+        console.log(updatedProduct)
+    
+        if (!updatedProduct) {
+          return res.status(404).json({ success: false, error: 'Product not found' });
+        }
+    
+        res.json({ success: true, product: updatedProduct });
+      } catch (error) {
+        console.error('Error updating product status:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+      }
+}
 
 
 module.exports = {
     loadOrder,
     placeOrder,
     orderDetails,
+    updateStatus,
 };

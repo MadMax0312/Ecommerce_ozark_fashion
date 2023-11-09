@@ -1,0 +1,161 @@
+<%- include('../adminLayouts/header.ejs') %>
+<%- include('../adminLayouts/sidebar.ejs') %>
+<%- include('../adminLayouts/navbar.ejs') %>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <h2 class="mt-4">Order Details</h2>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            Order Information
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Order ID:</strong> <%= order._id %></p>
+                            <p><strong>Order Status:</strong>
+                                <select id="orderStatus" onchange="updateOrderStatus('<%= order._id %>')"
+                                    class="form-select">
+                                    <option value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                    <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                    <option value="Out for Delivery" <%= order.orderStatus === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                                </select>
+                            </p>
+                            <p><strong>Order Date:</strong> <%= order.createdAt.toLocaleString() %></p>
+                            <p><strong>Payment Method: </strong> <%= order.paymentMethod %></p>
+                            <p><strong>Payment Status: </strong> <%= order.paymentStatus %></p>
+                            <p><strong>Instructions: </strong> <%= order.notes %></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            Address
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Full Name:</strong> <%= order.address.fullName %></p>
+                            <p><strong>City:</strong> <%= order.address.city %></p>
+                            <p><strong>District:</strong> <%= order.address.district %></p>
+                            <p><strong>State:</strong> <%= order.address.state %></p>
+                            <p><strong>Pincode:</strong> <%= order.address.pincode %></p>
+                            <p><strong>Mobile:</strong> <%= order.address.mobile %></p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            Products
+                        </div>
+                        <div class="card-body">
+                            <% order.products.forEach(product => { %>
+                                <div class="row mb-3">
+                                    <div class="col-md-2">
+                                        <img src="/static/admin/Assets/images/products/<%= product.productId.image[0] %>" alt="Product Image" style="width: 75px;">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5><%= product.productId.productname %></h5>
+                                        <p><strong>Quantity:</strong> <%= product.quantity %></p>
+                                        <p><strong>Price:</strong> <%= product.price %></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Subtotal:</strong> <%= product.subtotal %></p>
+                                        <p><strong>Status:</strong>
+                                            <select class="form-select productStatus"
+                                                data-product-id="<%= product._id %>"
+                                                onchange="updateProductStatus('<%= order._id %>', '<%= product._id %>')">
+                                                <option value="Pending" <%= product.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                                <option value="Shipped" <%= product.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                <option value="Out for Delivery" <%= product.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                                                <option value="Out for Delivery" <%= product.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                <option value="Cancelled" <%= product.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                            </select>
+                                        </p>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+async function updateProductStatus(orderId, productId) {
+    try {
+
+        const productStatusElement = document.querySelector(`.productStatus[data-product-id="${productId}"]`);
+        const productStatus = productStatusElement.value;
+
+        const response = await fetch('/admin/updateProductStatus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                orderId: orderId,
+                productId: productId,
+                productStatus: productStatus,
+            }),
+        });
+
+        console.log(response)
+
+        const data = await response.json();
+        console.log('Product status updated successfully:', data);
+
+    } catch (error) {
+        console.error('Error updating product status:', error);
+    }
+}
+
+
+function updateProgressBar(orderId, productId) {
+
+    const orderElement = document.getElementById(`order-${orderId}`);
+    const productElement = document.getElementById(`product-${productId}`);
+
+
+    fetch(`/admin/getProductStatus?orderId=${orderId}&productId=${productId}`)
+        .then(response => response.json())
+        .then(data => {
+            const productStatus = data.productStatus; // Assuming the response contains productStatus
+            // Update the progress bar classes based on the product status
+            if (productStatus >= 2) {
+                productElement.classList.add('active');
+            } else {
+                productElement.classList.remove('active');
+            }
+
+            // Check if all products in the order have been delivered (assuming status 4 indicates delivered)
+            const allProductsDelivered = data.orderProducts.every(product => product.status >= 4);
+
+            // Update the order progress bar based on all products' status
+            if (allProductsDelivered) {
+                orderElement.classList.add('completed');
+            } else {
+                orderElement.classList.remove('completed');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching product status:', error);
+        });
+}
+
+// Call the updateProductStatus function when a product status is updated, passing orderId and productId
+// For example, updateProductStatus(orderId, productId);
+
+
+</script>
+
+<%- include('../adminLayouts/footer.ejs') %>

@@ -1,98 +1,121 @@
-
-
 body {
-  font-family: 'Roboto Condensed';
-  height: 100vh;
-  width: 100vw;
-  padding: 0;
-  background-image: radial-gradient( bodyBG, shade(bodyBG, 25));
+    font-family: "Roboto Condensed";
+    height: 100vh;
+    width: 100vw;
+    padding: 0;
+    background-image: radial-gradient(bodyBG, shade(bodyBG, 25));
 }
 
-.gradient-custom-2 {
-  /* fallback for old browsers */
-  background: #a1c4fd;
-  
-  /* Chrome 10-25, Safari 5.1-6 */
-  background: -webkit-linear-gradient(to right, rgba(161, 196, 253, 1), rgba(194, 233, 251, 1));
-  
-  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-  background: linear-gradient(to right, rgba(161, 196, 253, 1), rgba(194, 233, 251, 1))
-  }
-  
-  #progressbar-1 {
-  color: #455A64;
-  }
-  
-  #progressbar-1 li {
-  list-style-type: none;
-  font-size: 13px;
-  width: 33.33%;
-  float: left;
-  position: relative;
-  }
-  
-  #progressbar-1 #step1:before {
-  content: "1";
-  color: #fff;
-  width: 29px;
-  margin-left: 22px;
-  padding-left: 11px;
-  }
-  
-  #progressbar-1 #step2:before {
-  content: "2";
-  color: #fff;
-  width: 29px;
-  }
-  
-  #progressbar-1 #step3:before {
-  content: "3";
-  color: #fff;
-  width: 29px;
-  margin-right: 22px;
-  text-align: center;
-  }
-  
-  #progressbar-1 li:before {
-  line-height: 29px;
-  display: block;
-  font-size: 12px;
-  background: #455A64;
-  border-radius: 50%;
-  margin: auto;
-  }
-  
-  #progressbar-1 li:after {
-  content: '';
-  width: 121%;
-  height: 2px;
-  background: #455A64;
-  position: absolute;
-  left: 0%;
-  right: 0%;
-  top: 15px;
-  z-index: -1;
-  }
-  
-  #progressbar-1 li:nth-child(2):after {
-  left: 50%
-  }
-  
-  #progressbar-1 li:nth-child(1):after {
-  left: 25%;
-  width: 121%
-  }
-  
-  #progressbar-1 li:nth-child(3):after {
-  left: 25%;
-  width: 50%;
-  }
-  
-  #progressbar-1 li.active:before,
-  #progressbar-1 li.active:after {
-  background: #1266f1;
-  }
-  
-  .card-stepper {
-  z-index: 0
-  }
+:-moz-any-link:focus {
+    outline: 0;
+}
+
+#progressbar {
+    margin-bottom: 3vh;
+    overflow: hidden;
+    color: #000;
+    padding-left: 0;
+    margin-top: 3vh;
+}
+
+#progressbar li {
+    list-style-type: none;
+    font-size: 0.8rem;
+    width: 25%;
+    float: left;
+    position: relative;
+    font-weight: 400;
+    color: #000;
+}
+
+#progressbar #step1:before {
+    content: "";
+    color: #000;
+    width: 20px;
+    height: 20px;
+    margin-left: 0 !important;
+}
+
+#progressbar #step2:before {
+    content: "";
+    color: #000;
+    width: 20px;
+    height: 20px;
+    margin-left: 32%;
+}
+
+#progressbar #step3:before {
+    content: "";
+    color: #000;
+    width: 20px;
+    height: 20px;
+    margin-right: 32%;
+}
+
+#progressbar #step4:before {
+    content: "";
+    color: rgb(151, 149, 149, 0.651);
+    width: 20px;
+    height: 20px;
+    margin-right: 0 !important;
+}
+
+#progressbar li:before {
+    line-height: 29px;
+    display: block;
+    font-size: 12px;
+    background: #d1d1d1;
+    border-radius: 50%;
+    margin: auto;
+    z-index: -1;
+    margin-bottom: 1vh;
+}
+
+#progressbar li:after {
+    content: "";
+    height: 3px;
+    background: #d1d1d1;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-bottom: 2vh;
+    top: 8px;
+    z-index: 1;
+}
+
+.progress-track {
+    padding: 0 8%;
+}
+
+#progressbar li:nth-child(2):after {
+    margin-right: auto;
+}
+
+#progressbar li:nth-child(1):after {
+    margin: auto;
+}
+
+#progressbar li:nth-child(3):after {
+    float: left;
+    width: 68%;
+}
+
+#progressbar li:nth-child(4):after {
+    margin-left: auto;
+    width: 132%;
+}
+
+#progressbar li.active:after,
+#progressbar li.active:before {
+    background: #00ff0d;
+}
+
+#three {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 767px) {
+    #three {
+        font-size: 1rem;
+    }
+}
