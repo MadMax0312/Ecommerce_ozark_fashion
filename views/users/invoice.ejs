@@ -42,44 +42,61 @@
               </div>
             </div>
 
-            <div class="progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status %>">
-              <ul id="progressbar">
-                <li style="font-size: 12px;" class="step0 <%= product.status >= 1 ? 'active' : '' %>" id="step1">Order Placed</li>
-                <li style="font-size: 12px;" class="step0 text-center <%= product.status >= 2 ? 'active' : '' %>" id="step2">Shipped</li>
-                <li style="font-size: 12px;" class="step0 text-right <%= product.status >= 3 ? 'active' : '' %>" id="step3">Out for Delivery</li>
-                <li style="font-size: 12px;" class="step0 text-right text-success <%= product.status >= 4 ? 'active' : '' %>" id="step4">Delivered</li>
-              </ul>
-            </div>
-         
-  
-              
+            <% if (product.status !== "Cancelled") { %>
+              <div class="progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Order Placed' ? 1 : (product.status === 'Shipped' ? 2 : (product.status === 'Out for Delivery' ? 3 : (product.status === 'Delivered' ? 4 : 0))) %>">
+                  <ul id="progressbar">
+                      <li style="font-size: 12px;" class="step <%= product.status === 'Order Placed' ? 'active' : '' %>" id="step1">Order Placed</li>
+                      <li style="font-size: 12px;text-align: center;" class="step <%= product.status === 'Shipped' ? 'active' : '' %>" id="step2">Shipped</li>
+                      <li style="font-size: 12px;text-align: center;" class="step <%= product.status === 'Out for Delivery' ? 'active' : '' %>" id="step3">Out for Delivery</li>
+                      <li style="font-size: 12px;text-align: right;" class="step <%= product.status === 'Delivered' ? 'active' : '' %>" id="step4">Delivered</li>
+                  </ul>
+              </div>
+              <% } else { %>
+                <!-- Separate progress bar for cancelled orders -->
             
-            
-
+                  <div class="cancelled-progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Order Placed' ? 1 : (product.status === 'Cancelled' ? 2 : 0) %>">
+                    <ul class="cancelled-progressbar">
+                      <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>">Order Placed</li>
+                      <li class="step <%= product.status === 'Cancelled' ? 'active text-danger' : '' %>">Cancelled</li>
+                    </ul>
+                    
+                  </div>
+               
+              <% } %>
+          
 
           </div>
 
           <div class="card-footer p-4">
             <div class="d-flex justify-content-between">
-              <h5 class="fw-normal mb-0">
-                <a href="#!" id="trackLink">Track</a>
-              </h5>
-              <div class="border-start h-100"></div>
-              <% if (product.status < 2) { %>
-              <h5 class="fw-normal mb-0 disabled-link">Cancel</h5>
-              <div class="border-start h-100"></div>
-              <h5 class="fw-normal mb-0 disabled-link">Return</h5>
-              <% } else { %>
-              <h5 class="fw-normal mb-0"><a href="#!" id="cancelLink">Cancel</a></h5>
-              <div class="border-start h-100"></div>
-              <h5 class="fw-normal mb-0"><a href="#!" id="returnLink">Return</a></h5>
-              <% } %>
-              <div class="border-start h-100"></div>
-              <h5 class="fw-normal mb-0">
-                <a href="#!" class="text-muted"><i class="fas fa-ellipsis-v"></i></a>
-              </h5>
+                <h5 class="fw-normal mb-0">
+                    <a href="#!" id="trackLink">Track</a>
+                </h5>
+                <div class="border-start h-100"></div>
+        
+                <div class="border-start h-100"></div>
+                <% if (product.status === "Delivered") { %>
+                    <h5 class="fw-normal mb-0"><a href="#!" id="returnLink">Return</a></h5>
+                <% } else { %>
+                    <h5 class="fw-normal mb-0 disabled-link">Return</h5>
+                <% } %>
+        
+                <% if (product.status !== "Delivered" && product.status !== "Cancelled") { %>
+                    <h5 class="fw-normal mb-0"><a href="#!" id="cancelLink">Cancel</a></h5>
+                <% } else { %>
+                    <h5 class="fw-normal mb-0 disabled-link">Cancel</h5>
+                <% } %>
+        
+                <% if (product.status === "Cancelled") { %>
+                    <style>
+                        #progressbar li {
+                            background-color: red;
+                        }
+                    </style>
+                    <p class="text-danger">Order Cancelled</p>
+                <% } %>
             </div>
-          </div>
+        </div>
 
 
         </div>
@@ -89,51 +106,116 @@
 </section>
 
 <script>
-  const progressBar = document.querySelector('.progress-track');
-  const orderId = progressBar.dataset.orderId;
-  const productId = progressBar.dataset.productId;
-  const initialProductStatus = progressBar.dataset.productStatus;
+  let initialProductStatus;
 
-  function updateProductStatus(orderId, productId, productStatus) {
-  fetch('/updateProductStatus', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      orderId: orderId,
-      productId: productId,
-      productStatus: productStatus,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        const updatedProduct = data.product;
-        // Update the progress bar based on updatedProduct.status
-        updateProgressBar(updatedProduct.status);
-      } else {
-        // Handle error (show an error message, etc.)
-        console.error('Error updating product status:', data.error);
-      }
+function updateProductStatus(orderId, productId, productStatus) {
+    fetch('/updateProductStatus', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            orderId: orderId,
+            productId: productId,
+            productStatus: productStatus,
+        }),
     })
-    .catch((error) => {
-      console.error('Error updating product status:', error);
-    });
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                const updatedProduct = data.product;
+                // Update the progress bar based on updatedProduct.status
+                updateProgressBar(updatedProduct.status);
+                // Display cancel message for cancelled orders
+                if (updatedProduct.status === 'Cancelled') {
+                    document.getElementById('cancelMessage').style.display = 'block';
+                }
+            } else {
+                console.error('Error updating product status:', data.error);
+            }
+        })
+        .catch((error) => {
+            console.error('Error updating product status:', error);
+        });
 }
 
-// Function to update progress bar steps based on product status
 function updateProgressBar(productStatus) {
-  // Remove active class from all steps
-  const progressBarSteps = document.querySelectorAll('.progress-track .step0');
-  progressBarSteps.forEach((step) => {
-    step.classList.remove('active');
-  });
+    const progressBarSteps = document.querySelectorAll('.progress-track .step');
 
-  // Add active class to steps based on productStatus
-  for (let i = 1; i <= productStatus; i++) {
-    progressBarSteps[i - 1].classList.add('active');
-  }
+    // Remove 'active' class from all steps
+    progressBarSteps.forEach((step) => {
+        step.classList.remove('active');
+    });
+
+    // Add 'active' class to the current status and all the previous statuses
+    for (let i = 0; i < productStatus; i++) {
+        progressBarSteps[i].classList.add('active');
+    }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const progressBar = document.querySelector('.progress-track');
+    const cancelledProgressBar = document.querySelector('.cancelled-progress-track');
+
+    if (progressBar) {
+        // Original progress bar logic
+        const orderId = progressBar.dataset.orderId;
+        const productId = progressBar.dataset.productId;
+        initialProductStatus = progressBar.dataset.productStatus;
+
+        updateProgressBar(initialProductStatus);
+    } else if (cancelledProgressBar) {
+        // Cancelled orders progress bar logic
+        const orderId = cancelledProgressBar.dataset.orderId;
+        const productId = cancelledProgressBar.dataset.productId;
+        initialProductStatus = cancelledProgressBar.dataset.productStatus;
+
+        updateCancelledProgressBar(initialProductStatus);
+
+        function updateCancelledProgressBar(productStatus) {
+            const cancelledProgressBarSteps = document.querySelectorAll('.cancelled-progress-track .step');
+
+            // Remove 'active' class from all steps
+            cancelledProgressBarSteps.forEach((step) => {
+                step.classList.remove('active');
+            });
+
+            // Add 'active' class to the current status
+            for (let i = 0; i < productStatus; i++) {
+                cancelledProgressBarSteps[i].classList.add('active');
+            }
+        }
+    }
+});
+
+document.getElementById('cancelLink').addEventListener('click', function (event) {
+    event.preventDefault();
+
+    // Retrieve orderId and productId from the progress bar
+    const progressBar = document.querySelector('.progress-track');
+    const orderId = progressBar ? progressBar.dataset.orderId : null;
+    const productId = progressBar ? progressBar.dataset.productId : null;
+
+    // Check if the product is delivered or cancelled
+    if (initialProductStatus !== 'Delivered' && initialProductStatus !== 'Cancelled') {
+        updateProductStatus(orderId, productId, 'Cancelled');
+
+        // Disable the "Cancel" link after clicking
+        this.classList.add('disabled-link');
+        this.removeAttribute('href');
+    }
+});
+
+document.getElementById('returnLink').addEventListener('click', function (event) {
+    event.preventDefault();
+
+    // Retrieve orderId and productId from the progress bar
+    const progressBar = document.querySelector('.progress-track');
+    const orderId = progressBar ? progressBar.dataset.orderId : null;
+    const productId = progressBar ? progressBar.dataset.productId : null;
+
+    updateProductStatus(orderId, productId, 'Returned');
+});
+
 
 </script>

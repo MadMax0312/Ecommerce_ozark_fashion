@@ -16,7 +16,18 @@ body {
     color: #000;
     padding-left: 0;
     margin-top: 3vh;
-}
+  }
+  
+  #cancelled-progressbar {
+    margin-bottom: 3vh;
+    overflow: hidden;
+    color: #000;
+    padding-left: 0;
+    margin-top: 3vh;
+  }
+  
+  /* Rest of your existing styles for #progressbar and #cancelled-progressbar */
+  
 
 #progressbar li {
     list-style-type: none;

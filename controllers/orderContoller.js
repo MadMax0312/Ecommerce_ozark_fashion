@@ -127,31 +127,39 @@ const orderDetails = async (req, res) => {
     }
 };
 
-const updateStatus = async(req, res) => {
+const updateStatus = async (req, res) => {
     try {
-        console.log("enterredddddd")
+        console.log("entered");
         const { orderId, productId, productStatus } = req.body;
-    
-        // Update the product status in the database
-        const updatedProduct = await Product.findOneAndUpdate(
-          { orderId, _id: productId },
-          { $set: { status: productStatus } },
-          { new: true }
-        );
 
-        console.log(updatedProduct)
-    
-        if (!updatedProduct) {
-          return res.status(404).json({ success: false, error: 'Product not found' });
+        console.log(productStatus);
+        console.log(orderId)
+        console.log(productId)
+
+       
+        const order = await Order.findOne({ _id: orderId, "products._id": productId });
+
+        if (!order) {
+            return res.status(404).json({ success: false, error: 'Order or product not found' });
         }
-    
-        res.json({ success: true, product: updatedProduct });
-      } catch (error) {
-        console.error('Error updating product status:', error);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
-      }
-}
 
+
+        const productIndex = order.products.findIndex(p => p._id.equals(productId));
+
+
+        order.products[productIndex].status = productStatus;
+
+
+        const updatedOrder = await order.save();
+
+        console.log(updatedOrder);
+  
+      res.json({ success: true, product: updatedOrder });
+    } catch (error) {
+      console.error('Error updating product status:', error);
+      res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+  };
 
 module.exports = {
     loadOrder,
