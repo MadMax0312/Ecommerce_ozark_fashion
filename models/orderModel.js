@@ -69,7 +69,7 @@ const orderSchema = new mongoose.Schema(
         },
         paymentMethod: {
             type: String,
-            enum: ["Cash on Delivery", "Online Payment", "Bank Transfer"],
+            enum: ["Cash on Delivery", "Razor Payment", "Bank Transfer"],
             required: true,
         },
         notes: {
@@ -84,6 +84,14 @@ const orderSchema = new mongoose.Schema(
             type: String,
             enum: ["Pending", "Paid", "Failed"],
             default: "Pending",
+        },
+        razorpayPaymentID: {
+            type: String,
+ 
+        },
+        razorpayOrderID: {
+            type: String,
+     
         },
     },
     {

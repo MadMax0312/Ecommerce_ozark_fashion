@@ -120,4 +120,6 @@ user_route.get('/invoice', orderContoller.orderDetails);
 
 user_route.post('/updateProductStatus', orderContoller.updateStatus);
 
+user_route.post('/razorpay-payment', orderContoller.handleRazorpayPayment);
+
 module.exports = user_route;

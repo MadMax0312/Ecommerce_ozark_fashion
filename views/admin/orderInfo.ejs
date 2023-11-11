@@ -2,6 +2,14 @@
 <%- include('../adminLayouts/sidebar.ejs') %>
 <%- include('../adminLayouts/navbar.ejs') %>
 
+<style>
+    .form-select.cancelled {
+    color: red; /* Change text color to red */
+    background-color: white;
+    }
+
+</style>
+
 <div class="main-panel">
     <div class="content-wrapper">
         <div class="container-fluid">
@@ -66,15 +74,19 @@
                                     <div class="col-md-4">
                                         <p><strong>Subtotal:</strong> <%= product.subtotal %></p>
                                         <p><strong>Status:</strong>
-                                            <select class="form-select productStatus"
+                                            <select class="form-select productStatus <%= product.status === 'Cancelled' ? 'cancelled' : '' %>"
                                                 data-product-id="<%= product._id %>"
-                                                onchange="updateProductStatus('<%= order._id %>', '<%= product._id %>')">
-                                                <option value="Pending" <%= product.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                                onchange="updateProductStatus('<%= order._id %>', '<%= product._id %>')"
+                                                <%= product.status === 'Cancelled' ? 'disabled' : '' %>>
+                                                <option value="Pending" <%= product.status === 'Order Placed' ? 'selected' : '' %>>Order Placed</option>
                                                 <option value="Shipped" <%= product.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                                 <option value="Out for Delivery" <%= product.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
-                                                <option value="Out for Delivery" <%= product.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                <option value="Delivered" <%= product.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                                                 <option value="Cancelled" <%= product.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                <option value="Return" <%= product.status === 'Return' ? 'selected' : '' %>>Return</option>
                                             </select>
+                                            
+                                        
                                         </p>
                                     </div>
                                 </div>
@@ -97,6 +109,13 @@ async function updateProductStatus(orderId, productId) {
         const productStatusElement = document.querySelector(`.productStatus[data-product-id="${productId}"]`);
         const productStatus = productStatusElement.value;
 
+        console.log(productStatus)
+
+        if (productStatus === 'Cancelled') {
+            // Do not proceed with the update if the status is 'Cancelled'
+            console.log('Cannot update status for cancelled product.');
+            return;
+        }
         const response = await fetch('/admin/updateProductStatus', {
             method: 'POST',
             headers: {
@@ -113,6 +132,12 @@ async function updateProductStatus(orderId, productId) {
 
         const data = await response.json();
         console.log('Product status updated successfully:', data);
+        if (response.ok) {
+            // Reload the page
+            window.location.reload();
+        } else {
+            console.error('Failed to update product status');
+        }
 
     } catch (error) {
         console.error('Error updating product status:', error);
@@ -121,10 +146,8 @@ async function updateProductStatus(orderId, productId) {
 
 
 function updateProgressBar(orderId, productId) {
-
     const orderElement = document.getElementById(`order-${orderId}`);
     const productElement = document.getElementById(`product-${productId}`);
-
 
     fetch(`/admin/getProductStatus?orderId=${orderId}&productId=${productId}`)
         .then(response => response.json())
@@ -138,7 +161,7 @@ function updateProgressBar(orderId, productId) {
             }
 
             // Check if all products in the order have been delivered (assuming status 4 indicates delivered)
-            const allProductsDelivered = data.orderProducts.every(product => product.status >= 4);
+            const allProductsDelivered = data.order.products.every(product => product.status >= 4);
 
             // Update the order progress bar based on all products' status
             if (allProductsDelivered) {
@@ -151,10 +174,6 @@ function updateProgressBar(orderId, productId) {
             console.error('Error fetching product status:', error);
         });
 }
-
-// Call the updateProductStatus function when a product status is updated, passing orderId and productId
-// For example, updateProductStatus(orderId, productId);
-
 
 </script>
 

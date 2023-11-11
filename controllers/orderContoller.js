@@ -6,15 +6,17 @@ const Product = require("../models/productModel");
 const Order = require("../models/orderModel");
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
+const crypto = require('crypto');
+const Razorpay = require('razorpay')
+const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env;
 
-const clearCart = async (userId) => {
-    try {
-        await Cart.findOneAndUpdate({ user_id: userId }, { items: [] }, { new: true });
-    } catch (error) {
-        console.error(error.message);
-        throw error;
-    }
-};
+const razorpayInstance = new Razorpay({
+  key_id: RAZORPAY_ID_KEY,
+  key_secret: RAZORPAY_SECRET_KEY
+});
+
+
+
 
 const loadOrder = async (req, res) => {
     try {
@@ -48,12 +50,10 @@ const placeOrder = async (req, res) => {
     try {
         const { productsData, totalAmount, address, paymentMethod, notes } = req.body;
         const user_id = req.session.user_id;
-        var payment = "";
+        var payment;
 
         if (paymentMethod == "Cash on Delivery") {
             payment = "Pending";
-        } else {
-            payment = "Paid";
         }
 
         const order = new Order({
@@ -78,10 +78,55 @@ const placeOrder = async (req, res) => {
 
         await Cart.findOneAndDelete({ user_id: user_id });
 
-        res.status(200).json({ message: "Order placed successfully!" });
+        // Fix: Add 'await' here
+        const razorpayOrder = await razorpayInstance.orders.create({
+            amount: totalAmount * 100,
+            currency: 'INR',
+            receipt: order._id.toString(), // Unique order ID
+        });
+
+        // Update order with Razorpay order ID
+        order.razorpayOrderID = razorpayOrder.id;
+        await order.save();
+
+        res.status(200).json({
+            message: "Order placed successfully!",
+            razorpayOrderID: razorpayOrder.id,
+        });
+        
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+const handleRazorpayPayment = async (req, res) => {
+    try {
+        const { razorpayOrderID, paymentID, signature} = req.body;
+
+        console.log('Received Razorpay Payment:', { razorpayOrderID, paymentID, signature });
+
+        // Update your order status in the database
+        const updatedOrder = await Order.findOneAndUpdate(
+            { razorpayOrderID  },
+            { $set: { paymentStatus: 'Paid', razorpayPaymentID: paymentID } },
+            { new: true }
+        );
+
+        console.log('Updated Order:', updatedOrder);
+
+        if (!updatedOrder) {
+            console.error('Order not found or could not be updated');
+            return res.status(404).json({ error: 'Order not found or could not be updated' });
+        }
+
+        console.log('Razorpay Payment Success:', { razorpayOrderID, paymentID, signature });
+
+        // Continue with additional processing or response
+        res.status(200).json({ message: 'Razorpay Payment Success' });
+    } catch (error) {
+        console.error('Error handling Razorpay payment:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
@@ -173,4 +218,5 @@ module.exports = {
     placeOrder,
     orderDetails,
     updateStatus,
+    handleRazorpayPayment,
 };

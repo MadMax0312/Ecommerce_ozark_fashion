@@ -36,6 +36,30 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        wallet: {
+            type: Number,
+            default: 0,
+        },
+        walletHistory: [
+            {
+                transactionDate: {
+                    type: Date,
+                    default: Date.now,
+                },
+                transactionDetails: {
+                    type: String,
+                },
+                transactionType: {
+                    type: String,
+                },
+                transactionAmount: {
+                    type: Number,
+                },
+                currentBalance: {
+                    type: Number,
+                },
+            },
+        ],
     },
     {
         timestamps: true,

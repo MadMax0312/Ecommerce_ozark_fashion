@@ -348,7 +348,7 @@
                                     <h6>
                                         <div class="d-flex justify-content-between">
                                             <div style="display: inline-block">
-                                                <p style="color: black;">SubTotal Amount :</p>
+                                                <p style="color: black">SubTotal Amount :</p>
                                             </div>
                                             <div style="display: inline-block">
                                                 <p style="color: black">₹ <%= totalAmount.toFixed(2) %></p>
@@ -411,10 +411,10 @@
                                                 class="form-check-input"
                                                 type="radio"
                                                 name="paymentOption"
-                                                id="onlinePayment"
-                                                value="Online Payment"
+                                                id="razorPayment"
+                                                value="Razor Payment"
                                             />
-                                            <label class="form-check-label" for="onlinePayment"> Online Payment </label>
+                                            <label class="form-check-label" for="razorPayment"> Razor Payment </label>
                                         </div>
                                         <div class="form-check mb-3">
                                             <input
@@ -495,6 +495,8 @@
     </div>
 </div>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
     function confirmorder(event) {
         event.preventDefault();
@@ -502,7 +504,7 @@
         Swal.fire({
             title: "Yeahh!!!!",
             text: "Your Order is Succesfull",
-            icon: "sucess",
+            icon: "success",
             confirmButtonColor: "#28a745",
             confirmButtonText: "View Details",
         }).then((result) => {
@@ -513,27 +515,144 @@
     }
 </script>
 
-<!-- <script>
-    document.body.addEventListener("click", async (event) => {
-        console.log("clicked");
-        if (event.target.matches(".placeOrderBtns")) {
-            try {
-                const response = await fetch("/order", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("razorPayment").addEventListener("change", async function () {
+            if (this.checked) {
+                console.log("coolllllllllll");
+                try {
+                    const selectedAddress = document.querySelector('input[name="defaultAddress"]:checked');
+                    const selectedAddressId = selectedAddress.id.split("_")[1];
 
-                if (response.ok) {
-                    window.location.href = "/order";
+                    const fullName = document.getElementById("data-full-name").textContent;
+                    const mobile = document.getElementById("data-mobile").textContent;
+                    const city = document.getElementById("data-city").textContent;
+                    const district = document.getElementById("data-district").textContent;
+                    const state = document.getElementById("data-state").textContent;
+                    const pincode = document.getElementById("data-pincode").textContent;
+
+                    console.log(district);
+
+                    const paymentMethod = "Razor Payment"; // Set the payment method to Razor Payment
+
+                    console.log("dsfljsfhlkjdsf", paymentMethod);
+                    const notes = document.getElementById("c_order_notes").value;
+
+                    const products = [];
+                    const cartItems = document.querySelectorAll(".site-block-order-table tbody tr");
+
+                    cartItems.forEach((item) => {
+                        const productId = item.querySelector(".product-image img").getAttribute("product-id");
+                        const quantity = parseInt(item.querySelector("td:nth-child(3)").textContent.trim());
+                        const price = parseFloat(item.querySelector("td:nth-child(4)").textContent.trim().substring(2)); // Remove '₹ ' and parse as float
+                        const subtotal = quantity * price;
+
+                        products.push({
+                            productId: productId,
+                            quantity: quantity,
+                            price: price,
+                            subtotal: subtotal,
+                        });
+                    });
+
+                    console.log(products);
+
+                    const address = {
+                        fullName: fullName,
+                        mobile: mobile,
+                        city: city,
+                        district: district,
+                        state: state,
+                        pincode: pincode,
+                        country: "India",
+                    };
+
+                    const orderData = {
+                        address: address,
+                        paymentMethod: paymentMethod,
+                        notes: notes,
+                        productsData: products,
+                        totalAmount: products.reduce((total, product) => total + product.subtotal, 0),
+                    };
+
+                    const response = await fetch("/place-order", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(orderData),
+                    });
+
+                    console.log("dfsadds", response);
+
+                    if (response.ok) {
+                        const responseData = await response.json();
+                        console.log("enterererere", responseData.message);
+
+                        const rzp = new Razorpay({
+                            key: "<%= process.env.RAZORPAY_ID_KEY %>",
+                            order_id: responseData.razorpayOrderID,
+                            handler: async function (response) {
+                                try {
+                                    // Send the Razorpay response to your server
+                                    const razorpayResponse = {
+                                        razorpayOrderID: responseData.razorpayOrderID,
+
+                                        paymentID: response.razorpay_payment_id,
+                                        signature: response.razorpay_signature,
+                                        // Add other relevant data
+                                    };
+                                    console.log(razorpayResponse.razorpayOrderID);
+                                    console.log(razorpayResponse.paymentID);
+                                    console.log(razorpayResponse.signature);
+
+                                    const paymentResponse = await fetch("/razorpay-payment", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify(razorpayResponse),
+                                    });
+
+                                    console.log("hot", paymentResponse);
+
+                                    if (paymentResponse.ok) {
+                                        const paymentData = await paymentResponse.json();
+                                        console.log("Payment server response:", paymentData);
+
+                                        Swal.fire({
+                                            title: "Yeahh!!!!",
+                                            text: "Your Order is Succesfull",
+                                            icon: "success",
+                                            confirmButtonColor: "#28a745",
+                                            confirmButtonText: "View Details",
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = "/order";
+                                            }
+                                        });
+                                    } else {
+                                        console.error("Failed to process Razorpay payment on the server");
+                                    }
+                                } catch (error) {
+                                    console.error("Error handling Razorpay response:", error);
+                                }
+                            },
+                   
+                        });
+
+                        // Open Razorpay payment form
+                        rzp.open();
+                    } else {
+                        console.error("Failed to place order");
+                    }
+                } catch (error) {
+                    console.error("Error occurred while placing the order", error);
                 }
-            } catch (error) {
-                console.error("There was a problem with the fetch operation:", error);
             }
-        }
+        });
     });
-</script> -->
+</script>
 
 <script>
     document.getElementById("placeOrderBtn").addEventListener("click", async function () {
@@ -603,11 +722,11 @@
                 body: JSON.stringify(orderData),
             });
 
-            console.log(response);
+            console.log("dfsadds", response);
 
             if (response.ok) {
                 const responseData = await response.json();
-                console.log(responseData.message);
+                console.log("enterererere", responseData.message);
             } else {
                 console.error("Failed to place order");
             }

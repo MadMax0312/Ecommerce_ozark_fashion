@@ -64,6 +64,7 @@ const updateProductStatus = async (req, res) => {
         const productId = req.body.productId;
         const productStatus = req.body.productStatus;
 
+        // Update product status
         const order = await Order.findOneAndUpdate(
             { 
                 _id: orderId,
@@ -77,7 +78,27 @@ const updateProductStatus = async (req, res) => {
             { new: true }
         ).populate('products.productId');
 
-        console.log(order)
+       
+        console.log("11111111",order)
+
+        const updatedOrder = await Order.findById(orderId);
+
+        console.log("222222222222222",updatedOrder)
+
+
+
+        // Update payment status if all products are delivered
+        if (productStatus === 'Delivered') {
+            await Order.findByIdAndUpdate(
+                orderId,
+                {
+                    $set: {
+                        paymentStatus: 'Paid'
+                    }
+                },
+                { new: true }
+            );
+        }
 
         res.json({ order });
     } catch (error) {
@@ -85,6 +106,8 @@ const updateProductStatus = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+
 
 
 
