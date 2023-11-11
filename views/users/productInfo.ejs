@@ -1,11 +1,20 @@
 <%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
+<style>
+    .featured-product-image {
+        max-height: 200px; /* Set a maximum height for the images */
+        width: auto; /* Ensure images scale proportionally */
+        margin: 0 auto; /* Center the images horizontally */
+    }
+</style>
+
 <div class="site-wrap">
     <div class="bg-light py-3">
         <div class="container">
             <div class="row">
                 <div class="col-md-12 mb-0">
-                    <a href="/">Home</a> <span class="mx-2 mb-0">/</span><a href="/shop">Shop</a> <span class="mx-2 mb-0">/</span>
+                    <a href="/">Home</a> <span class="mx-2 mb-0">/</span><a href="/shop">Shop</a>
+                    <span class="mx-2 mb-0">/</span>
                     <strong class="text-black"><%= Product.productname %></strong>
                 </div>
             </div>
@@ -15,47 +24,51 @@
     <div class="site-section">
         <div class="container">
             <div class="row">
-
-
-               <div class="col-md-6">
-    <div id="imageCarousel" class="carousel slide" data-ride="carousel" >
-        <div class="carousel-inner">
-            <% if (Product && Product.image && Product.image.length > 0) { Product.image.forEach((data, index) => { %>
-            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                <div class="zoom-container">
-                    <img id="myImage" src="/static/admin/Assets/images/products/<%= data %>" class="d-block img-drift-demo-trigger" alt="Image" />
+                <div class="col-md-6">
+                    <div id="imageCarousel" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <% if (Product && Product.image && Product.image.length > 0) { Product.image.forEach((data,
+                            index) => { %>
+                            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                <div class="zoom-container">
+                                    <img
+                                        id="myImage"
+                                        src="/static/admin/Assets/images/products/<%= data %>"
+                                        class="d-block img-drift-demo-trigger"
+                                        alt="Image"
+                                    />
+                                </div>
+                            </div>
+                            <% }); } else { %>
+                            <div class="carousel-item active">
+                                <div class="zoom-container">
+                                    <img
+                                        id="myImage"
+                                        src="/static/admin/Assets/images/products/<%= data %>"
+                                        class="d-block img-drift-demo-trigger"
+                                        alt="Placeholder Image"
+                                    />
+                                </div>
+                            </div>
+                            <% } %>
+                        </div>
+                        <div class="carousel-controls">
+                            <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-          
-            </div>
-            <% }); } else { %>
-            <div class="carousel-item active">
-                <div class="zoom-container">
-                    <img id="myImage" src="/static/admin/Assets/images/products/<%= data %>" class="d-block img-drift-demo-trigger" alt="Placeholder Image"/>
-                </div>
-            </div>
-            <% } %>
-        </div>
-        <div class="carousel-controls">
-            <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-    </div>
-</div>
-
-                  
 
                 <div class="col-md-6">
                     <h2 class="text-black"><%= Product.productname %></h2>
                     <p><%= Product.description %></p>
                     <p><strong class="text-primary h4">₹<%= Product.price %></strong></p>
-                  
-
 
                     <div class="mb-5">
                         <div class="input-group mb-3" style="max-width: 120px">
@@ -128,16 +141,18 @@
                         <div class="item">
                             <div class="block-4 text-center">
                                 <figure class="block-4-image">
+                                  <a href="/product-info?id=<%= data[i]._id %>">
                                     <img
-                                        src="/static/admin/Assets/images/products/<%= data[i].image[0] %>"
-                                        alt="Image placeholder"
-                                        class="img-fluid"
-                                    />
+                                    src="/static/admin/Assets/images/products/<%= data[i].image[0] %>"
+                                    alt="Image placeholder"
+                                    class="img-fluid featured-product-image"
+                                />
+                                  </a>
                                 </figure>
-                                <div class="block-4-text p-4">
-                                    <h3><a href="#"><%= data[i].productname %></a></h3>
-                                    <p class="mb-0">Finding perfect t-shirt</p>
-                                    <p class="text-primary font-weight-bold">₹<%= data[i].price %></p>
+                                <div class="block-4-text p-1">
+                                    <h3 style="color: black;"><%= data[i].productname %></h3>
+                                    <p class="mb-0">Finding the perfect t-shirt</p>
+                                    <p class="font-weight-bold" style="color: black;">₹ <%= data[i].price %></p>
                                 </div>
                             </div>
                         </div>
@@ -145,127 +160,125 @@
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
 </div>
 
-<script> 
+<script>
+    var clicked = true;
 
-var clicked = true;
+    document.body.addEventListener("click", async (event) => {
+        if (event.target.matches(".addToWishlistBtn")) {
+            const productId = event.target.getAttribute("data-product-id");
 
-
-document.body.addEventListener("click", async (event) => {
-    if (event.target.matches(".addToWishlistBtn")) {
-        const productId = event.target.getAttribute("data-product-id");
-
-        try {
-            const response = await fetch("/addToWishlist?id=" + productId, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ id: productId }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                
-                Swal.fire({
-                    position: "center",
-                    icon: "success",
-                    title: "Success!",
-                    text: data.message,
-                });
-            } else {
-               
-                Swal.fire({
-                    position: "center",
-                    icon: "warning",
-                    title: "Warning!",
-                    text: data.message || "An error occurred while adding the product to the wishlist.",
-                });
-            }
-        } catch (error) {
-            // Handle fetch error
-            console.error("There was a problem with the fetch operation:", error);
-        }
-    }
-});
-
-
-document.body.addEventListener("click", async (event) => {
-    if (event.target.matches(".addToCartBtn")) {
-        const productId = event.target.getAttribute("data-product-id");
-        const quantityInput = document.getElementById("quantityInput");
-        const quantity = parseInt(quantityInput.value, 10);
-
-
-        if (!isNaN(quantity) && quantity > 0) {
             try {
-                const response = await fetch("/addToCart", {
+                const response = await fetch("/addToWishlist?id=" + productId, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ id: productId, quantity: quantity }),
+                    body: JSON.stringify({ id: productId }),
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
                     Swal.fire({
+                        position: "center",
                         icon: "success",
                         title: "Success!",
                         text: data.message,
                     });
                 } else {
-                    if (data.message === "Exceeded maximum stock limit") {
+                    Swal.fire({
+                        position: "center",
+                        icon: "warning",
+                        title: "Warning!",
+                        text: data.message || "An error occurred while adding the product to the wishlist.",
+                    });
+                }
+            } catch (error) {
+                // Handle fetch error
+                console.error("There was a problem with the fetch operation:", error);
+            }
+        }
+    });
+
+    document.body.addEventListener("click", async (event) => {
+        if (event.target.matches(".addToCartBtn")) {
+            const productId = event.target.getAttribute("data-product-id");
+            const quantityInput = document.getElementById("quantityInput");
+            const quantity = parseInt(quantityInput.value, 10);
+
+            if (!isNaN(quantity) && quantity > 0) {
+                try {
+                    const response = await fetch("/addToCart", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: productId, quantity: quantity }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
                         Swal.fire({
-                            icon: "error",
-                            title: "Error!",
+                            icon: "success",
+                            title: "Success!",
+                            text: data.message,
+                        });
+                    } else if (response.status === 402) {
+                        Swal.fire({
+                            icon: "info",
+                            title: "Sorry!",
+                            text: data.message,
+                        });
+                    } else if (response.status === 400) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Warning!",
                             text: data.message,
                         });
                     } else {
                         Swal.fire({
-                            icon: "warning",
-                            title: "Warning!",
+                            icon: "error",
+                            title: "Error!",
                             text: data.message || "An error occurred while adding the product to the cart.",
                         });
                     }
+                } catch (error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: "An error occurred while adding the product to the cart.",
+                    });
+                    console.error("There was a problem with the fetch operation:", error);
                 }
-            } catch (error) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error!",
-                    text: "An error occurred while adding the product to the cart.",
-                });
-                console.error("There was a problem with the fetch operation:", error);
+            } else {
+                console.error("Invalid quantity");
+                // Optionally, show an error message to the user
             }
-        } else {
-            console.error("Invalid quantity");
-            // Optionally, show an error message to the user
         }
-    }
-});
+    });
 
+    document.body.addEventListener("click", async (event) => {
+        if (event.target.matches(".js-btn-minus")) {
+            const quantityInput = document.getElementById("quantityInput");
+            let currentQuantity = parseInt(quantityInput.value, 10);
 
-document.body.addEventListener("click", async (event) => {
-    if (event.target.matches(".js-btn-minus")) {
-        const quantityInput = document.getElementById("quantityInput");
-        let currentQuantity = parseInt(quantityInput.value, 10);
+            // Ensure the quantity does not go below 1
+            if (currentQuantity > 1) {
+                currentQuantity--;
+            } else {
+                currentQuantity = 1;
+            }
 
-        // Ensure the quantity does not go below 1
-        if (currentQuantity > 1) {
-            currentQuantity--;
-        } else {
-            currentQuantity = 1;
+            quantityInput.value = currentQuantity;
         }
-
-        quantityInput.value = currentQuantity;
-    }
-})
-
+    });
 </script>
 
 <%- include('../userLayouts/footer.ejs') %>

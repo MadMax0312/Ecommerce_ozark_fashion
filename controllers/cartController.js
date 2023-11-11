@@ -67,54 +67,53 @@ const getMaxStock = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
-       
         const user_id = req.session.user_id;
-        if (user_id) {
+
+        if (!user_id) {
+            return res.status(401).json({ message: "User not logged in, please log in first" });
+        }
+
         const quantity = req.body.quantity;
         const productId = req.body.id;
- 
 
-  
-            let cartItem = await Cart.findOne({ user_id });
+        const product = await Product.findById(productId);
+        const maxStock = product.quantity;
 
-            const product = await Product.findById(productId);
-            const maxStock = product.quantity;
+        
+        if (maxStock <= 0) {
+            return res.status(402).json({ message: "Sorry, Product not available" });
+        }else if (quantity > maxStock) {
+            return res.status(400).json({ message: "Exceeded maximum stock limit" });
+        }
 
-            if (cartItem) {
-                // Check if the product is already in the cart
-                const existingProductIndex = cartItem.items.findIndex((item) => item.product.equals(productId));
+       
 
-                if (existingProductIndex !== -1) {
-                    return res.status(400).json({ message: "Product already in cart" });
-                } else {
-                    // If the product is not in the cart, add it with the given quantity
-                    cartItem.items.push({ product: productId, quantity: parseInt(quantity, 10) });
-                }
+        let cartItem = await Cart.findOne({ user_id });
 
-                if (quantity > maxStock) {
-                    return res.status(400).json({ success: false, message: "Exceeded maximum stock limit" });
-                }
+        if (cartItem) {
+            const existingProductIndex = cartItem.items.findIndex((item) => item.product.equals(productId));
 
+            if (existingProductIndex !== -1) {
+                return res.status(400).json({ message: "Product already in cart" });
+            } else {
+                cartItem.items.push({ product: productId, quantity: parseInt(quantity, 10) });
                 await cartItem.save();
                 return res.status(200).json({ message: "Product added to cart successfully" });
-            } else {
-                // If the user doesn't have a cart, create one and add the product
-                const newCartItem = new Cart({
-                    user_id,
-                    items: [{ product: productId, quantity: parseInt(quantity, 10) }],
-                });
-                await newCartItem.save();
-                return res.status(200).json({ message: "Product added to cart successfully" });
             }
-        }else {
-            // Send response indicating the user needs to log in
-            return res.status(401).json({ message: "User not logged in, please log in first" });
+        } else {
+            const newCartItem = new Cart({
+                user_id,
+                items: [{ product: productId, quantity: parseInt(quantity, 10) }],
+            });
+            await newCartItem.save();
+            return res.status(200).json({ message: "Product added to cart successfully" });
         }
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
     }
 };
+
 
 const removeProduct = async (req, res) => {
     try {

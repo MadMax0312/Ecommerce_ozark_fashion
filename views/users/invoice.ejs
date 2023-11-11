@@ -105,90 +105,113 @@
   </div>
 </section>
 
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
 <script>
   let initialProductStatus;
 
-function updateProductStatus(orderId, productId, productStatus) {
+  function updateProductStatus(orderId, productId, productStatus) {
     fetch('/updateProductStatus', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            orderId: orderId,
-            productId: productId,
-            productStatus: productStatus,
-        }),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        orderId: orderId,
+        productId: productId,
+        productStatus: productStatus,
+      }),
     })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.success) {
-                const updatedProduct = data.product;
-                // Update the progress bar based on updatedProduct.status
-                updateProgressBar(updatedProduct.status);
-                // Display cancel message for cancelled orders
-                if (updatedProduct.status === 'Cancelled') {
-                    document.getElementById('cancelMessage').style.display = 'block';
-                }
-            } else {
-                console.error('Error updating product status:', data.error);
-            }
-        })
-        .catch((error) => {
-            console.error('Error updating product status:', error);
-        });
-}
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          const updatedProduct = data.product;
+          // Update the progress bar based on updatedProduct.status
+          updateProgressBar(updatedProduct.status);
+          // Display cancel message for cancelled orders
+          if (updatedProduct.status === 'Cancelled') {
+            document.getElementById('cancelMessage').style.display = 'block';
+          }
+        } else {
+          console.error('Error updating product status:', data.error);
+        }
+      })
+      .catch((error) => {
+        console.error('Error updating product status:', error);
+      });
+  }
 
-function updateProgressBar(productStatus) {
+  function updateProductStatusWithConfirmation(orderId, productId, productStatus) {
+    // Display a confirmation dialog using SweetAlert
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You won\'t be able to revert this!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, cancel it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // If the user confirms, proceed with the cancellation
+        updateProductStatus(orderId, productId, productStatus);
+
+        location.reload();
+      }
+    });
+  }
+
+  function updateProgressBar(productStatus) {
     const progressBarSteps = document.querySelectorAll('.progress-track .step');
 
     // Remove 'active' class from all steps
     progressBarSteps.forEach((step) => {
-        step.classList.remove('active');
+      step.classList.remove('active');
     });
 
     // Add 'active' class to the current status and all the previous statuses
     for (let i = 0; i < productStatus; i++) {
-        progressBarSteps[i].classList.add('active');
+      progressBarSteps[i].classList.add('active');
     }
-}
+  }
 
-document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const progressBar = document.querySelector('.progress-track');
     const cancelledProgressBar = document.querySelector('.cancelled-progress-track');
 
     if (progressBar) {
-        // Original progress bar logic
-        const orderId = progressBar.dataset.orderId;
-        const productId = progressBar.dataset.productId;
-        initialProductStatus = progressBar.dataset.productStatus;
+      // Original progress bar logic
+      const orderId = progressBar.dataset.orderId;
+      const productId = progressBar.dataset.productId;
+      initialProductStatus = progressBar.dataset.productStatus;
 
-        updateProgressBar(initialProductStatus);
+      updateProgressBar(initialProductStatus);
     } else if (cancelledProgressBar) {
-        // Cancelled orders progress bar logic
-        const orderId = cancelledProgressBar.dataset.orderId;
-        const productId = cancelledProgressBar.dataset.productId;
-        initialProductStatus = cancelledProgressBar.dataset.productStatus;
+      // Cancelled orders progress bar logic
+      const orderId = cancelledProgressBar.dataset.orderId;
+      const productId = cancelledProgressBar.dataset.productId;
+      initialProductStatus = cancelledProgressBar.dataset.productStatus;
 
-        updateCancelledProgressBar(initialProductStatus);
+      updateCancelledProgressBar(initialProductStatus);
 
-        function updateCancelledProgressBar(productStatus) {
-            const cancelledProgressBarSteps = document.querySelectorAll('.cancelled-progress-track .step');
+      function updateCancelledProgressBar(productStatus) {
+        const cancelledProgressBarSteps = document.querySelectorAll('.cancelled-progress-track .step');
 
-            // Remove 'active' class from all steps
-            cancelledProgressBarSteps.forEach((step) => {
-                step.classList.remove('active');
-            });
+        // Remove 'active' class from all steps
+        cancelledProgressBarSteps.forEach((step) => {
+          step.classList.remove('active');
+        });
 
-            // Add 'active' class to the current status
-            for (let i = 0; i < productStatus; i++) {
-                cancelledProgressBarSteps[i].classList.add('active');
-            }
+        // Add 'active' class to the current status
+        for (let i = 0; i < productStatus; i++) {
+          cancelledProgressBarSteps[i].classList.add('active');
         }
+      }
     }
-});
+  });
 
-document.getElementById('cancelLink').addEventListener('click', function (event) {
+  document.getElementById('cancelLink').addEventListener('click', function (event) {
     event.preventDefault();
 
     // Retrieve orderId and productId from the progress bar
@@ -198,15 +221,16 @@ document.getElementById('cancelLink').addEventListener('click', function (event)
 
     // Check if the product is delivered or cancelled
     if (initialProductStatus !== 'Delivered' && initialProductStatus !== 'Cancelled') {
-        updateProductStatus(orderId, productId, 'Cancelled');
+      // Display SweetAlert confirmation before cancelling
+      updateProductStatusWithConfirmation(orderId, productId, 'Cancelled');
 
-        // Disable the "Cancel" link after clicking
-        this.classList.add('disabled-link');
-        this.removeAttribute('href');
+      // Disable the "Cancel" link after clicking
+      this.classList.add('disabled-link');
+      this.removeAttribute('href');
     }
-});
+  });
 
-document.getElementById('returnLink').addEventListener('click', function (event) {
+  document.getElementById('returnLink').addEventListener('click', function (event) {
     event.preventDefault();
 
     // Retrieve orderId and productId from the progress bar
@@ -215,7 +239,5 @@ document.getElementById('returnLink').addEventListener('click', function (event)
     const productId = progressBar ? progressBar.dataset.productId : null;
 
     updateProductStatus(orderId, productId, 'Returned');
-});
-
-
+  });
 </script>

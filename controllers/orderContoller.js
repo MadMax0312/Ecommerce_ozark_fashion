@@ -111,8 +111,6 @@ const orderDetails = async (req, res) => {
         const product = orderData.products.find(item => {
             return item._id.toString() === productsObjectId.toString();
         });
-        
-        console.log("Found product:", product);
 
         res.render('invoice', {
             user: userId,
@@ -129,37 +127,46 @@ const orderDetails = async (req, res) => {
 
 const updateStatus = async (req, res) => {
     try {
-        console.log("entered");
+
+        console.log("abababaab")
+
+        
         const { orderId, productId, productStatus } = req.body;
 
-        console.log(productStatus);
-        console.log(orderId)
-        console.log(productId)
-
-       
         const order = await Order.findOne({ _id: orderId, "products._id": productId });
 
         if (!order) {
             return res.status(404).json({ success: false, error: 'Order or product not found' });
         }
 
-
         const productIndex = order.products.findIndex(p => p._id.equals(productId));
+        const originalStatus = order.products[productIndex].status;
 
+        if (productStatus === "Cancelled" && originalStatus !== "Cancelled") {
+            const cancelledQuantity = order.products[productIndex].quantity;
+
+            // Assuming productId is an object with an _id property
+            const productIdObject = order.products[productIndex].productId;
+            const productIdValue = productIdObject._id;
+
+            console.log(productIdValue)
+
+            await Product.findByIdAndUpdate(productIdValue, { $inc: { quantity: cancelledQuantity } }, { new: true });
+        }
 
         order.products[productIndex].status = productStatus;
 
-
         const updatedOrder = await order.save();
 
-        console.log(updatedOrder);
-  
-      res.json({ success: true, product: updatedOrder });
+        console.log(updatedOrder)
+
+        res.json({ success: true, product: updatedOrder });
     } catch (error) {
-      console.error('Error updating product status:', error);
-      res.status(500).json({ success: false, error: 'Internal Server Error' });
+        console.error('Error updating product status:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
-  };
+};
+
 
 module.exports = {
     loadOrder,

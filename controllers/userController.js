@@ -7,6 +7,7 @@ const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
 const { getTotalProductsInCart } = require("../number/cartNumber")
+require('dotenv').config();
 
 const securePassword = async (password) => {
     try {
@@ -27,7 +28,7 @@ const sendVerifyMail = async (email, otp) => {
             requireTLS: true,
             auth: {
                 user: "thahirmuhammedap@gmail.com",
-                pass: "hpey gbkn ncbk yrju",
+                pass: process.env.smtp_pass,
             },
         });
         const mailOptions = {
