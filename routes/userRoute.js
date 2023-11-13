@@ -29,6 +29,7 @@ const addressController = require("../controllers/addressController");
 const checkoutController = require("../controllers/checkoutController");
 const profileController = require("../controllers/profileController");
 const orderContoller = require("../controllers/orderContoller");
+const walletController = require("../controllers/walletController");
 
 user_route.get("/register", userController.loadRegister);
 user_route.post("/register", userController.verifyOtp);
@@ -71,6 +72,14 @@ user_route.post('/updateUser',auth.isLogin,profileController.updateUser);
 user_route.post('/resetPassword',auth.isLogin,profileController.resetPassword);
 user_route.get('/viewOrder',auth.isLogin,profileController.loadOrderPage);
 user_route.get('/orderDetails', profileController.viewDetails);
+
+
+user_route.get('/wallet', walletController.loadWallet);
+user_route.post('/creditMoney', walletController.addMoneyToWallet);
+user_route.post('/updateWallet', walletController.updateWallet);
+user_route.post('/verifypayment', walletController.verifyTransaction);
+
+
 
 
 //======================================================================

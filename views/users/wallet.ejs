@@ -1,0 +1,386 @@
+<%- include('../userLayouts/header.ejs') %>
+<%- include('../userLayouts/navbar.ejs') %>
+
+<style>
+    /* Add this CSS to make the table responsive */
+    @media (max-width: 768px) {
+        table {
+            overflow-x: auto;
+            display: block;
+            white-space: nowrap;
+        }
+    }
+
+    #content {
+        display: flex;
+    }
+
+    #sidebar {
+        background-color: #d0bbbb;
+        padding-top: 20px;
+        color: rgb(14, 14, 14);
+    }
+
+    #main-content {
+        flex: 1;
+        padding: 16px;
+    }
+
+    .wallet-container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    .balance-section {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+
+    .transaction-section {
+        margin-bottom: 20px;
+    }
+
+    .transaction-table th,
+    .transaction-table td {
+        text-align: center;
+    }
+
+    .transaction-table th {
+        background-color: #343a40;
+        color: #ffffff;
+    }
+
+    .transaction-actions {
+        margin-top: 10px;
+    }
+
+    /* Add icon styles */
+    #sidebar i {
+        margin-right: 10px;
+    }
+
+    .transaction-table .hidden-row {
+        display: none;
+    }
+
+    /* Add this CSS to make the form narrower */
+    .narrow-form {
+        max-width: 300px; /* Adjust the width as needed */
+        margin: 0 auto; /* Center the form horizontally */
+    }
+    a {
+    color: black;
+    text-decoration: none;
+    background-color: transparent;
+}
+a:hover{
+  color: red;
+}
+
+    /* Media query for smaller screens */
+    @media (max-width: 576px) {
+        #content {
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #sidebar {
+            width: 100%;
+            padding-bottom: 20px; /* Add padding to the bottom for spacing */
+        }
+    }
+</style>
+
+<div id="content" class="row">
+    <div id="sidebar" class="col-md-3 col-lg-2">
+        <h3 class="text-center my-3">My account</h3>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Address</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/viewOrder"><i class="fa fa-shopping-cart"></i>Orders</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Coupons</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/wallet"><i class="fa fa-ticket"></i>Wallet</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="main-content" class="col">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="mb-4">My Wallet</h3>
+                </div>
+             
+            </div>
+
+            <!-- Display wallet balance -->
+            <div class="wallet-container balance-section">
+                <h4>Wallet Balance:</h4>
+                <p class="lead" id="walletBalance" style="color: black">₹ <%= user.wallet.toFixed(2) %></p>
+            </div>
+
+            <!-- Display wallet transaction history in a table -->
+            <div class="wallet-container transaction-section">
+              <h4>Recent Transactions:</h4>
+              <div class="table-responsive">
+                  <table class="table table-bordered transaction-table">
+                      <thead>
+                          <tr>
+                              <th scope="col" class="col-2">Date</th>
+                              <th scope="col" class="col-2">Type</th>
+                              <th scope="col" class="col-2">Amount</th>
+                          </tr>
+                      </thead>
+                      <tbody id="walletHistory">
+                          <% if (user.walletHistory && user.walletHistory.length > 0) { %> 
+                              <% user.walletHistory.reverse().forEach((entry, index) => { %>
+                                  <tr class="<%= index >= 5 ? 'hidden-row' : '' %>">
+                                      <td><%= new Date(entry.transactionDate).toLocaleString() %></td>
+                                      <td><%= entry.transactionType %></td>
+                                      <td><%= entry.transactionAmount %></td>
+                                  </tr>
+                              <% }); %> 
+                          <% } else { %>
+                              <tr>
+                                  <td colspan="3">No transaction history available.</td>
+                              </tr>
+                          <% } %>
+                      </tbody>
+                  </table>
+              </div>
+              <div class="text-center transaction-actions">
+                  <button id="viewMoreButton" class="btn btn-outline-primary">View More Transactions</button>
+              </div>
+          </div>
+
+            <!-- Add money to the wallet form -->
+            <div class="wallet-container">
+              <h5>Add Money to Wallet:</h5>
+              <form id="addMoneyForm" class="narrow-form">
+                  <div class="form-group">
+                      <label for="addMoneyAmount">Amount:</label>
+                      <input type="number" class="form-control" id="addMoneyAmount" />
+                  </div>
+                  <button type="button" class="btn btn-primary" onclick="initiateRazorpayPayment()">Add Money</button>
+              </form>
+              <input type="hidden" id="userId" value="<%= user._id %>" />
+          </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      // JavaScript/jQuery logic to toggle visibility
+      var hiddenRows = document.querySelectorAll('.transaction-table .hidden-row');
+      var viewMoreButton = document.getElementById('viewMoreButton');
+      var isViewLess = false;
+
+      viewMoreButton.addEventListener('click', function () {
+          hiddenRows.forEach(function (row, index) {
+              row.style.display = isViewLess ? (index >= 5 ? 'none' : 'table-row') : 'table-row';
+          });
+  });
+})
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // JavaScript/jQuery logic to toggle visibility
+        var hiddenRows = document.querySelectorAll(".transaction-table .hidden-row");
+        var viewMoreButton = document.getElementById("viewMoreButton");
+        var isViewLess = false;
+
+        viewMoreButton.addEventListener("click", function () {
+            hiddenRows.forEach(function (row, index) {
+                row.style.display = isViewLess ? (index >= 5 ? "none" : "table-row") : "table-row";
+            });
+            // Toggle the button text and state
+            viewMoreButton.innerText = isViewLess ? "View More Transactions" : "View Less Transactions";
+            isViewLess = !isViewLess;
+        });
+    });
+</script>
+
+<script src="https://crypto-js.googlecode.com/svn/tags/3.1.9/build/rollups/sha256.js"></script>
+<script src="https://crypto-js.googlecode.com/svn/tags/3.1.9/build/rollups/hmac-sha256.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    // Function to get the user ID from the hidden input field
+    function getUserId() {
+        return document.getElementById("userId").value;
+    }
+
+    function loadCryptoJS(callback) {
+        var script1 = document.createElement("script");
+        script1.type = "text/javascript";
+        script1.src = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9/crypto-js.js";
+        script1.onload = function () {
+            var script2 = document.createElement("script");
+            script2.type = "text/javascript";
+            script2.src = "https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9/hmac-sha256.js";
+            script2.onload = callback;
+            document.head.appendChild(script2);
+        };
+        document.head.appendChild(script1);
+    }
+
+    async function initiateRazorpayPayment() {
+        try {
+            const addMoneyAmount = document.getElementById("addMoneyAmount").value;
+            console.log(addMoneyAmount);
+
+            // Step 1: Create Razorpay Order
+            const orderResponse = await fetch("/creditMoney", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    amount: addMoneyAmount * 100, // Razorpay amount is in paise
+                }),
+            });
+
+            console.log("reponse", orderResponse);
+
+            const orderData = await orderResponse.json();
+
+            console.log("data", orderData);
+
+            // Step 2: Open Razorpay Payment Modal
+            const options = {
+                key: "<%= process.env.RAZORPAY_ID_KEY %>",
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: "Ozark",
+                description: "Add Money to Wallet",
+                order_id: orderData.id,
+                handler: function (response) {
+                    handleRazorpaySuccess(orderResponse, addMoneyAmount, orderData);
+                },
+                prefill: {
+                    name: "User Name",
+                    email: "user@example.com",
+                    contact: "9876543210",
+                },
+            };
+
+            const razorpayInstance = new Razorpay(options);
+            razorpayInstance.open();
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Error initiating Razorpay payment. Please try again.",
+            });
+        }
+    }
+
+    async function handleRazorpaySuccess(response, addMoneyAmount, orderData) {
+        try {
+            const userId = getUserId();
+
+            // Load CryptoJS and execute the logic when it's loaded
+            loadCryptoJS(async function () {
+                const generatedSignature = CryptoJS.HmacSHA256(
+                    response.razorpay_order_id + "|" + response.razorpay_payment_id,
+                    "<%= process.env.RAZORPAY_SECRET_KEY %>"
+                ).toString(CryptoJS.enc.Hex);
+
+                console.log(generatedSignature);
+
+                const verificationData = {
+                    order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    signature: generatedSignature,
+                };
+
+                console.log("dfsafdadsfdsa", verificationData);
+
+                // Step 5: Make an AJAX request to your server to verify the payment
+                const verifyPaymentResponse = await fetch("/verifypayment", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(verificationData),
+                });
+
+                console.log("response2", verifyPaymentResponse);
+
+                const verifyPaymentData = await verifyPaymentResponse.json();
+
+                console.log("data2", verifyPaymentData);
+
+                if (verifyPaymentData.success) {
+                    // Payment verification successful, proceed to update wallet
+                    const updateWalletResponse = await fetch("/updateWallet", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            transactionType: "deposit",
+                            transactionAmount: addMoneyAmount,
+                            transactionDetails: "Added money to the wallet",
+                            razorpay_payment_id: response.razorpay_payment_id,
+                        }),
+                    });
+
+                    const updateWalletData = await updateWalletResponse.json();
+
+                    if (updateWalletData.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text: "Money added to the wallet successfully!",
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        console.error("Transaction failed:", updateWalletData.error);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Failed to add money to the wallet. Please try again.",
+                        });
+                    }
+                } else {
+                    console.error("Payment verification failed:", verifyPaymentData.error);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Payment verification failed. Please try again.",
+                    });
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Error handling Razorpay success. Please try again.",
+            });
+        }
+    }
+</script>
+
+<%- include('../userLayouts/footer.ejs') %>

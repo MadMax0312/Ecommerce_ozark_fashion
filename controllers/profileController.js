@@ -10,15 +10,17 @@ const { getTotalProductsInCart } = require("../number/cartNumber");
 const loadProfile = async (req, res) => {
     try {
         const id = req.session.user_id;
-        const userData = await User.findById({ _id: id });
+        const userData = await User.findById({ _id: id }).populate('walletHistory');
         const userAddress = await Address.findOne({ userId: id });
         const count = await Cart.find().countDocuments();
 
         res.render("userProfile", { user: userData, address: userAddress, count: count });
     } catch (error) {
         console.log(error);
+        res.status(500).send('Internal Server Error');
     }
 };
+
 
 // ========= rendering user address page ==========
 const loadAddress = async (req, res) => {

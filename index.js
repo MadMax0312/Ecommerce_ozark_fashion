@@ -3,6 +3,8 @@ const path = require("path");
 const session = require("express-session");
 const config = require("./config/config");
 require('dotenv').config();
+const cors = require('cors');
+
 
 mongoose.connect("mongodb://127.0.0.1:27017/Ozark_Fashion", {
     useNewUrlParser: true,
@@ -11,6 +13,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/Ozark_Fashion", {
 
 const express = require("express");
 const app = express();
+app.use(cors());
 
 app.use(
     session({

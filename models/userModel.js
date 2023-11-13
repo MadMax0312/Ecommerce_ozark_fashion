@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 
+// Define the transactionTypes enum
+const transactionTypes = ["deposit", "withdrawal", "purchase"]; // Add other types as needed
+
 const userSchema = new mongoose.Schema(
     {
         first_name: {
@@ -38,7 +41,7 @@ const userSchema = new mongoose.Schema(
         },
         wallet: {
             type: Number,
-            default: 0,
+            default: 10,
         },
         walletHistory: [
             {
@@ -51,6 +54,7 @@ const userSchema = new mongoose.Schema(
                 },
                 transactionType: {
                     type: String,
+                    enum: transactionTypes,
                 },
                 transactionAmount: {
                     type: Number,
