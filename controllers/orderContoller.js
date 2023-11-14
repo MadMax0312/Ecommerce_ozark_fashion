@@ -54,6 +54,8 @@ const placeOrder = async (req, res) => {
 
         if (paymentMethod == "Cash on Delivery") {
             payment = "Pending";
+        }else{
+            payment = "Paid"
         }
 
         const order = new Order({
@@ -78,7 +80,6 @@ const placeOrder = async (req, res) => {
 
         await Cart.findOneAndDelete({ user_id: user_id });
 
-        // Fix: Add 'await' here
         const razorpayOrder = await razorpayInstance.orders.create({
             amount: totalAmount * 100,
             currency: 'INR',
@@ -102,33 +103,43 @@ const placeOrder = async (req, res) => {
 
 const handleRazorpayPayment = async (req, res) => {
     try {
-        const { razorpayOrderID, paymentID, signature} = req.body;
+        const { razorpayOrderID, paymentID, signature } = req.body;
 
-        console.log('Received Razorpay Payment:', { razorpayOrderID, paymentID, signature });
+        // Construct the string to sign
+        const stringToSign = `${razorpayOrderID}|${paymentID}`;
 
-        // Update your order status in the database
-        const updatedOrder = await Order.findOneAndUpdate(
-            { razorpayOrderID  },
-            { $set: { paymentStatus: 'Paid', razorpayPaymentID: paymentID } },
-            { new: true }
-        );
+        // Create an HMAC SHA-256 hash using your secret key
+        const generatedSignature = crypto
+            .createHmac('sha256', process.env.RAZORPAY_SECRET_KEY)
+            .update(stringToSign)
+            .digest('hex');
+            
+        if (generatedSignature === signature) {
 
-        console.log('Updated Order:', updatedOrder);
+            const updatedOrder = await Order.findOneAndUpdate(
+                { razorpayOrderID },
+                { $set: { paymentStatus: 'Paid', razorpayPaymentID: paymentID } },
+                { new: true }
+            );
 
-        if (!updatedOrder) {
-            console.error('Order not found or could not be updated');
-            return res.status(404).json({ error: 'Order not found or could not be updated' });
+            await Cart.findOneAndDelete({ user_id: user_id });
+
+            if (!updatedOrder) {
+                console.error('Order not found or could not be updated');
+                return res.status(404).json({ error: 'Order not found or could not be updated' });
+            }
+
+            res.status(200).json({ message: 'Razorpay Payment Success' });
+        } else {
+            console.error('Razorpay signature mismatch');
+            res.status(403).json({ error: 'Razorpay signature mismatch' });
         }
-
-        console.log('Razorpay Payment Success:', { razorpayOrderID, paymentID, signature });
-
-        // Continue with additional processing or response
-        res.status(200).json({ message: 'Razorpay Payment Success' });
     } catch (error) {
         console.error('Error handling Razorpay payment:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 
 const orderDetails = async (req, res) => {
     try {
@@ -151,8 +162,6 @@ const orderDetails = async (req, res) => {
             path: 'products.productId'
         });
 
-        console.log(orderData);
-
         const product = orderData.products.find(item => {
             return item._id.toString() === productsObjectId.toString();
         });
@@ -173,9 +182,6 @@ const orderDetails = async (req, res) => {
 const updateStatus = async (req, res) => {
     try {
 
-        console.log("abababaab")
-
-        
         const { orderId, productId, productStatus } = req.body;
 
         const order = await Order.findOne({ _id: orderId, "products._id": productId });
@@ -194,16 +200,12 @@ const updateStatus = async (req, res) => {
             const productIdObject = order.products[productIndex].productId;
             const productIdValue = productIdObject._id;
 
-            console.log(productIdValue)
-
             await Product.findByIdAndUpdate(productIdValue, { $inc: { quantity: cancelledQuantity } }, { new: true });
         }
 
         order.products[productIndex].status = productStatus;
 
         const updatedOrder = await order.save();
-
-        console.log(updatedOrder)
 
         res.json({ success: true, product: updatedOrder });
     } catch (error) {
@@ -212,6 +214,71 @@ const updateStatus = async (req, res) => {
     }
 };
 
+const checkWalletBalance = async(req, res) => {
+    try{
+
+        const userId = req.session.user_id;
+        const userData = await User.findById({ _id:userId });
+
+        const userWalletBalance = userData.wallet;
+        console.log("walletBalaceffffffffffffffffffffffffffff", userWalletBalance)
+        res.json({ walletBalance: userWalletBalance });
+
+    }catch(error){
+        console.log(error.message)
+    }
+}
+
+const walletTransaction = async(req, res) => {
+    try{
+
+         const { transactionType, transactionAmount, transactionDetails } = req.body;
+
+         const userId = req.session.user_id;
+
+        // Retrieve the user from the database
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Update the user's wallet amount based on the transaction type
+        switch (transactionType) {
+            case 'purchase':
+                if (user.wallet >= transactionAmount) {
+                    user.wallet -= transactionAmount;
+                } else {
+                    return res.status(400).json({ error: 'Insufficient funds in the wallet' });
+                }
+                break;
+            // Add other transaction types as needed
+
+            default:
+                return res.status(400).json({ error: 'Invalid transaction type' });
+        }
+
+        // Add the transaction to walletHistory
+        const newTransaction = {
+            transactionDate: new Date(),
+            transactionDetails,
+            transactionType,
+            transactionAmount,
+            currentBalance: user.wallet,
+        };
+
+        user.walletHistory.push(newTransaction);
+
+        // Save the updated user
+        await user.save();
+
+        return res.status(200).json({ message: 'Wallet transaction successful' });
+
+    }catch(error){
+        console.log(error.message)
+    }
+}
+
 
 module.exports = {
     loadOrder,
@@ -219,4 +286,6 @@ module.exports = {
     orderDetails,
     updateStatus,
     handleRazorpayPayment,
+    checkWalletBalance,
+    walletTransaction,
 };

@@ -1,99 +1,4 @@
-<%- include('../userLayouts/header.ejs') %>
-<%- include('../userLayouts/navbar.ejs') %>
-
-<style>
-    /* Add this CSS to make the table responsive */
-    @media (max-width: 768px) {
-        table {
-            overflow-x: auto;
-            display: block;
-            white-space: nowrap;
-        }
-    }
-
-    #content {
-        display: flex;
-    }
-
-    #sidebar {
-        background-color: #d0bbbb;
-        padding-top: 20px;
-        color: rgb(14, 14, 14);
-    }
-
-    #main-content {
-        flex: 1;
-        padding: 16px;
-    }
-
-    .wallet-container {
-        background-color: #f8f9fa;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        margin-top: 20px;
-    }
-
-    .balance-section {
-        border-bottom: 1px solid #dee2e6;
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-    }
-
-    .transaction-section {
-        margin-bottom: 20px;
-    }
-
-    .transaction-table th,
-    .transaction-table td {
-        text-align: center;
-    }
-
-    .transaction-table th {
-        background-color: #343a40;
-        color: #ffffff;
-    }
-
-    .transaction-actions {
-        margin-top: 10px;
-    }
-
-    /* Add icon styles */
-    #sidebar i {
-        margin-right: 10px;
-    }
-
-    .transaction-table .hidden-row {
-        display: none;
-    }
-
-    /* Add this CSS to make the form narrower */
-    .narrow-form {
-        max-width: 300px; /* Adjust the width as needed */
-        margin: 0 auto; /* Center the form horizontally */
-    }
-    a {
-    color: black;
-    text-decoration: none;
-    background-color: transparent;
-}
-a:hover{
-  color: red;
-}
-
-    /* Media query for smaller screens */
-    @media (max-width: 576px) {
-        #content {
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        #sidebar {
-            width: 100%;
-            padding-bottom: 20px; /* Add padding to the bottom for spacing */
-        }
-    }
-</style>
+<%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
 <div id="content" class="row">
     <div id="sidebar" class="col-md-3 col-lg-2">
@@ -123,7 +28,6 @@ a:hover{
                 <div class="col-md-6">
                     <h3 class="mb-4">My Wallet</h3>
                 </div>
-             
             </div>
 
             <!-- Display wallet balance -->
@@ -134,70 +38,69 @@ a:hover{
 
             <!-- Display wallet transaction history in a table -->
             <div class="wallet-container transaction-section">
-              <h4>Recent Transactions:</h4>
-              <div class="table-responsive">
-                  <table class="table table-bordered transaction-table">
-                      <thead>
-                          <tr>
-                              <th scope="col" class="col-2">Date</th>
-                              <th scope="col" class="col-2">Type</th>
-                              <th scope="col" class="col-2">Amount</th>
-                          </tr>
-                      </thead>
-                      <tbody id="walletHistory">
-                          <% if (user.walletHistory && user.walletHistory.length > 0) { %> 
-                              <% user.walletHistory.reverse().forEach((entry, index) => { %>
-                                  <tr class="<%= index >= 5 ? 'hidden-row' : '' %>">
-                                      <td><%= new Date(entry.transactionDate).toLocaleString() %></td>
-                                      <td><%= entry.transactionType %></td>
-                                      <td><%= entry.transactionAmount %></td>
-                                  </tr>
-                              <% }); %> 
-                          <% } else { %>
-                              <tr>
-                                  <td colspan="3">No transaction history available.</td>
-                              </tr>
-                          <% } %>
-                      </tbody>
-                  </table>
-              </div>
-              <div class="text-center transaction-actions">
-                  <button id="viewMoreButton" class="btn btn-outline-primary">View More Transactions</button>
-              </div>
-          </div>
+                <h4>Recent Transactions:</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered transaction-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="col-2">Date</th>
+                                <th scope="col" class="col-2">Type</th>
+                                <th scope="col" class="col-2">Details</th>
+                                <th scope="col" class="col-2">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="walletHistory">
+                            <% if (user.walletHistory && user.walletHistory.length > 0) { %> <%
+                            user.walletHistory.reverse().forEach((entry, index) => { %>
+                            <tr class="<%= index >= 5 ? 'hidden-row' : '' %>">
+                                <td><%= new Date(entry.transactionDate).toLocaleDateString() %></td>
+                                <td><%= entry.transactionType %></td>
+                                <td><%= entry.transactionDetails %></td>
+                                <td><%= entry.transactionAmount %></td>
+                            </tr>
+                            <% }); %> <% } else { %>
+                            <tr>
+                                <td colspan="3">No transaction history available.</td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center transaction-actions">
+                    <button id="viewMoreButton" class="btn btn-outline-primary">View More Transactions</button>
+                </div>
+            </div>
 
             <!-- Add money to the wallet form -->
             <div class="wallet-container">
-              <h5>Add Money to Wallet:</h5>
-              <form id="addMoneyForm" class="narrow-form">
-                  <div class="form-group">
-                      <label for="addMoneyAmount">Amount:</label>
-                      <input type="number" class="form-control" id="addMoneyAmount" />
-                  </div>
-                  <button type="button" class="btn btn-primary" onclick="initiateRazorpayPayment()">Add Money</button>
-              </form>
-              <input type="hidden" id="userId" value="<%= user._id %>" />
-          </div>
+                <h5>Add Money to Wallet:</h5>
+                <form id="addMoneyForm" class="narrow-form">
+                    <div class="form-group">
+                        <label for="addMoneyAmount">Amount:</label>
+                        <input type="number" class="form-control" id="addMoneyAmount" />
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="initiateRazorpayPayment()">Add Money</button>
+                </form>
+                <input type="hidden" id="userId" value="<%= user._id %>" />
+            </div>
         </div>
     </div>
 </div>
 
-
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-      // JavaScript/jQuery logic to toggle visibility
-      var hiddenRows = document.querySelectorAll('.transaction-table .hidden-row');
-      var viewMoreButton = document.getElementById('viewMoreButton');
-      var isViewLess = false;
+    document.addEventListener("DOMContentLoaded", function () {
+        // JavaScript/jQuery logic to toggle visibility
+        var hiddenRows = document.querySelectorAll(".transaction-table .hidden-row");
+        var viewMoreButton = document.getElementById("viewMoreButton");
+        var isViewLess = false;
 
-      viewMoreButton.addEventListener('click', function () {
-          hiddenRows.forEach(function (row, index) {
-              row.style.display = isViewLess ? (index >= 5 ? 'none' : 'table-row') : 'table-row';
-          });
-  });
-})
+        viewMoreButton.addEventListener("click", function () {
+            hiddenRows.forEach(function (row, index) {
+                row.style.display = isViewLess ? (index >= 5 ? "none" : "table-row") : "table-row";
+            });
+        });
+    });
 </script>
-
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

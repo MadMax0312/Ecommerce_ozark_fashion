@@ -131,4 +131,9 @@ user_route.post('/updateProductStatus', orderContoller.updateStatus);
 
 user_route.post('/razorpay-payment', orderContoller.handleRazorpayPayment);
 
+user_route.get('/checkBalance', orderContoller.checkWalletBalance);
+
+user_route.post('/walletTransaction', orderContoller.walletTransaction);
+
+
 module.exports = user_route;

@@ -385,7 +385,7 @@
                                                 <div style="display: inline-block">
                                                     <p style="color: black">Total Amount :</p>
                                                 </div>
-                                                <div style="display: inline-block">
+                                                <div id="purchaseAmountElement" style="display: inline-block">
                                                     <p style="color: black">₹ <%= totalAmount.toFixed(2) %></p>
                                                 </div>
                                             </div>
@@ -401,10 +401,11 @@
                                                 class="form-check-input"
                                                 type="radio"
                                                 name="paymentOption"
-                                                id="bankTransfer"
+                                                id="walletTransfer"
                                                 value="Wallet Transfer"
                                             />
-                                            <label class="form-check-label" for="bankTransfer"> Pay with my Wallet </label>
+                                            <label class="form-check-label" for="walletTransfer"> Pay with my Wallet </label>
+                                            <input type="hidden" id="userWalletBalance" value="<%= user.wallet.toFixed(2) %>" />
                                         </div>
                                  
                                         <div class="form-check mb-3">
@@ -435,7 +436,7 @@
                                             type="button"
                                             class="btn btn-primary btn-lg py-3 btn-block placeOrderBtns"
                                             id="placeOrderBtn"
-                                            onclick="confirmorder(event)"
+                                            onclick="confirmOrder()"
                                         >
                                             Place Order
                                         </button>
@@ -500,22 +501,107 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-    function confirmorder(event) {
-        event.preventDefault();
-
-        Swal.fire({
-            title: "Yeahh!!!!",
-            text: "Your Order is Succesfull",
-            icon: "success",
-            confirmButtonColor: "#28a745",
-            confirmButtonText: "View Details",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "/order";
-            }
-        });
+    async function checkWalletBalance() {
+        try {
+            const response = await fetch('/checkBalance');
+            const data = await response.json();
+            return data.walletBalance;
+        } catch (error) {
+            console.error('Error fetching wallet balance:', error);
+            throw error;
+        }
     }
-</script>
+    
+    async function confirmOrder() {
+        const selectedPaymentOption = document.querySelector('input[name="paymentOption"]:checked');
+    
+        if (selectedPaymentOption) {
+            if (selectedPaymentOption.value === 'Wallet Transfer') {
+                try {
+                    const userWalletBalance = await checkWalletBalance();
+    
+                    // Extract and parse the purchase amount using the element ID
+                    const purchaseAmountElement = document.getElementById('purchaseAmountElement');
+                    const purchaseAmount = parseFloat(purchaseAmountElement.textContent.replace('₹', ''));
+
+                    if (userWalletBalance >= purchaseAmount) {
+                        // Make a request to the server to handle the wallet transaction
+                        const response = await fetch('/walletTransaction', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                               
+                                transactionType: 'purchase',
+                                transactionAmount: purchaseAmount,
+                                transactionDetails: 'Shopping', // Provide additional details if needed
+                            }),
+                        });
+
+                        const responseData = await response.json();
+
+                        console.log("wlltransaction", responseData)
+
+                        // Check if the transaction was successful
+                        if (response.ok) {
+                            Swal.fire({
+                                title: "Yeahh!!!!",
+                                text: "Your Order is Successful",
+                                icon: "success",
+                                confirmButtonColor: "#28a745",
+                                confirmButtonText: "View Details",
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "/order";
+                                }
+                            });
+                        } else {
+                            // Handle error from the server
+                            Swal.fire({
+                                title: "Oops!",
+                                text: responseData.error || "Error processing the order. Please try again.",
+                                icon: "error",
+                                confirmButtonColor: "#dc3545",
+                                confirmButtonText: "OK",
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: "Oops!",
+                            text: "Insufficient funds in the wallet. Please choose another payment option.",
+                            icon: "error",
+                            confirmButtonColor: "#dc3545",
+                            confirmButtonText: "OK",
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error checking wallet balance:', error);
+                }
+            } else {
+                Swal.fire({
+                    title: "Yeahh!!!!",
+                    text: "Your Order is Successful",
+                    icon: "success",
+                    confirmButtonColor: "#28a745",
+                    confirmButtonText: "View Details",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/order";
+                    }
+                });
+            }
+        } else {
+            Swal.fire({
+                title: "Oops!",
+                text: "Please select a payment option.",
+                icon: "error",
+                confirmButtonColor: "#dc3545",
+                confirmButtonText: "OK",
+            });
+        }
+    }
+    </script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -554,6 +640,7 @@
                             quantity: quantity,
                             price: price,
                             subtotal: subtotal,
+                    
                         });
                     });
 

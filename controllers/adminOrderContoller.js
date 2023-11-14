@@ -9,9 +9,32 @@ const Cart = require("../models/cartModel");
 
 const loadOrder = async (req, res) => {
     try {
-        const orders = await Order.find().sort({ createdAt: -1 });
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; // Adjust the number of orders per page as needed
 
-        // Modify orderData to include formatted delivery date for each order
+        const searchQuery = req.query.search || '';
+        const statusFilter = req.query.status || '';
+
+        const filter = {};
+        if (searchQuery) {
+            filter.$or = [
+                { '_id': { $regex: searchQuery, $options: 'i' } },
+                // Add more fields for search as needed
+            ];
+        }
+
+        if (statusFilter) {
+            filter['products.status'] = statusFilter;
+        }
+
+        const orders = await Order.find(filter)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        const totalOrders = await Order.countDocuments(filter);
+        const totalPages = Math.ceil(totalOrders / limit);
+
         const ordersWithFormattedDeliveryDate = orders.map((order) => {
             const orderDate = new Date(order.createdAt);
             const expectedDeliveryDate = new Date(orderDate);
@@ -26,18 +49,36 @@ const loadOrder = async (req, res) => {
                 .replace(/\//g, "-");
 
             return {
-                ...order.toObject(), // Convert Mongoose document to plain JavaScript object
+                ...order.toObject(),
                 formattedDeliveryDate: formattedDeliveryDate,
             };
         });
 
+        // Get order summary statistics
+        const totalSales = await Order.aggregate([
+            { $match: filter },
+            { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
+        ]);
+
+        const orderSummary = {
+            totalOrders,
+            totalSales: totalSales.length > 0 ? totalSales[0].totalAmount : 0,
+            averageOrderValue: totalOrders > 0 ? totalSales[0].totalAmount / totalOrders : 0,
+        };
+
         res.render("orders", {
             orders: ordersWithFormattedDeliveryDate,
+            currentPage: page,
+            totalPages: totalPages,
+            searchQuery: searchQuery,
+            statusFilter: statusFilter,
+            orderSummary: orderSummary,
         });
     } catch (error) {
         console.log(error.message);
     }
 };
+
 
 const viewDetails = async (req, res) => {
   try {

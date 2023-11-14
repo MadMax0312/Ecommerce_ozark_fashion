@@ -28,7 +28,7 @@ const orderSchema = new mongoose.Schema(
                 },
                 status: {
                     type: String,
-                    enum: ["Order Placed", "Shipped", "Out for Delivery", "Delivered", "Cancelled", "Return"],
+                    enum: ["Order Placed", "Shipped", "Out for Delivery", "Delivered", "Cancelled", "Return" , "Processing"],
                     default: "Order Placed",
                 },
             },
@@ -69,7 +69,7 @@ const orderSchema = new mongoose.Schema(
         },
         paymentMethod: {
             type: String,
-            enum: ["Cash on Delivery", "Razor Payment", "Bank Transfer"],
+            enum: ["Cash on Delivery", "Razor Payment", "Wallet Transfer"],
             required: true,
         },
         notes: {

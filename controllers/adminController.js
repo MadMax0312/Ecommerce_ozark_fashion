@@ -8,6 +8,7 @@ const path = require("path");
 
 const randomstring = require("randomstring");
 const fs = require('fs');
+const Order = require("../models/orderModel");
 
 const securePassword = async (password) => {
     try {
@@ -70,20 +71,6 @@ const loadLogout = async (req, res) => {
     }
 };
 
-//-----------------Rendering homePage-------------------------
-
-const loadDashboard = async (req, res) => {
-    try {
-        // const adminData = await Admin.findById({ _id:req.session.admin_id });
-        const userCount = await User.find().countDocuments();
-        const blockCount = await User.find({isBlock:true}).countDocuments();
-        const productCount = await Product.find().countDocuments();
-
-        res.render("home", {Ucount:userCount, Pcount:productCount, Bcount:blockCount});
-    } catch (error) {
-        console.log(error.message);
-    }
-};
 
 ///----------Loading user page in admin dashboard===========
 
@@ -178,23 +165,14 @@ const loadOrder = async (req, res) => {
     }
 };
 
-const loadSales = async (req, res) => {
-    try {
-        res.render("sales");
-    } catch (error) {
-        console.log(error.message);
-    }
-};
 
 module.exports = {
     loadLogin,
     verifyLogin,
     loadLogout,
-    loadDashboard,
     loadUsers,
     blockUsers,
     loadBanner,
     loadCoupons,
     loadOrder,
-    loadSales,
 };

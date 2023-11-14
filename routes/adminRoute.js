@@ -48,6 +48,10 @@ const adminController = require("../controllers/adminController");
 
 const adminOrderController = require("../controllers/adminOrderContoller");
 
+const dashboardController = require("../controllers/dashboardController");
+
+const salesController = require("../controllers/salesController");
+
 
 admin_route.get("/", auth.isLogout, adminController.loadLogin);
 
@@ -55,11 +59,13 @@ admin_route.post("/", adminController.verifyLogin);
 
 admin_route.get("/logout", auth.isLogin, adminController.loadLogout);
 
-admin_route.get("/home", auth.isLogin, adminController.loadDashboard);
-
 admin_route.get("/users", auth.isLogin, adminController.loadUsers);
 
 admin_route.post("/block-user", auth.isLogin, adminController.blockUsers);
+
+//==================================================================================
+
+admin_route.get("/home", auth.isLogin, dashboardController.loadDashboard);
 
 //=================================  P R O D U C T === S E C T I O N  =================================================================================//
 
@@ -107,9 +113,14 @@ admin_route.get('/orderDetailss', adminOrderController.viewDetails);
 
 admin_route.post('/updateProductStatus', adminOrderController.updateProductStatus);
 
-admin_route.get("/sales", auth.isLogin, adminController.loadSales);
-
 //============================================================================================
+
+admin_route.get("/sales", auth.isLogin, salesController.loadSales);
+
+admin_route.get("/export-sales", salesController.exportReport);
+
+
+
 
 
 admin_route.get("*", function (req, res) {

@@ -28,9 +28,14 @@
     </div>
 </div>
 
-<div class="container mt-5 mb-5">
+<div class="container mt-5 mb-5" >
+    <div class="row justify-content-end mb-3">
+        <button id="downloadButton" class="btn" style="background-color: rgb(160, 176, 201);">Download Invoice</button>
+    </div>
+  
     <div class="row d-flex justify-content-center">
-        <div class="col-md-8 p-0">
+        
+        <div class="col-md-8 p-3" id="invoice">
             <div class="card">
                 <div class="invoice p-1" style="color: black;">
                     <h2 class="text-center">Your Order Confirmed!</h5>
@@ -78,6 +83,7 @@
                                     </td>
                                 </tr>
 
+                           
                                
 
 
@@ -89,11 +95,11 @@
                         <table class="table" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
                             <thead>
                                 <td class="a-block" style="border: 1px solid black;">Product</td>
-                                <td class="a-block" style="border: 1px solid black;">Product Details</td>
+                                <td class="a-block" style="border: 1px solid black;">Details</td>
                                 <td class="a-block" style="border: 1px solid black;">Payment Method</td>
                                 <td class="a-block" style="border: 1px solid black;">Payment Status</td>
                                 <td class="a-block" style="border: 1px solid black;">Amount</td>
-                                <td class="a-block" style="border: 1px solid black;">Action</td>
+                            
                             </thead>
                             <tbody>
                                 <% if (data && data.length > 0) { %> <% data.forEach(order => { %> <%
@@ -129,7 +135,7 @@
                                         </div>
                                     </td>
                                     <td width="20%">
-                                        <div class="text-center align-center">
+                                        <div class="align-center">
                                             <span class="c-block"
                                                 ><%= order.paymentStatus %></span
                                             >
@@ -137,7 +143,7 @@
                                     </td>
 
                                     <td width="20%">
-                                        <div class="text-center align-center">
+                                        <div>
                                             <span class="c-block"
                                                 >₹ <%= (item.quantity * item.productId.price).toFixed(2) %></span
                                             >
@@ -146,12 +152,21 @@
                                     <td width="20%">
                                         <div>
                                             <a href="/invoice?productId=<%= item.productId._id %>&orderId=<%= order._id %>&productIdss=<%= item._id %>">
-                                                <button class="btn sm" style="background-color: grey;">Details</button>
+                                                <button class="btn sm" style="background-color: grey;">Track</button>
                                             </a>
                                             
                                         </div>
                                     </td>
+                               
+                                     
+                                  
+                                     
                                 </tr>
+
+                             
+
+                              
+
 
                                
                               
@@ -164,7 +179,9 @@
                                 <% } %>
                            
                             </tbody>
+                  
                         </table>
+            
                     </div>
                     <div class="row d-flex">
                         <div class="col-md-6">
@@ -266,13 +283,39 @@
                    </div>
                    <br>
 
-                   <div class="btn lg"><a href="/shop">Continue Shopping</a></div>
+                   
                 
               
                 </div>
             </div>
         </div>
+       
     </div>
 </div>
+
+
+<script>
+    document.getElementById('downloadButton').addEventListener('click', async () => {
+        const invoiceElement = document.getElementById('invoice');
+
+        try {
+            const canvas = await html2canvas(invoiceElement);
+            const pdf = new jspdf.jsPDF('p', 'mm', 'a4'); // Use jspdf.jsPDF instead of jsPDF
+
+            pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', 0, 0, 210, 297);
+
+            console.log('Inside pdf callback');
+            console.log(pdf);
+
+            pdf.save('invoice.pdf');
+
+            console.log('After pdf');
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+        }
+    });
+</script>
+
+
 
 <%- include('../userLayouts/footer.ejs') %>

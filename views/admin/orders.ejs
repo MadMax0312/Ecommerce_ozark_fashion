@@ -3,10 +3,19 @@
 <%- include('../adminLayouts/navbar.ejs') %>
 
 <style>
-    .table,
-    .jsgrid .jsgrid-table {
-        color: #fff;
+    .status-indicator {
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 5px;
     }
+
+    .status-indicator.orderplaced { background-color: #3498db; color: #fff; }
+    .status-indicator.shipped { background-color: #2ecc71; color: #fff; }
+    .status-indicator.outfordelivery { background-color: #f39c12; color: #fff; }
+    .status-indicator.delivered { background-color: #27ae60; color: #fff; }
+    .status-indicator.cancelled { background-color: #e74c3c; color: #fff; }
+    .status-indicator.return { background-color: #c0392b; color: #fff; }
+    .status-indicator.processing { background-color: #9b59b6; color: #fff; }
 
     .table th, .table td {
         white-space: nowrap;
@@ -21,8 +30,39 @@
                     <div class="card">
                         <div class="card-body">
                             <h2 class="card-title text-center mb-4">ORDERS</h2>
+
+                            <!-- Search and Filter Form -->
+                            <form action="/admin/orders" method="get" class="form-inline mb-3">
+                                <div class="form-group mr-2">
+                                    <input type="text" class="form-control" placeholder="Search" name="search" value="<%= searchQuery %>">
+                                </div>
+                                <div class="form-group mr-2">
+                                    <select class="form-control" name="status">
+                                        <option value="" <%= statusFilter === '' ? 'selected' : '' %>>All Status</option>
+                                        <option value="Order Placed" <%= statusFilter === 'Order Placed' ? 'selected' : '' %>>Order Placed</option>
+                                        <option value="Shipped" <%= statusFilter === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                        <option value="Out for Delivery" <%= statusFilter === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                                        <option value="Delivered" <%= statusFilter === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                        <option value="Cancelled" <%= statusFilter === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                        <option value="Return" <%= statusFilter === 'Return' ? 'selected' : '' %>>Return</option>
+                                        <!-- Add more status options as needed -->
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Apply Filter</button>
+                            </form>
+
+                            <!-- Order Summary Statistics -->
+                            <div class="mt-3">
+                                <h4>Order Summary Statistics</h4>
+                                <p>Total Orders: <%= orderSummary.totalOrders %></p>
+                                <p>Total Sales: ₹ <%= orderSummary.totalSales.toFixed(2) %></p>
+                                <p>Average Order Value: ₹ <%= orderSummary.averageOrderValue.toFixed(2) %></p>
+                            </div>
+
+                            <!-- Table content -->
                             <div class="table-responsive">
                                 <table class="table table-bordered">
+                                    <!-- Table header -->
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -30,18 +70,26 @@
                                             <th>Order Date</th>
                                             <th>Amount</th>
                                             <th>Payment</th>
+                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
+                                    <!-- Table body -->
                                     <tbody>
                                         <% if (orders.length > 0) { %> 
                                             <% for (let i = 0; i < orders.length; i++) { %>
                                                 <tr>
-                                                    <td><%= i + 1 %></td>
+                                                    <td><%= (currentPage - 1) * 10 + i + 1 %></td>
                                                     <td><%= orders[i]._id %></td>
                                                     <td><%= orders[i].createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></td>
                                                     <td>₹ <%= orders[i].totalAmount %></td>
                                                     <td><%= orders[i].paymentMethod %></td>
+                                                    <td>
+                                                        <span class="status-indicator <%= orders[i].products[0].status.toLowerCase().replace(/\s/g, '') %>">
+                                                            <%= orders[i].products[0].status %>
+                                                        </span>
+                                                        
+                                                    </td>
                                                     <td>
                                                         <div class="btn-group" role="group">
                                                             <a href="/admin/orderDetailss?id=<%= orders[i]._id %>" class="btn btn-info btn-sm">Manage</a>
@@ -51,7 +99,7 @@
                                             <% } %> 
                                         <% } else { %>
                                             <tr>
-                                                <td colspan="6" class="text-center">
+                                                <td colspan="7" class="text-center">
                                                     <div class="error-content text-center">
                                                         <h1 class="error-title">No Orders</h1>
                                                         <p>You have not placed any orders yet.</p>
@@ -65,6 +113,17 @@
                                         <% } %>
                                     </tbody>
                                 </table>
+                            </div>
+
+                            <!-- Pagination links -->
+                            <div class="pagination-container">
+                                <ul class="pagination">
+                                    <% for (let i = 1; i <= totalPages; i++) { %>
+                                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                        </li>
+                                    <% } %>
+                                </ul>
                             </div>
                         </div>
                     </div>

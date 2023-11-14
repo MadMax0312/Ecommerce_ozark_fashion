@@ -1,0 +1,91 @@
+   /* Add this CSS to make the table responsive */
+   @media (max-width: 768px) {
+    table {
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+}
+
+#content {
+    display: flex;
+}
+
+#sidebar {
+    background-color: #d0bbbb;
+    padding-top: 20px;
+    color: rgb(14, 14, 14);
+}
+
+#main-content {
+    flex: 1;
+    padding: 16px;
+}
+
+.wallet-container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.balance-section {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.transaction-section {
+    margin-bottom: 20px;
+}
+
+.transaction-table th,
+.transaction-table td {
+    text-align: center;
+}
+
+.transaction-table th {
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+.transaction-actions {
+    margin-top: 10px;
+}
+
+/* Add icon styles */
+#sidebar i {
+    margin-right: 10px;
+}
+
+.transaction-table .hidden-row {
+    display: none;
+}
+
+/* Add this CSS to make the form narrower */
+.narrow-form {
+    max-width: 300px; /* Adjust the width as needed */
+    margin: 0 auto; /* Center the form horizontally */
+}
+a {
+    color: black;
+    text-decoration: none;
+    background-color: transparent;
+}
+a:hover {
+    color: red;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 576px) {
+    #content {
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    #sidebar {
+        width: 100%;
+        padding-bottom: 20px; /* Add padding to the bottom for spacing */
+    }
+}
