@@ -37,6 +37,10 @@ const orderSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        orderTrackId: {
+            type: Number,
+            required: true,
+        },
         address: {
             fullName: {
                 type: String,

@@ -72,30 +72,43 @@ include('../adminLayouts/navbar.ejs') %>
                           <textarea class="form-control" id="description" rows="4" name="description"></textarea>
                           <p id="description-error" class="error-message" style="color: red;"></p>
                       </div>
-
                       <div class="container-fluid">
-                          <label for="">File upload (Multiple Images)</label>
-                          <div class="row">
-                              <div class="col-md-6 mb-0">
-                                  <div class="dynamic-image-inputs">
-                                      <div class="input-group">
-                                          <input type="file" name="images" id="image" class="form-control" required/>
-                                          <div class="input-group-append">
-                                              <button class="btn btn-primary add-image-input" type="button">
-                                                  Add Image
-                                              </button>
-                                          </div>
-                                      </div>
-                                  </div>
+                        <label for="">File upload (Multiple Images)</label>
+                        <div class="row">
+                          <div class="col-md-6 mb-0">
+                            <div class="dynamic-image-inputs">
+                              <div class="input-group mb-3">
+                                <div class="custom-file">
+                                  <input type="file" class="custom-file-input" id="image" name="images">
+                                  <label class="custom-file-label" for="image">Choose file</label>
+                                </div>
+                                <div class="input-group-append">
+                                  <button class="btn btn-primary add-image-input" type="button">Add Image</button>
+                                </div>
                               </div>
-                           
+                            </div>
                           </div>
+                        </div>
+                      
+                        <!-- Display image previews -->
+                        <div id="imagePreviews" class="mt-3">
+                          <!-- Images will be displayed here -->
+                        </div>
+                      
+                        <!-- Display all added images section -->
+                        <div class="mt-4">
+                          <h5>All Added Images</h5>
+                          <div id="allImagePreviews" class="d-flex flex-wrap">
+                            <!-- All images will be displayed here -->
+                          </div>
+                        </div>
                       </div>
+                      
 
                       
-                      <div class="row mt-5">
+                        <div class="row mt-5">
                         <div class="col-md-12 text-center">
-                          <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                          <button type="submit" class="btn btn-primary mr-2" id="submitButton">Submit</button>
                           <button class="btn btn-dark">Cancel</button>
                         </div>
                       </div>
@@ -108,10 +121,11 @@ include('../adminLayouts/navbar.ejs') %>
 
 <!-- page-body-wrapper ends -->
 
-<script>
+<!-- <script>
    document.addEventListener("DOMContentLoaded", function () {
     const addImageButton = document.querySelector(".add-image-input");
     const dynamicImageInputs = document.querySelector(".dynamic-image-inputs");
+    const imagePreviewsContainer = document.getElementById("imagePreviews");
 
     // Track the number of added images
     let imageCount = 1;
@@ -154,6 +168,138 @@ include('../adminLayouts/navbar.ejs') %>
     });
 });
 
-</script>
+</script> -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const addImageButton = document.querySelector(".add-image-input");
+      const dynamicImageInputs = document.querySelector(".dynamic-image-inputs");
+      const imagePreviewsContainer = document.getElementById("imagePreviews");
+      const allImagePreviewsContainer = document.getElementById("allImagePreviews");
+  
+      // Track the number of added images
+      let imageCount = 1;
+  
+      addImageButton.addEventListener("click", function () {
+        if (imageCount < 4) {
+          const inputGroup = document.createElement("div");
+          inputGroup.className = "input-group mb-3";
+  
+          const customFile = document.createElement("div");
+          customFile.className = "custom-file";
+  
+          const inputFile = document.createElement("input");
+          inputFile.type = "file";
+          inputFile.className = "custom-file-input";
+          inputFile.name = "images";
+          inputFile.required = true;
+  
+          const label = document.createElement("label");
+          label.className = "custom-file-label";
+          label.htmlFor = "image";
+          label.textContent = "Choose file";
+  
+          inputFile.addEventListener("change", function () {
+            label.textContent = Array.from(this.files).map(file => file.name).join(', ');
+  
+            // Display image previews
+            displayImagePreviews(this.files);
+  
+            // Display all added images
+            displayAllImagePreviews();
+          });
+  
+          const inputGroupAppend = document.createElement("div");
+          inputGroupAppend.className = "input-group-append";
+  
+          const removeButton = document.createElement("button");
+          removeButton.className = "btn btn-danger remove-image-input";
+          removeButton.type = "button";
+          removeButton.textContent = "Remove";
+  
+          removeButton.addEventListener("click", function () {
+            inputGroup.remove();
+            imageCount--; // Decrease the image count when removing an input
+  
+            // Clear existing previews
+            imagePreviewsContainer.innerHTML = '';
+            allImagePreviewsContainer.innerHTML = '';
+          });
+  
+          customFile.appendChild(inputFile);
+          customFile.appendChild(label);
+  
+          inputGroupAppend.appendChild(removeButton);
+  
+          inputGroup.appendChild(customFile);
+          inputGroup.appendChild(inputGroupAppend);
+  
+          dynamicImageInputs.appendChild(inputGroup);
+  
+          imageCount++; // Increase the image count when adding an input
+        } else {
+          // Show SweetAlert modal instead of the regular alert
+          Swal.fire({
+            title: "Oops!",
+            text: "You can add only 4 images.",
+            icon: "warning",
+            showCancelButton: false,
+            confirmButtonText: "OK",
+          });
+        }
+      });
+  
+      // Function to display image previews
+      function displayImagePreviews(files) {
+        // Clear existing previews
+        imagePreviewsContainer.innerHTML = '';
+  
+        // Loop through selected files and create previews
+        Array.from(files).forEach(file => {
+          const preview = document.createElement("img");
+          preview.className = "img-thumbnail mr-2";
+          preview.style.width = "100px";
+          preview.style.height = "100px";
+  
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            preview.src = e.target.result;
+          };
+  
+          reader.readAsDataURL(file);
+  
+          imagePreviewsContainer.appendChild(preview);
+        });
+      }
+  
+      // Function to display all added image previews
+      function displayAllImagePreviews() {
+        // Clear existing previews
+        allImagePreviewsContainer.innerHTML = '';
+  
+        // Loop through all added images and create previews
+        Array.from(dynamicImageInputs.querySelectorAll(".custom-file-input")).forEach(fileInput => {
+          Array.from(fileInput.files).forEach(file => {
+            const preview = document.createElement("img");
+            preview.className = "img-thumbnail mr-2";
+            preview.style.width = "100px";
+            preview.style.height = "100px";
+  
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              preview.src = e.target.result;
+            };
+  
+            reader.readAsDataURL(file);
+  
+            allImagePreviewsContainer.appendChild(preview);
+          });
+        });
+      }
+
+
+  })
+  </script>
+  
 
 <%- include('../adminLayouts/footer.ejs') %>

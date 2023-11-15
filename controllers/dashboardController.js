@@ -63,10 +63,29 @@ const loadDashboard = async (req, res) => {
     ]);
 
     // Daily Revenue
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set the time to the beginning of the day
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1); // Set the time to the beginning of the next day
+    
     const dailyRevenue = await Order.aggregate([
-        { $match: { createdAt: { $gte: new Date(new Date() - 1 * 24 * 60 * 60 * 1000) } } }, // Last 24 hours
-        { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
+        {
+            $match: {
+                createdAt: {
+                    $gte: today,
+                    $lt: tomorrow,
+                },
+            },
+        },
+        {
+            $group: {
+                _id: null,
+                totalAmount: { $sum: '$totalAmount' },
+            },
+        },
     ]);
+    
 
     // Yearly Revenue
     const yearlyRevenue = await Order.aggregate([
@@ -79,6 +98,36 @@ const loadDashboard = async (req, res) => {
         { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
     ]);
 
+    const walletRevenue = await Order.aggregate([
+        { $match: { paymentMethod: 'Wallet Transfer' } },
+        { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
+    ]);
+
+    const cashOnDeliveryRevenue = await Order.aggregate([
+        { $match: { paymentMethod: 'Cash on Delivery' } },
+        { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
+    ]);
+
+    const RazorPayRevenue = await Order.aggregate([
+        { $match: { paymentMethod: 'Razor Payment' } },
+        { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
+    ]);
+
+    const orderData = await Order.find()
+    .sort({ createdAt: -1 })
+    .populate({
+        path: "user",
+    })
+    .populate({
+        path: "products.productId",
+    })
+    .limit(5)
+
+    console.log(totalPurchase)
+    console.log(totalProductsSold)
+    console.log(totalSales)
+
+
     const orderSummary = {
         totalSales: totalSales.length > 0 ? totalSales[0].totalAmount : 0,
         totalPurchase: totalPurchase.length > 0 ? totalPurchase[0].totalAmount : 0,
@@ -90,9 +139,11 @@ const loadDashboard = async (req, res) => {
         yearlySales: yearlyRevenue.length > 0 ? yearlyRevenue[0].totalAmount : 0,
         totalOrder: totalRevenue.length > 0 ? totalRevenue[0].totalAmount : 0,
         totalRevenue: totalSales.length > 0 ? totalSales[0].totalAmount * 0.3 : 0,
+        razorRevenue: RazorPayRevenue.length > 0 ? RazorPayRevenue[0].totalAmount : 0,
+        walletRevenue: walletRevenue.length > 0 ? walletRevenue[0].totalAmount : 0,
+        cashOnDeliveryRevenue: cashOnDeliveryRevenue.length > 0 ? cashOnDeliveryRevenue[0].totalAmount : 0,
+        orderData:orderData,
     };
-
-    console.log(mostSoldProductDetails)
 
       res.render("home", {
         Ucount:userCount, 

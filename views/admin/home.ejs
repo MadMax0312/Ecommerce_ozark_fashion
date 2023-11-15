@@ -26,12 +26,16 @@ include('../adminLayouts/navbar.ejs') %>
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-9">
+                            <div class="col-8">
                                 <div class="d-flex align-items-center align-self-start">
-                                    <h3 class="mb-0"><%= Ucount %></h3>
+                                    <h3 class="mb-0 p-4"><%= Ucount %></h3>
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
+                                <div class="col-md-6 col-md-4 col-lg-3">
+                                    <span class="icon-md mdi mdi-account-multiple-plus"></span>
+                                    
+                                </div>
                                 <div class="icon icon-box-success">
                                     <a href="/admin/users" style="text-decoration: none"
                                         ><span class="mdi mdi-arrow-top-right icon-item"></span
@@ -47,12 +51,13 @@ include('../adminLayouts/navbar.ejs') %>
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-9">
+                            <div class="col-8">
                                 <div class="d-flex align-items-center align-self-start">
-                                    <h3 class="mb-0"><%= Pcount %></h3>
+                                    <h3 class="mb-0 p-4"><%= Pcount %></h3>
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
+                                <span class="icon-md mdi mdi-snowflake mdi-spin"></span>
                                 <div class="icon icon-box-success">
                                     <a href="/admin/view-products"
                                         ><span class="mdi mdi-arrow-top-right icon-item"></span
@@ -60,7 +65,7 @@ include('../adminLayouts/navbar.ejs') %>
                                 </div>
                             </div>
                         </div>
-                        <h6 class="text-muted font-weight-normal">Total Products</h6>
+                        <h6 class="text-muted font-weight-normal">Total Stock</h6>
                     </div>
                 </div>
             </div>
@@ -68,12 +73,14 @@ include('../adminLayouts/navbar.ejs') %>
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-9">
+                            <div class="col-8">
                                 <div class="d-flex align-items-center align-self-start">
-                                    <h3 class="mb-0"><%= Bcount %></h3>
+                                    
+                                    <h3 class="mb-0 p-4"><%= Bcount %></h3>
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
+                                <span class="icon-md mdi mdi-account-alert"></span>
                                 <div class="icon icon-box-success">
                                     <a href="/admin/users" style="text-decoration: none"
                                         ><span class="mdi mdi-arrow-top-right icon-item"></span
@@ -89,12 +96,13 @@ include('../adminLayouts/navbar.ejs') %>
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-9">
+                            <div class="col-8">
                                 <div class="d-flex align-items-center align-self-start">
-                                    <h3 class="mb-0"><%= Ocount %></h3>
+                                    <h3 class="mb-0 p-4"><%= Ocount %></h3>
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
+                                <span class="icon-md mdi mdi-briefcase-check"></span>
                                 <div class="icon icon-box-success">
                                     <a href="/admin/orders" style="text-decoration: none"
                                         ><span class="mdi mdi-arrow-top-right icon-item"></span
@@ -143,53 +151,42 @@ include('../adminLayouts/navbar.ejs') %>
                 </div>
             </div>
             <div class="col-md-6 grid-margin stretch-card">
-              <div class="card">
-                  <div class="card-body">
-                      <div class="d-flex flex-row justify-content-between">
-                          <h4 class="card-title mb-1">Most Sold Products</h4>
-                          
-                      </div>
-                     
-                          <% if (order.mostSoldProductDetails && order.mostSoldProductDetails.length > 0) { %>
-                              <% for (let i = 0; i < order.mostSoldProductDetails.length; i++) { %>
-                                <div class="row">
-                                  <div class="col-md-6">
-                                      <div class="preview-item border-bottom">
-                                          <div class="preview-thumbnail">
-                                            
-                                              <%= order.mostSoldProductDetails[i].name %><br />
-                                              <img src="/static/admin/Assets/images/products/<%= order.mostSoldProductDetails[i].image[0] %>"
-                                                  alt="<%= order.mostSoldProductDetails[i].name %> Image"
-                                                  style="width: 100px; height: 100px;"
-                                              />
-                                          </div>
-                                      </div>
-                                  </div>
-                                  <div class="col-md-6">
-                                      
-                                          <br>
-                                              <h6>Total Quantity Sold:</h6>
-                                              <%= order.mostSoldProductDetails[i].totalQuantity %>
-                                          
-                                       <br>
-                                            <h6>Price: <%= order.mostSoldProductDetails[i].price %></h6>
-                                          
-                                        
-                                              
-                                          
-                                         
-                                      
-                                  </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-row justify-content-between">
+                            <h4 class="card-title mb-1">Most Sold Products</h4>
+                        </div>
+
+                        <% if (order.mostSoldProductDetails && order.mostSoldProductDetails.length > 0) { %> <% for (let i =
+                        0; i < order.mostSoldProductDetails.length; i++) { %>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="preview-item border-bottom">
+                                    <div class="preview-thumbnail">
+                                        <%= order.mostSoldProductDetails[i].name %><br />
+                                        <img
+                                            src="/static/admin/Assets/images/products/<%= order.mostSoldProductDetails[i].image[0] %>"
+                                            alt="<%= order.mostSoldProductDetails[i].name %> Image"
+                                            style="width: 100px; height: 100px"
+                                        />
+                                    </div>
                                 </div>
-                              <% } %>
-                          <% } else { %>
-                              <p>No product sold yet.</p>
-                          <% } %>
-                      
-                  </div>
-              </div>
-          </div>
-          
+                            </div>
+                            <div class="col-md-6">
+                                <br />
+                                <h6>Total Quantity Sold:</h6>
+                                <%= order.mostSoldProductDetails[i].totalQuantity %>
+
+                                <br />
+                                <h6>Price: ₹ <%= order.mostSoldProductDetails[i].price %></h6>
+                            </div>
+                        </div>
+                        <% } %> <% } else { %>
+                        <p>No product sold yet.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row">
@@ -258,133 +255,53 @@ include('../adminLayouts/navbar.ejs') %>
             <div class="col-12 grid-margin">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Order Status</h4>
+                        <h4 class="card-title">Recent Orders</h4>
                         <div class="table-responsive">
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>
-                                            <div class="form-check form-check-muted m-0">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input" />
-                                                </label>
-                                            </div>
-                                        </th>
+                                        <th>#</th>
                                         <th>Client Name</th>
-                                        <th>Order No</th>
-                                        <th>Product Cost</th>
-                                        <th>Project</th>
+                                        <th>Order Id</th>
+
+                                        <th>Total Amount</th>
                                         <th>Payment Mode</th>
-                                        <th>Start Date</th>
+                                        <th>Order Date</th>
                                         <th>Payment Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <% order.orderData.forEach(order => { %>
+
                                     <tr>
                                         <td>
-                                            <div class="form-check form-check-muted m-0">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input" />
-                                                </label>
+                                            <div class="col-sm-6 col-md-4 col-lg-3">
+                                                <i class="mdi mdi-arrow-right-bold"></i>
                                             </div>
                                         </td>
                                         <td>
                                             <img src="/static/admin/images/faces/face1.jpg" alt="image" />
-                                            <span class="pl-2">Henry Klein</span>
+                                            <span class="pl-2"><%= order.user.first_name %></span>
                                         </td>
-                                        <td>02312</td>
-                                        <td>$14,500</td>
-                                        <td>Dashboard</td>
-                                        <td>Credit card</td>
-                                        <td>04 Dec 2019</td>
+                                        <td><%= order.orderTrackId %></td>
+
+                                        <td>₹ <%= order.totalAmount %></td>
+
+                                        <td><%= order.paymentMethod %></td>
                                         <td>
-                                            <div class="badge badge-outline-success">Approved</div>
+                                            <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
+                                            'short', day: '2-digit' }).replace(/\//g, '-') %> %>
                                         </td>
-                                    </tr>
-                                    <tr>
                                         <td>
-                                            <div class="form-check form-check-muted m-0">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input" />
-                                                </label>
+                                            <div
+                                                id="status"
+                                                class="<%= order.paymentStatus === 'Paid' ? 'badge badge-outline-success' : (order.paymentMethod === 'Cash on Delivery' ? 'badge badge-outline-warning' : '') %>"
+                                            >
+                                                <%= order.paymentStatus %>
                                             </div>
                                         </td>
-                                        <td>
-                                            <img src="/static/admin/images/faces/face2.jpg" alt="image" />
-                                            <span class="pl-2">Estella Bryan</span>
-                                        </td>
-                                        <td>02312</td>
-                                        <td>$14,500</td>
-                                        <td>Website</td>
-                                        <td>Cash on delivered</td>
-                                        <td>04 Dec 2019</td>
-                                        <td>
-                                            <div class="badge badge-outline-warning">Pending</div>
-                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="form-check form-check-muted m-0">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input" />
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <img src="/static/admin/images/faces/face5.jpg" alt="image" />
-                                            <span class="pl-2">Lucy Abbott</span>
-                                        </td>
-                                        <td>02312</td>
-                                        <td>$14,500</td>
-                                        <td>App design</td>
-                                        <td>Credit card</td>
-                                        <td>04 Dec 2019</td>
-                                        <td>
-                                            <div class="badge badge-outline-danger">Rejected</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="form-check form-check-muted m-0">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input" />
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <img src="/static/admin/images/faces/face3.jpg" alt="image" />
-                                            <span class="pl-2">Peter Gill</span>
-                                        </td>
-                                        <td>02312</td>
-                                        <td>$14,500</td>
-                                        <td>Development</td>
-                                        <td>Online Payment</td>
-                                        <td>04 Dec 2019</td>
-                                        <td>
-                                            <div class="badge badge-outline-success">Approved</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="form-check form-check-muted m-0">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input" />
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <img src="/static/admin/images/faces/face4.jpg" alt="image" />
-                                            <span class="pl-2">Sallie Reyes</span>
-                                        </td>
-                                        <td>02312</td>
-                                        <td>$14,500</td>
-                                        <td>Website</td>
-                                        <td>Credit card</td>
-                                        <td>04 Dec 2019</td>
-                                        <td>
-                                            <div class="badge badge-outline-success">Approved</div>
-                                        </td>
-                                    </tr>
+                                    <% }) %>
                                 </tbody>
                             </table>
                         </div>
@@ -392,6 +309,70 @@ include('../adminLayouts/navbar.ejs') %>
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-sm-4 grid-margin">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Daily Sales</h5>
+                        <div class="row">
+                            <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                                <div class="d-flex d-sm-block d-md-flex align-items-center">
+                                    <h2 class="mb-0">
+                                        <%= order.dailySales.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })
+                                        %>
+                                    </h2>
+                                </div>
+                            </div>
+                            <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                                <i class="icon-lg mdi mdi-codepen text-primary ml-auto"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 grid-margin">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Monthy Sales</h5>
+                        <div class="row">
+                            <div class="col-8 col-sm-12 col-xl-8 my-auto p-0">
+                                <div class="d-flex d-sm-block d-md-flex align-items-center">
+                                    <h2 class="mb-0">
+                                        <%= order.monthlyRevenue.toLocaleString('en-IN', { style: 'currency', currency:
+                                        'INR' }) %>
+                                    </h2>
+                                </div>
+                            </div>
+                            <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right p-0">
+                                <i class="icon-lg mdi mdi-wallet-travel text-danger ml-auto"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 grid-margin">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Yearly Sales</h5>
+                        <div class="row">
+                            <div class="col-8 col-sm-12 col-xl-8 my-auto">
+                                <div class="d-flex d-sm-block d-md-flex align-items-center">
+                                    <h2 class="mb-0">
+                                        <%= order.yearlySales.toLocaleString('en-IN', { style: 'currency', currency: 'INR'
+                                        }) %>
+                                    </h2>
+                                </div>
+                            </div>
+                            <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
+                                <i class="icon-lg mdi mdi-monitor text-success ml-auto"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-6 col-xl-4 grid-margin stretch-card">
                 <div class="card">
@@ -567,81 +548,44 @@ include('../adminLayouts/navbar.ejs') %>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Visitors by Countries</h4>
-                        <div class="row">
-                            <div class="col-md-5">
-                                <div class="table-responsive">
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <i class="flag-icon flag-icon-us"></i>
-                                                </td>
-                                                <td>USA</td>
-                                                <td class="text-right">1500</td>
-                                                <td class="text-right font-weight-medium">56.35%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <i class="flag-icon flag-icon-de"></i>
-                                                </td>
-                                                <td>Germany</td>
-                                                <td class="text-right">800</td>
-                                                <td class="text-right font-weight-medium">33.25%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <i class="flag-icon flag-icon-au"></i>
-                                                </td>
-                                                <td>Australia</td>
-                                                <td class="text-right">760</td>
-                                                <td class="text-right font-weight-medium">15.45%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <i class="flag-icon flag-icon-gb"></i>
-                                                </td>
-                                                <td>United Kingdom</td>
-                                                <td class="text-right">450</td>
-                                                <td class="text-right font-weight-medium">25.00%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <i class="flag-icon flag-icon-ro"></i>
-                                                </td>
-                                                <td>Romania</td>
-                                                <td class="text-right">620</td>
-                                                <td class="text-right font-weight-medium">10.25%</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <i class="flag-icon flag-icon-br"></i>
-                                                </td>
-                                                <td>Brasil</td>
-                                                <td class="text-right">230</td>
-                                                <td class="text-right font-weight-medium">75.00%</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-md-7">
-                                <div id="audience-map" class="vector-map"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+        <div style="width: 80%; margin: auto">
+            <canvas id="ordersChart"></canvas>
         </div>
+
+       
+      
     </div>
     <!-- content-wrapper ends -->
     <!-- partial:partials/_footer.html -->
 
     <!-- partial -->
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sample data (replace this with your actual data)
+        const data = {
+            labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"],
+            datasets: [
+                {
+                    label: "Orders",
+                    borderColor: "rgb(75, 192, 192)",
+                    data: [1, 8, 15, 7, 12],
+                    fill: true,
+                },
+            ],
+        };
+
+        // Get the canvas element
+        const ctx = document.getElementById("ordersChart").getContext("2d");
+
+        // Create the chart
+        const ordersChart = new Chart(ctx, {
+            type: "line",
+            data: data,
+        });
+    });
+</script>
 
 <%- include('../adminLayouts/footer.ejs') %>

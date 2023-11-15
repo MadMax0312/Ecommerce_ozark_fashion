@@ -1,5 +1,8 @@
 
 function productValidForm() {
+
+  event.preventDefault()
+
   const nameError = document.getElementById("productname-error");
   const priceError = document.getElementById("price-error");
   const quantityError = document.getElementById("quantity-error");

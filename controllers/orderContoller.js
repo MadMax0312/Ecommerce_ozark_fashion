@@ -7,7 +7,8 @@ const Order = require("../models/orderModel");
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 const crypto = require('crypto');
-const Razorpay = require('razorpay')
+const Razorpay = require('razorpay');
+const randomString = require('randomstring');
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env;
 
 const razorpayInstance = new Razorpay({
@@ -57,6 +58,7 @@ const placeOrder = async (req, res) => {
         }else{
             payment = "Paid"
         }
+        const randomOrderId = Math.floor(Math.random() * 9000000) + 1000000;
 
         const order = new Order({
             user: user_id,
@@ -67,7 +69,10 @@ const placeOrder = async (req, res) => {
             createdAt: Date.now(),
             notes: notes,
             paymentStatus: payment,
+            orderTrackId: randomOrderId,
         });
+
+        console.log(order);
 
         await order.save();
 
@@ -105,6 +110,8 @@ const handleRazorpayPayment = async (req, res) => {
     try {
         const { razorpayOrderID, paymentID, signature } = req.body;
 
+        const userId = req.session.user_id;
+
         // Construct the string to sign
         const stringToSign = `${razorpayOrderID}|${paymentID}`;
 
@@ -122,7 +129,7 @@ const handleRazorpayPayment = async (req, res) => {
                 { new: true }
             );
 
-            await Cart.findOneAndDelete({ user_id: user_id });
+            await Cart.findOneAndDelete({ user_id: userId });
 
             if (!updatedOrder) {
                 console.error('Order not found or could not be updated');
@@ -221,7 +228,6 @@ const checkWalletBalance = async(req, res) => {
         const userData = await User.findById({ _id:userId });
 
         const userWalletBalance = userData.wallet;
-        console.log("walletBalaceffffffffffffffffffffffffffff", userWalletBalance)
         res.json({ walletBalance: userWalletBalance });
 
     }catch(error){

@@ -12,19 +12,19 @@ const loadOrder = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 10; // Adjust the number of orders per page as needed
 
-        const searchQuery = req.query.search || '';
-        const statusFilter = req.query.status || '';
+        const searchQuery = req.query.search || "";
+        const statusFilter = req.query.status || "";
 
         const filter = {};
         if (searchQuery) {
             filter.$or = [
-                { '_id': { $regex: searchQuery, $options: 'i' } },
+                { _id: { $regex: searchQuery, $options: "i" } },
                 // Add more fields for search as needed
             ];
         }
 
         if (statusFilter) {
-            filter['products.status'] = statusFilter;
+            filter["products.status"] = statusFilter;
         }
 
         const orders = await Order.find(filter)
@@ -57,7 +57,7 @@ const loadOrder = async (req, res) => {
         // Get order summary statistics
         const totalSales = await Order.aggregate([
             { $match: filter },
-            { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
+            { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
         ]);
 
         const orderSummary = {
@@ -79,24 +79,23 @@ const loadOrder = async (req, res) => {
     }
 };
 
-
 const viewDetails = async (req, res) => {
-  try {
-      const orderId = req.query.id;
-      const latestOrder = await Order.findById({ _id: orderId })
-          .populate({
-              path: "address",
-          })
-          .populate({
-              path: "products.productId",
-          });
+    try {
+        const orderId = req.query.id;
+        const latestOrder = await Order.findById({ _id: orderId })
+            .populate({
+                path: "address",
+            })
+            .populate({
+                path: "products.productId",
+            });
 
-      res.render("orderInfo", {
-          order: latestOrder,
-      });
-  } catch (error) {
-      console.log(error.message);
-  }
+        res.render("orderInfo", {
+            order: latestOrder,
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
 };
 
 const updateProductStatus = async (req, res) => {
@@ -107,35 +106,28 @@ const updateProductStatus = async (req, res) => {
 
         // Update product status
         const order = await Order.findOneAndUpdate(
-            { 
+            {
                 _id: orderId,
-                'products._id': productId 
+                "products._id": productId,
             },
             {
                 $set: {
-                    'products.$.status': productStatus
-                }
+                    "products.$.status": productStatus,
+                },
             },
             { new: true }
-        ).populate('products.productId');
-
-       
-        console.log("11111111",order)
+        ).populate("products.productId");
 
         const updatedOrder = await Order.findById(orderId);
 
-        console.log("222222222222222",updatedOrder)
-
-
-
         // Update payment status if all products are delivered
-        if (productStatus === 'Delivered') {
+        if (productStatus === "Delivered") {
             await Order.findByIdAndUpdate(
                 orderId,
                 {
                     $set: {
-                        paymentStatus: 'Paid'
-                    }
+                        paymentStatus: "Paid",
+                    },
                 },
                 { new: true }
             );
@@ -143,14 +135,10 @@ const updateProductStatus = async (req, res) => {
 
         res.json({ order });
     } catch (error) {
-        console.error('Error updating product status:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error("Error updating product status:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };
-
-
-
-
 
 module.exports = {
     loadOrder,

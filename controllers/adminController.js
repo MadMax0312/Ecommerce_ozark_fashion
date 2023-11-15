@@ -33,12 +33,9 @@ const verifyLogin = async (req, res) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
-        console.log(password);
 
         const adminData = await Admin.findOne({ email: email });
-        console.log(adminData);
         if (adminData) {
-            console.log("helloo");
 
             const passwordMatch = await bcrypt.compare(password, adminData.password);
 
