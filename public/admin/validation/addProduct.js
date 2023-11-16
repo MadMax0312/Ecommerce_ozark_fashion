@@ -1,7 +1,18 @@
 
-function productValidForm() {
+function productValidForm(event) {
 
-  event.preventDefault()
+  event.preventDefault();
+
+  const isValid = validateForm(); // Your client-side validation logic
+
+  if (isValid) {
+    // If client-side validation passes, allow the form to submit
+    event.currentTarget.submit();
+  }
+  // If validation fails, the form will not be submitted
+}
+
+function validateForm() {
 
   const nameError = document.getElementById("productname-error");
   const priceError = document.getElementById("price-error");

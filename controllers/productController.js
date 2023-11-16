@@ -82,6 +82,11 @@ const addProducts = async (req, res) => {
           images[i] = req.files[i].filename;
       }
 
+      if (!productname || !size || !price || !quantity || !description) {
+        // Return validation error response
+        return res.status(400).json({ error: "All fields are required." });
+      }
+
       console.log("kjhgffg");
       const newProduct = new Product({
           productname: productname,
@@ -89,7 +94,6 @@ const addProducts = async (req, res) => {
           size: size,
           description: description,
           price: price,
-      
           image: images,
           quantity: quantity,
           status: true,
