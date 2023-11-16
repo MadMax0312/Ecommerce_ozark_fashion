@@ -31,29 +31,40 @@ const loadAddCategories = async (req, res) => {
 //=================Adding Category-----=====================//
 
 const addCategory = async (req, res) => {
-  try {
+    try {
       const categoryname = req.body.categoryname;
       const categorydes = req.body.categorydes;
-
-      const data = new Category({
-          categoryname: categoryname,
-          description: categorydes,
-          status: true,
-      });
-
-      console.log(data);
-
-      const categoryData = await data.save();
-
-      if (categoryData) {
-          res.redirect("/admin/categories");
-      } else {
-          res.render("addCategories", { message: "Something went wrong" });
+  
+      // Check if the category with the same name already exists
+      const existingCategory = await Category.findOne({ categoryname: categoryname });
+  
+      if (existingCategory) {
+        // Category with the same name already exists, send an error message
+        return res.render("addCategories", { message: "Category with the same name already exists" });
       }
-  } catch (error) {
+  
+      // Create a new category
+      const newCategory = new Category({
+        categoryname: categoryname,
+        description: categorydes,
+        status: true,
+      });
+  
+      const categoryData = await newCategory.save();
+  
+      if (categoryData) {
+        // Category added successfully, redirect to the categories page
+        res.redirect("/admin/categories");
+      } else {
+        // Error while adding category, show error message
+        res.render("addCategories", { message: "Something went wrong" });
+      }
+    } catch (error) {
       console.log(error.message);
-  }
-};
+      res.status(500).send("Internal Server Error");
+    }
+  };
+  
 
 ///==============To unlist Category----=================================
 

@@ -66,22 +66,14 @@ include('../adminLayouts/navbar.ejs') %>
                             <textarea class="form-control" id="description" rows="4" name="description"></textarea>
                             <p id="description-error" class="error-message" style="color: red"></p>
                         </div>
+
                         <div class="container-fluid">
                             <label for="">File upload (Multiple Images)</label>
                             <div class="row">
                                 <div class="col-md-6 mb-0">
                                     <div class="dynamic-image-inputs">
-                                        <div class="input-group mb-3">
-                                            <div class="custom-file">
-                                                <input type="file" class="custom-file-input" id="image" name="images" />
-                                                <label class="custom-file-label" for="image">Choose file</label>
-                                            </div>
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary add-image-input" type="button">
-                                                    Add Image
-                                                </button>
-                                            </div>
-                                        </div>
+                                        <!-- Add Image button -->
+                                        <button class="btn btn-primary add-image-input" type="button">Add Image</button>
                                     </div>
                                 </div>
                             </div>
@@ -172,7 +164,7 @@ include('../adminLayouts/navbar.ejs') %>
         const allImagePreviewsContainer = document.getElementById("allImagePreviews");
 
         // Track the number of added images
-        let imageCount = 1;
+        let imageCount = 0;
 
         addImageButton.addEventListener("click", function () {
             if (imageCount < 4) {
@@ -294,5 +286,4 @@ include('../adminLayouts/navbar.ejs') %>
         }
     });
 </script>
-
 <%- include('../adminLayouts/footer.ejs') %>

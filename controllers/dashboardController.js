@@ -15,6 +15,59 @@ const loadDashboard = async (req, res) => {
       const productCount = await Product.find().countDocuments();
       const orderCount = await Order.find().countDocuments();
 
+      const categoryCount = await Order.aggregate([
+        {
+            $match: {
+                paymentStatus: 'Paid',
+            },
+        },
+        {
+            $unwind: '$products',
+        },
+        {
+            $lookup: {
+                from: 'products',
+                localField: 'products.productId',
+                foreignField: '_id',
+                as: 'productDetails',
+            },
+        },
+        {
+            $unwind: '$productDetails',
+        },
+        {
+            $lookup: {
+                from: 'categories', 
+                localField: 'productDetails.category',
+                foreignField: '_id',
+                as: 'categoryDetails',
+            },
+        },
+        {
+            $unwind: '$categoryDetails',
+        },
+        {
+            $group: {
+                _id:'$categoryDetails.categoryname',
+                count:{$sum:'$products.quantity'}
+            },
+        },
+     
+    ])
+
+    const paymentMethod = await Order.aggregate([
+    
+        {
+            $group: {
+                _id:'$paymentStatus',
+                count:{$sum:1}
+            }
+        }
+    ])
+
+    console.log("dsfdsafd",paymentMethod);
+
+
        // Total Sales Amount
        const totalSales = await Order.aggregate([
         { $match: { paymentStatus: 'Paid' } }, // You may adjust the match criteria as needed
@@ -41,6 +94,7 @@ const loadDashboard = async (req, res) => {
         { $sort: { totalQuantity: -1 } },
         { $limit: 3 },
     ]);
+
 
     const mostSoldProductDetails = await Promise.all(
       mostSoldProduct.map(async (product) => {

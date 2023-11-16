@@ -52,6 +52,8 @@ const dashboardController = require("../controllers/dashboardController");
 
 const salesController = require("../controllers/salesController");
 
+const couponController = require("../controllers/couponController");
+
 
 admin_route.get("/", auth.isLogout, adminController.loadLogin);
 
@@ -105,7 +107,9 @@ admin_route.get("/unlist-category", auth.isLogin, categoryController.unlistCateg
 
 admin_route.get("/banner", auth.isLogin, adminController.loadBanner);
 
-admin_route.get("/coupons", auth.isLogin, adminController.loadCoupons);
+admin_route.get("/coupons", auth.isLogin, couponController.loadCoupons);
+
+admin_route.get('/addCoupons', auth.isLogin, couponController.loadAddCoupons);
 
 admin_route.get("/orders", auth.isLogin, adminOrderController.loadOrder);
 

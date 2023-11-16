@@ -379,8 +379,6 @@ const login = async (req, res) => {
 };
 
 
-
-
 //-------loading shop page------------//
 
 
@@ -406,14 +404,11 @@ const loadShop = async (req, res) => {
         const category = await Category.find();
         const categoryNames = category.map((categoryObj) => categoryObj.categoryname);
         const cname = categoryNames.join("\n");
-        console.log(cname);
 
         let categoryFilter = {};
         if (req.query.gender) {
             categoryFilter = { "category.categoryname": req.query.gender };
         }
-
-        console.log(categoryFilter);
 
         const count = await Product.countDocuments({
             $and: [
@@ -449,7 +444,6 @@ const loadShop = async (req, res) => {
 
         productData.forEach((product) => {
             product.price = parseFloat(product.price); // or parseInt(product.price) for integer values
-            console.log(product.price);
         });
 
         res.render("shop", {
@@ -477,9 +471,9 @@ const loadProductInfo = async (req, res) => {
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
 
-        const pddata = await Product.find();
+        const products = await Product.find({ status: true });
 
-        res.render("productInfo", { Product: product, data: pddata, user: req.session.user_id, count: totalProductsInCart });
+        res.render("productDetails", { Product: product, data: products, user: req.session.user_id, count: totalProductsInCart });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");

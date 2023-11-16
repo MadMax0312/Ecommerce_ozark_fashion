@@ -32,7 +32,8 @@
     "otp-generator": "^4.0.1",
     "ra": "^0.9.7",
     "randomstring": "^1.3.0",
-    "razorpay": "^2.9.2"
+    "razorpay": "^2.9.2",
+    "sweetalert2": "^11.10.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

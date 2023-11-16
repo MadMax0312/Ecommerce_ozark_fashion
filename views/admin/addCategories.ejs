@@ -13,11 +13,9 @@
                   <h4 class="card-title">Add Category</h4>
                   <form class="forms-sample" action="" method="post" onsubmit="return validForm()">
 
-                    <% if (typeof message !== 'undefined') { %>
-                      <div id="invalid-msg" class="alert alert-danger text-center mt-3">
-                        <h4><%- message %></h4>
-                      </div>
-                    <% } %>
+                    <% if(typeof message !== 'undefined'){ %>
+                      <h6 id="invalid-msg" class="text-danger text-center"><%- message %></h6>
+                  <% } %>
 
                     <div class="form-group">
                       <label for="exampleInputName1">Category Name</label>

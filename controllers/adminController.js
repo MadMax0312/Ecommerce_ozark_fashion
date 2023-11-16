@@ -146,13 +146,7 @@ const loadBanner = async (req, res) => {
     }
 };
 
-const loadCoupons = async (req, res) => {
-    try {
-        res.render("coupons");
-    } catch (error) {
-        console.log(error.message);
-    }
-};
+
 
 const loadOrder = async (req, res) => {
     try {
@@ -170,6 +164,5 @@ module.exports = {
     loadUsers,
     blockUsers,
     loadBanner,
-    loadCoupons,
     loadOrder,
 };

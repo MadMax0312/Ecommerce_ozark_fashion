@@ -71,6 +71,7 @@ const exportReport = async (req, res) => {
       'Order Date': order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-'),
       'Amount': order.totalAmount,
       'Payment': order.paymentMethod,
+      'Payment Status': order.paymentStatus,
       'Status': order.products[0].status,
     }));
 

@@ -1,4 +1,5 @@
 function validForm() {
+    
   document.getElementById('categoryname-error').textContent = '';
   document.getElementById('categorydes-error').textContent = '';
 

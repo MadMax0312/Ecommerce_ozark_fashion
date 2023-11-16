@@ -1,0 +1,46 @@
+<%- include('../adminLayouts/header.ejs') %>
+<%- include('../adminLayouts/sidebar.ejs') %>
+<%- include('../adminLayouts/navbar.ejs') %>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center">COUPONS</h2>
+                    <form action="" method="post" class="forms-sample" onsubmit="return couponValid()">
+                        <div class="form-group">
+                            <label for="exampleInputName1">Coupon Name</label>
+                            <input type="text" class="form-control" id="couponName" placeholder="Name" onkeyup="this.value = this.value.toUpperCase();"   />
+                            <span id="couponNameError" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail3">Coupon Discount(in %)</label>
+                            <input type="number" class="form-control" id="couponDiscount" placeholder="Discount"  />
+                            <span id="couponDiscountError" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword4">Minimum Purchase</label>
+                            <input type="number" class="form-control" id="minPurchase" placeholder="Purchase"  />
+                            <span id="minPurchaseError" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputCity1">Starting Date</label>
+                            <input type="date" class="form-control" id="startDate"  />
+                            <span id="startDateError" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputCity1">Expiry Date</label>
+                            <input type="date" class="form-control" id="expiryDate"  />
+                            <span id="expiryDateError" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                        <button class="btn btn-dark">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../adminLayouts/footer.ejs') %>

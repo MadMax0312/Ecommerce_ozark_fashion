@@ -2,6 +2,8 @@
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const fs = require('fs');
+const Swal = require('sweetalert2');
+
 
 const viewProducts = async (req, res) => {
   try {
@@ -71,43 +73,52 @@ const loadaddProducts = async (req, res) => {
 const addProducts = async (req, res) => {
   try {
     console.log("Enterrrr");
-      const productname = req.body.productname;
-      const category = req.body.category;
-      const size = req.body.size;
-      const description = req.body.description;
-      const price = req.body.price;
-      const quantity = req.body.quantity;
-      const images = [];
-      for (let i = 0; i < req.files.length; i++) {
-          images[i] = req.files[i].filename;
-      }
+    const productname = req.body.productname;
+    const category = req.body.category;
+    const size = req.body.size;
+    const description = req.body.description;
+    const price = req.body.price;
+    const quantity = req.body.quantity;
+   
+    const images = [];
 
-      if (!productname || !size || !price || !quantity || !description) {
-        // Return validation error response
-        return res.status(400).json({ error: "All fields are required." });
-      }
+    for (let i = 0; i < req.files.length; i++) {
+      images[i] = req.files[i].filename;
+    }
 
-      console.log("kjhgffg");
-      const newProduct = new Product({
-          productname: productname,
-          category: category,
-          size: size,
-          description: description,
-          price: price,
-          image: images,
-          quantity: quantity,
-          status: true,
-      });
-      const productData = await newProduct.save();
-      console.log(productData);
-      if (productData) {
-          res.redirect("/admin/add-products");
-      } else {
-          res.render("addProducts", { message: "Something went wrong" });
-      }
+    if (!productname || !size || !price || !quantity || !description) {
+      // Return validation error response
+      return res.status(400).json({ error: "All fields are required." });
+    }
+
+    console.log("kjhgffg");
+    const newProduct = new Product({
+      productname: productname,
+      category: category,
+      size: size,
+      description: description,
+      price: price,
+      image: images,
+      quantity: quantity,
+      createdAt: Date.now(),
+      status: true,
+    });
+
+    const productData = await newProduct.save();
+    console.log(productData);
+
+    if (productData) {
+     
+        res.redirect("/admin/view-products");
+     
+    } else {
+    
+        res.render("addProducts", { message: "Something went wrong" });
+     
+    }
   } catch (error) {
-      console.error(error);
-      res.status(500).send("Internal Server Error");
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 };
 
