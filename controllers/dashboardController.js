@@ -52,22 +52,18 @@ const loadDashboard = async (req, res) => {
                 count:{$sum:'$products.quantity'}
             },
         },
-     
     ])
 
     const paymentMethod = await Order.aggregate([
     
         {
             $group: {
-                _id:'$paymentStatus',
+                _id:'$paymentMethod',
                 count:{$sum:1}
             }
         }
     ])
-
-    console.log("dsfdsafd",paymentMethod);
-
-
+   
        // Total Sales Amount
        const totalSales = await Order.aggregate([
         { $match: { paymentStatus: 'Paid' } }, // You may adjust the match criteria as needed
@@ -177,10 +173,6 @@ const loadDashboard = async (req, res) => {
     })
     .limit(5)
 
-    console.log(totalPurchase)
-    console.log(totalProductsSold)
-    console.log(totalSales)
-
 
     const orderSummary = {
         totalSales: totalSales.length > 0 ? totalSales[0].totalAmount : 0,
@@ -196,7 +188,9 @@ const loadDashboard = async (req, res) => {
         razorRevenue: RazorPayRevenue.length > 0 ? RazorPayRevenue[0].totalAmount : 0,
         walletRevenue: walletRevenue.length > 0 ? walletRevenue[0].totalAmount : 0,
         cashOnDeliveryRevenue: cashOnDeliveryRevenue.length > 0 ? cashOnDeliveryRevenue[0].totalAmount : 0,
-        orderData:orderData,
+        orderData: orderData,
+        paymentMethod: paymentMethod,
+        categoryCount: categoryCount,
     };
 
       res.render("home", {

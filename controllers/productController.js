@@ -109,7 +109,7 @@ const addProducts = async (req, res) => {
 
     if (productData) {
      
-        res.redirect("/admin/view-products");
+        res.render("addproducts", { message: "Product Added Successfully" });
      
     } else {
     

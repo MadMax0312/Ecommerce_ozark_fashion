@@ -107,21 +107,33 @@ admin_route.get("/unlist-category", auth.isLogin, categoryController.unlistCateg
 
 admin_route.get("/banner", auth.isLogin, adminController.loadBanner);
 
-admin_route.get("/coupons", auth.isLogin, couponController.loadCoupons);
-
-admin_route.get('/addCoupons', auth.isLogin, couponController.loadAddCoupons);
-
 admin_route.get("/orders", auth.isLogin, adminOrderController.loadOrder);
 
 admin_route.get('/orderDetailss', adminOrderController.viewDetails);
 
 admin_route.post('/updateProductStatus', adminOrderController.updateProductStatus);
 
-//============================================================================================
+//===================== C O U P O N - S E C T I O N  ======================================================================
+
+admin_route.get("/coupons", auth.isLogin, couponController.loadCoupons);
+
+admin_route.get('/addCoupons', auth.isLogin, couponController.loadAddCoupons);
+
+admin_route.post('/addCoupons', couponController.addCoupon);
+
+admin_route.get('/editCoupons', auth.isLogin, couponController.loadEditCoupon);
+
+admin_route.post('/editCoupons', couponController.editCoupon);
+
+admin_route.get('/delete-coupons', couponController.deleteCoupon);
+
+//=====================================================================================================
 
 admin_route.get("/sales", auth.isLogin, salesController.loadSales);
 
-admin_route.get("/export-sales", salesController.exportReport);
+admin_route.get("/export-sales", auth.isLogin, salesController.exportReport);
+
+
 
 
 

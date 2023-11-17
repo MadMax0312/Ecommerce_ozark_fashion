@@ -1,45 +1,97 @@
-<%- include('../adminLayouts/header.ejs') %>
-<%- include('../adminLayouts/sidebar.ejs') %>
-<%- include('../adminLayouts/navbar.ejs') %>
-        <!-- partial -->
-        <div class="main-panel">
-          <div class="content-wrapper">
+<%- include('../adminLayouts/header.ejs') %> <%- include('../adminLayouts/sidebar.ejs') %> <%-
+include('../adminLayouts/navbar.ejs') %>
+<style>
+  .table thead th, .jsgrid .jsgrid-table thead th {
+    font-weight: 700;
+    color: #f8f9f3;
+}
+.table, .jsgrid .jsgrid-table {
+    color: #fff;
+}
+</style>
 
-
-            <div class="col-12 grid-margin stretch-card">
-              <div class="card">
+<!--============================ Adding categories table=============== -->
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
                 <div class="card-body">
-                  <h2 class="card-title" >COUPONS</h2>
-                  <form class="forms-sample">
-                    <div class="form-group">
-                      <label for="exampleInputName1">Name</label>
-                      <input type="text" class="form-control" id="exampleInputName1" placeholder="Name">
+                    <h2 class="card-title" style="text-align: center">COUPONS</h2>
+                    <div class="table-responsive">
+                        <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Name</th>
+                                    <th>Discount(%)</th>
+                                    <th>Min. Purchase</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th style="text-align: end;">Action</th>
+                                </tr>
+                            </thead>
+
+                            <% if (data.length > 0) { for (let i = 0; i < data.length; i++) { %>
+                            <tr>
+                                <td><%= i+1 %></td>
+                                <td><%= data[i].couponName %></td>
+                                <td><%= data[i].discountPercentage %></td>
+                                <td><%= data[i].minimumPurchase %></td>
+                                <td><%= data[i].startingDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %> %></td>
+                                <td><%= data[i].expiryDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %> %></td>
+                                <td>
+                                    <a href="/admin/editCoupons">
+                                        <a
+                                            href="/admin/editCoupons?id=<%= data[i]._id %>"
+                                            class="btn btn-outline-secondary btn-icon-text btn-warning"
+                                            style="color: black;"
+                                        >
+                                            Edit <i class="mdi mdi-file-check btn-icon-append"></i>
+                                        </a>
+                                    </a>
+                                </td>
+                                <td>
+
+                                  <a
+                                  href="/admin/delete-coupons?id=<%= data[i]._id %>"
+                                  class="btn btn-outline-secondary btn-icon-text btn-danger"
+                                  style="color: black;"
+                                  onclick="confirmRemove(event)"
+                              >
+                                  Delete <i class="mdi mdi-file-check btn-icon-append"></i>
+                              </a>
+                              
+                                </td>
+                            </tr>
+                            <% } } %>
+                        </table>
                     </div>
-                    <div class="form-group">
-                      <label for="exampleInputEmail3">Email address</label>
-                      <input type="email" class="form-control" id="exampleInputEmail3" placeholder="Email">
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputPassword4">Password</label>
-                      <input type="password" class="form-control" id="exampleInputPassword4" placeholder="Password">
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleInputCity1">City</label>
-                      <input type="text" class="form-control" id="exampleInputCity1" placeholder="Location">
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleTextarea1">Textarea</label>
-                      <textarea class="form-control" id="exampleTextarea1" rows="4"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
-                    <button class="btn btn-dark">Cancel</button>
-                  </form>
                 </div>
-              </div>
             </div>
-
-
-          </div>
         </div>
-  
-    <%- include('../adminLayouts/footer.ejs') %>
+    </div>
+</div>
+
+<script>
+  function confirmRemove(event) {
+      event.preventDefault();
+
+      Swal.fire({
+          title: "Are you sure?",
+          text: "You are about to remove this Coupon. Continue?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+      }).then((result) => {
+          if (result.isConfirmed) {
+              // If user clicks "OK", proceed with the removal
+              window.location.href = event.target.href;
+          }
+      });
+  }
+</script>
+
+<%- include('../adminLayouts/footer.ejs') %>

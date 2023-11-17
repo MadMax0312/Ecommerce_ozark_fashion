@@ -91,7 +91,7 @@
             if (event.target.matches(".addToCartBtn")) {
                 const productId = event.target.getAttribute("data-product-id");
                 const quantity = 1; // Set the quantity to the desired value
-
+    
                 try {
                     const response = await fetch("/addToCart", {
                         method: "POST",
@@ -100,19 +100,31 @@
                         },
                         body: JSON.stringify({ id: productId, quantity: quantity }),
                     });
-
+    
                     const data = await response.json();
-
+    
                     if (response.ok) {
-                        // Show success message as an alert
-                        alert(data.message);
+                        // Show success message using SweetAlert
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message,
+                        });
                     } else {
-                        // Show error message as an alert
-                        alert(data.message || "An error occurred while adding the product to the cart.");
+                        // Show error message using SweetAlert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'An error occurred while adding the product to the cart.',
+                        });
                     }
                 } catch (error) {
-                    // Show error message as an alert
-                    alert("An error occurred while adding the product to the cart.");
+                    // Show error message using SweetAlert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while adding the product to the cart.',
+                    });
                     console.error("There was a problem with the fetch operation:", error);
                 }
             }
