@@ -881,14 +881,14 @@
                                 text: "Your address has been added successfully!",
                                 timer: 1000,
                                 showConfirmButton: false,
-                            });
-
+                            })
+                            location.reload()
                             return response.json(); // or return response.text() based on the server response
                         }
                         throw new Error("Network response was not ok.");
                     })
                     .then((data) => {
-                        // Handle data from the server
+                        
                         console.log(data); // Log the response data from the server
                     })
                     .catch((error) => {
@@ -958,9 +958,9 @@
             return false;
         }
 
-        const pincodeRegex = /^\d{4}$/;
+        const pincodeRegex = /^\d{6}$/;
 
-        if (!pincodes || !pincode.match(pincodeRegex)) {
+        if (!pincodes || !pincodes.match(pincodeRegex)) {
             pincodeError.textContent = "Pincode should be a 6-digit numeric value.";
             setTimeout(function () {
                 pincodeError.textContent = "";
@@ -1039,6 +1039,7 @@
                     if (response.ok) {
                         // Parse the response JSON data
                         const updatedAddressData = await response.json();
+            
 
                         Swal.fire({
                             icon: "success",
