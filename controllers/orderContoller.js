@@ -8,6 +8,12 @@ const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
+const puppeteer = require('puppeteer');
+const fs = require("fs");
+const path = require("path");
+const ejs = require('ejs');
+
+
 const randomString = require('randomstring');
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env;
 
@@ -151,6 +157,7 @@ const handleRazorpayPayment = async (req, res) => {
 const orderDetails = async (req, res) => {
     try {
         const userId = req.session.user_id;
+
         const totalProductsInCart = await getTotalProductsInCart(userId);
         const userData = await User.findById({ _id: userId });
 
@@ -173,7 +180,7 @@ const orderDetails = async (req, res) => {
             return item._id.toString() === productsObjectId.toString();
         });
 
-        res.render('invoice', {
+        res.render('orderDetails', {
             user: userId,
             userData: userData,
             count: totalProductsInCart,
@@ -285,6 +292,61 @@ const walletTransaction = async(req, res) => {
     }
 }
 
+const invoiceDownload = async (req, res, next) => {
+    try {
+      const { orderId } = req.query;
+      console.log('orderId:', orderId);
+  
+      // const orderData = await Order.findById(orderId).populate('cart.products.productId');
+      const orderData = await Order.findById(orderId).populate('products.productId').populate('user');
+  
+      console.log('orderData:', orderData);
+  
+      if (!orderData) {
+        // Handle the case where the order with the specified orderId doesn't exist
+        console.log('Order not found');
+        return res.status(404).send('Order not found');
+      }
+  
+      const userId = req.session.user_id;
+
+      const userData = await User.findById(userId);
+      console.log('userData:', userData);
+  
+      const date = new Date();
+      console.log('date:', date);
+  
+      const data = {
+        orderData: orderData,
+        userData: userData,
+        date,
+
+      };
+  
+      const filepathName = path.resolve(__dirname, "../views/users/invoice.ejs");
+      const html = fs.readFileSync(filepathName).toString();
+      const ejsData = ejs.render(html, data);
+  
+      console.log('ejsData:', ejsData);
+  
+      const browser = await puppeteer.launch({ headless: true });
+      const page = await browser.newPage();
+      await page.setContent(ejsData, { waitUntil: "networkidle0" });
+      const pdfBytes = await page.pdf({ format: "Letter" });
+      await browser.close();
+  
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=order_invoice.pdf"
+      );
+      res.send(pdfBytes);
+    } catch (error) {
+      console.error('Error in invoiceDownload:', error);
+      next(error);
+    }
+  };
+
 
 module.exports = {
     loadOrder,
@@ -294,4 +356,5 @@ module.exports = {
     handleRazorpayPayment,
     checkWalletBalance,
     walletTransaction,
+    invoiceDownload
 };

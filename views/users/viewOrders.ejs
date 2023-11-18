@@ -31,7 +31,7 @@
                                     <th>Amount</th>
                                     <th>Payment</th>
                                     <th>Expected Delivery</th>
-                                    <th>Tracking Number</th>
+                                    <th>Order Id</th>
                                     <th>Details</th>
                                 </tr>
                             </thead>
@@ -49,12 +49,18 @@
                              
 
                                     <td><%= orders[i].formattedDeliveryDate %></td>
-                                    <td>okkk</td>
+                                    <td><%= orders[i].orderTrackId %></td>
                                     <td>
-                                        <a href="/orderDetails?id=<%= orders[i]._id %>" class="btn-outline-dark btn-round"
+                                        <a href="/orderDetails?id=<%= orders[i]._id %>" class="btn-sm btn-outline-dark btn-round btn-primary" style="color: white;"
                                             >View Details</a
                                         >
                                     </td>
+                                    <td>
+                                        <a href="/downloadInvoice?orderId=<%= orders[i]._id %>" class="btn-sm btn-round" style="color: black; background-color: gray;">
+                                            Download Invoice
+                                        </a>
+                                    </td>
+                                    
                                 </tr>
                                 <% } %> <% } else { %>
                                 <tr>

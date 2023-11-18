@@ -223,24 +223,32 @@ const loadOrderPage = async (req, res) => {
 const viewDetails = async (req, res) => {
     try {
         const userId = req.session.user_id;
+        const orderId = req.query.id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
         const userData = await User.findById({ _id: userId });
 
-        const orderId = req.query.id;
-
         const latestOrder = await Order.findById({ _id: orderId })
             .populate({
-                path: "address",
-            })
-            .populate({
                 path: "products.productId",
-            });
+            })
+            .sort({ createdAt: -1 });
 
-        res.render("order", {
+            if (!latestOrder) {
+                return res.status(404).json({
+                  success: false,
+                  message: "No orders found for the user.",
+                });
+              }
+
+          
+
+              console.log("data", latestOrder)
+
+        res.render("orderDetails", {
             user: userId,
             userData: userData,
             count: totalProductsInCart,
-            data: [latestOrder],
+            order: latestOrder,
         });
     } catch (error) {
         console.log(error.message);

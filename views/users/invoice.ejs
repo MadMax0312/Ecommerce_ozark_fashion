@@ -1,243 +1,259 @@
-<%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
+<!DOCTYPE html>
+<html lang="en">
 
-<style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Invoice</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-  .hot{
-    color: black;
-  }
+        /* Header styles */
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+        }
 
-</style>
+        /* Content container styles */
+        .container {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
 
-<section class="gradient-custom-2">
-  <div class="container py-2 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-md-10 col-lg-8 col-xl-6">
-        <div class="card card-stepper" style="border-radius: 16px;">
-          <div class="card-header p-4">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <p class="text-muted mb-2"> Order ID: &nbsp; <span class="fw-bold text-body"><%= order._id %></span></p>
-                <p class="text-muted mb-0"> Placed On:  &nbsp;<span class="fw-bold text-body"> <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
-                  'short', day: '2-digit' }).replace(/\//g, '-') %></span> </p>
-              </div>
-              <div>
-                <h6 class="mb-0"> <a href="#">View Details</a> </h6>
-              </div>
-            </div>
-          </div>
-          <div class="card-body p-4">
-            <div class="d-flex flex-row mb-4 pb-2">
-              <div class="flex-fill">
-                <h3 class="hot"><%= product.productId.productname %></h3>
-                <h6 class="hot"><%= product.productId.description %></h5>
-                <p class="hot">Qty: <%= product.quantity %></p>
-                <h5 class="hot" style="font-weight: 600;">Total: <%= product.subtotal %></h5>
-                <h6 class="hot"><span class="hot"><%= order.paymentMethod %> </span></h6>
-                <h5 class="hot">Payment: <span class="hot"><%= order.paymentStatus %> </span></h5>
-                <p class="text-muted">Tracking Status on: <span class="text-body">11:30pm, Today</span></p>
-              </div>
-              <div>
-                <img class="align-self-center img-fluid"
-                src="/static/admin/Assets/images/products/<%= product.productId.image[0] %>" width="150">
-              </div>
-            </div>
+        /* Card styles */
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-            <% if (product.status !== "Cancelled") { %>
-              <div class="progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Order Placed' ? 1 : (product.status === 'Shipped' ? 2 : (product.status === 'Out for Delivery' ? 3 : (product.status === 'Delivered' ? 4 : 0))) %>">
-                  <ul id="progressbar">
-                      <li style="font-size: 12px;" class="step <%= product.status === 'Order Placed' ? 'active' : '' %>" id="step1">Order Placed</li>
-                      <li style="font-size: 12px;text-align: center;" class="step <%= product.status === 'Shipped' ? 'active' : '' %>" id="step2">Shipped</li>
-                      <li style="font-size: 12px;text-align: center;" class="step <%= product.status === 'Out for Delivery' ? 'active' : '' %>" id="step3">Out for Delivery</li>
-                      <li style="font-size: 12px;text-align: right;" class="step <%= product.status === 'Delivered' ? 'active' : '' %>" id="step4">Delivered</li>
-                  </ul>
-              </div>
-              <% } else { %>
-                <!-- Separate progress bar for cancelled orders -->
-            
-                  <div class="cancelled-progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Order Placed' ? 1 : (product.status === 'Cancelled' ? 2 : 0) %>">
-                    <ul class="cancelled-progressbar">
-                      <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>">Order Placed</li>
-                      <li class="step <%= product.status === 'Cancelled' ? 'active text-danger' : '' %>">Cancelled</li>
-                    </ul>
-                    
-                  </div>
-               
-              <% } %>
-          
+        /* Invoice styles */
+        .invoice {
+            color: black;
+            padding: 20px;
+        }
 
-          </div>
+        /* User info styles */
+        .user-info {
+            margin-top: 20px;
+        }
 
-          <div class="card-footer p-4">
-            <div class="d-flex justify-content-between">
-                <h5 class="fw-normal mb-0">
-                    <a href="#!" id="trackLink">Track</a>
-                </h5>
-                <div class="border-start h-100"></div>
-        
-                <div class="border-start h-100"></div>
-                <% if (product.status === "Delivered") { %>
-                    <h5 class="fw-normal mb-0"><a href="#!" id="returnLink">Return</a></h5>
-                <% } else { %>
-                    <h5 class="fw-normal mb-0 disabled-link">Return</h5>
-                <% } %>
-        
-                <% if (product.status !== "Delivered" && product.status !== "Cancelled") { %>
-                    <h5 class="fw-normal mb-0"><a href="#!" id="cancelLink">Cancel</a></h5>
-                <% } else { %>
-                    <h5 class="fw-normal mb-0 disabled-link">Cancel</h5>
-                <% } %>
-        
-                <% if (product.status === "Cancelled") { %>
-                    <style>
-                        #progressbar li {
-                            background-color: red;
-                        }
-                    </style>
-                    <p class="text-danger">Order Cancelled</p>
-                <% } %>
+        /* Order details styles */
+        .order-details {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            padding: 20px;
+        }
+
+        /* Product details styles */
+        .product-details {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .product-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .product-details th,
+        .product-details td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .product-details img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Totals styles */
+        .totals {
+            margin-top: 20px;
+        }
+
+        /* Closing message styles */
+        .closing-message {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-8 p-3" id="invoice">
+                <div class="card">
+                    <div class="invoice">
+                        <h2>Your Order Confirmed!</h2>
+                        <div class="user-info">
+                            <span>Hello, <%= userData.first_name %> <%= userData.last_name %></span>
+                            <span>Your order has been confirmed and will be shipped in the next two days!</span>
+                        </div>
+
+                        <!-- Order details -->
+                        <div class="order-details">
+                            <h3>Order Details</h3>
+                            <table>
+                                <tr>
+                                    <td>Order Date:</td>
+                                    <td><%= orderData.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></td>
+                                </tr>
+                                <tr>
+                                    <td>Order Id:</td>
+                                    <td><%= orderData.orderTrackId %></td>
+                                </tr>
+                                <tr>
+                                    <td>Expected Delivery:</td>
+                                    <% const orderDate = new Date(orderData.createdAt);
+                                    const expectedDeliveryDate = new Date(orderDate);
+                                    expectedDeliveryDate.setDate(orderDate.getDate() + 7);
+                                    const formattedDeliveryDate = expectedDeliveryDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-');
+                                    %>
+                                    <td><%= formattedDeliveryDate %></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Product details -->
+                        <div class="product-details">
+                            <h3>Product Details</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Payment Method</th>
+                                        <th>Status</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (orderData && orderData.products.length > 0) { %>
+                                        <% orderData.products.forEach(item => { %>
+                                            <tr>
+                                                <td>
+                                                    <span><%= item.productId.productname %></span>
+                                                </td>
+                                                <td>
+                                                    <div class="text-left">
+                                                        <span>Price: ₹ <%= item.productId.price %></span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="text-left">
+                                                        <span>Quantity: <%= item.quantity %></span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="text-left">
+                                                        <span><%= orderData.paymentMethod %></span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="text-left">
+                                                        <span><%= orderData.paymentStatus %></span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="text-left">
+                                                        <span>₹ <%= (item.quantity * item.productId.price).toFixed(2) %></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="6">
+                                                <p>No products available.</p>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Shipping Address -->
+                        <div class="row d-flex">
+                            <div class="col-md-6">
+                                <h3>Shipping Address</h3>
+                                <table>
+                                    <tr>
+                                        <td><%= orderData.address.fullName %></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= orderData.address.city %></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= orderData.address.district %></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= orderData.address.state %></td>
+                                    </tr>
+                                    <tr>
+                                        <td><%= orderData.address.country %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>PIN: <%= orderData.address.pincode %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mobile Number: <%= orderData.address.mobile %></td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Billing Details -->
+                            <div class="col-md-6">
+                                <h3>Billing Details</h3>
+                                <table>
+                                    <tr>
+                                        <td>Subtotal : </td>
+                                        <td>₹ <%= orderData.totalAmount.toFixed(2) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Shipping Fee</td>
+                                        <td>₹ 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Discount</td>
+                                        <td>₹ 0.00</td>
+                                    </tr>
+                                    <tr class="border-top border-bottom">
+                                        <td class="font-weight-bold">Total : </td>
+                                        <td class="font-weight-bold">₹ <%= orderData.totalAmount.toFixed(2) %></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Closing message -->
+                        <div class="closing-message">
+                            <p class="font-weight-bold mb-0">Thanks for shopping with us!</p>
+                            <span>Ozark Team</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-
-        </div>
-      </div>
     </div>
-  </div>
-</section>
 
+</body>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
-<script>
-  let initialProductStatus;
-
-  function updateProductStatus(orderId, productId, productStatus) {
-    fetch('/updateProductStatus', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        orderId: orderId,
-        productId: productId,
-        productStatus: productStatus,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          const updatedProduct = data.product;
-          // Update the progress bar based on updatedProduct.status
-          updateProgressBar(updatedProduct.status);
-          // Display cancel message for cancelled orders
-          if (updatedProduct.status === 'Cancelled') {
-            document.getElementById('cancelMessage').style.display = 'block';
-          }
-        } else {
-          console.error('Error updating product status:', data.error);
-        }
-      })
-      .catch((error) => {
-        console.error('Error updating product status:', error);
-      });
-  }
-
-  function updateProductStatusWithConfirmation(orderId, productId, productStatus) {
-    // Display a confirmation dialog using SweetAlert
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'You won\'t be able to revert this!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, cancel it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // If the user confirms, proceed with the cancellation
-        updateProductStatus(orderId, productId, productStatus);
-
-        location.reload();
-      }
-    });
-  }
-
-  function updateProgressBar(productStatus) {
-    const progressBarSteps = document.querySelectorAll('.progress-track .step');
-
-    // Remove 'active' class from all steps
-    progressBarSteps.forEach((step) => {
-      step.classList.remove('active');
-    });
-
-    // Add 'active' class to the current status and all the previous statuses
-    for (let i = 0; i < productStatus; i++) {
-      progressBarSteps[i].classList.add('active');
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function () {
-    const progressBar = document.querySelector('.progress-track');
-    const cancelledProgressBar = document.querySelector('.cancelled-progress-track');
-
-    if (progressBar) {
-      // Original progress bar logic
-      const orderId = progressBar.dataset.orderId;
-      const productId = progressBar.dataset.productId;
-      initialProductStatus = progressBar.dataset.productStatus;
-
-      updateProgressBar(initialProductStatus);
-    } else if (cancelledProgressBar) {
-      // Cancelled orders progress bar logic
-      const orderId = cancelledProgressBar.dataset.orderId;
-      const productId = cancelledProgressBar.dataset.productId;
-      initialProductStatus = cancelledProgressBar.dataset.productStatus;
-
-      updateCancelledProgressBar(initialProductStatus);
-
-      function updateCancelledProgressBar(productStatus) {
-        const cancelledProgressBarSteps = document.querySelectorAll('.cancelled-progress-track .step');
-
-        // Remove 'active' class from all steps
-        cancelledProgressBarSteps.forEach((step) => {
-          step.classList.remove('active');
-        });
-
-        // Add 'active' class to the current status
-        for (let i = 0; i < productStatus; i++) {
-          cancelledProgressBarSteps[i].classList.add('active');
-        }
-      }
-    }
-  });
-
-  document.getElementById('cancelLink').addEventListener('click', function (event) {
-    event.preventDefault();
-
-    // Retrieve orderId and productId from the progress bar
-    const progressBar = document.querySelector('.progress-track');
-    const orderId = progressBar ? progressBar.dataset.orderId : null;
-    const productId = progressBar ? progressBar.dataset.productId : null;
-
-    // Check if the product is delivered or cancelled
-    if (initialProductStatus !== 'Delivered' && initialProductStatus !== 'Cancelled') {
-      // Display SweetAlert confirmation before cancelling
-      updateProductStatusWithConfirmation(orderId, productId, 'Cancelled');
-
-      // Disable the "Cancel" link after clicking
-      this.classList.add('disabled-link');
-      this.removeAttribute('href');
-    }
-  });
-
-  document.getElementById('returnLink').addEventListener('click', function (event) {
-    event.preventDefault();
-
-    // Retrieve orderId and productId from the progress bar
-    const progressBar = document.querySelector('.progress-track');
-    const orderId = progressBar ? progressBar.dataset.orderId : null;
-    const productId = progressBar ? progressBar.dataset.productId : null;
-
-    updateProductStatus(orderId, productId, 'Returned');
-  });
-</script>
+</html>
