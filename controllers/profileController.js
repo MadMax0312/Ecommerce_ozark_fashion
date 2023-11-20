@@ -187,7 +187,18 @@ const loadOrderPage = async (req, res) => {
         const userData = await User.findById({ _id: userId });
         const totalProductsInCart = await getTotalProductsInCart(userId);
 
-        const orderData = await Order.find({ user: userId }).sort({ createdAt: -1 });
+        const page = parseInt(req.query.page) || 1;
+        const limit = 7;
+        const skip = (page - 1) * limit;
+
+        const orderData = await Order.find({ user: userId })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalOrders = await Order.countDocuments({ user: userId });
+
+        const totalPages = Math.ceil(totalOrders / limit);
 
         // Modify orderData to include formatted delivery date for each order
         const ordersWithFormattedDeliveryDate = orderData.map((order) => {
@@ -212,8 +223,9 @@ const loadOrderPage = async (req, res) => {
         res.render("viewOrders", {
             user: userData,
             orders: ordersWithFormattedDeliveryDate, // Use the modified orderData array
-        
             count: totalProductsInCart,
+            totalPages: totalPages,
+            currentPage: page,
         });
     } catch (error) {
         console.log(error);
@@ -244,11 +256,11 @@ const viewDetails = async (req, res) => {
 
               console.log("data", latestOrder)
 
-        res.render("orderDetails", {
+        res.render("order", {
             user: userId,
             userData: userData,
             count: totalProductsInCart,
-            order: latestOrder,
+            data: [latestOrder],
         });
     } catch (error) {
         console.log(error.message);

@@ -119,6 +119,8 @@ user_route.post("/updateAddress/:id", auth.isLogin, checkoutController.updateAdd
 
 user_route.post("/addNewAddress", auth.isLogin, checkoutController.addAddress);
 
+user_route.post("/applyCoupon", auth.isLogin, checkoutController.applyCoupon);
+
 //===================== O R D E R ========================================
 
 user_route.get("/order", orderContoller.loadOrder);

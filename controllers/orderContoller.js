@@ -23,8 +23,6 @@ const razorpayInstance = new Razorpay({
 });
 
 
-
-
 const loadOrder = async (req, res) => {
     try {
         const userId = req.session.user_id;
@@ -55,7 +53,7 @@ const loadOrder = async (req, res) => {
 
 const placeOrder = async (req, res) => {
     try {
-        const { productsData, totalAmount, address, paymentMethod, notes } = req.body;
+        const { productsData, totalAmount, address, paymentMethod, notes, couponDiscount } = req.body;
         const user_id = req.session.user_id;
         var payment;
 
@@ -76,6 +74,7 @@ const placeOrder = async (req, res) => {
             notes: notes,
             paymentStatus: payment,
             orderTrackId: randomOrderId,
+            couponDiscount:couponDiscount,
         });
 
         console.log(order);
@@ -195,7 +194,6 @@ const orderDetails = async (req, res) => {
 
 const updateStatus = async (req, res) => {
     try {
-
         const { orderId, productId, productStatus } = req.body;
 
         const order = await Order.findOne({ _id: orderId, "products._id": productId });
@@ -215,9 +213,37 @@ const updateStatus = async (req, res) => {
             const productIdValue = productIdObject._id;
 
             await Product.findByIdAndUpdate(productIdValue, { $inc: { quantity: cancelledQuantity } }, { new: true });
+        } else if (productStatus === "Return" && originalStatus === "Delivered") {
+            const returnedQuantity = order.products[productIndex].quantity;
+
+            // Assuming productId is an object with an _id property
+            const productIdObject = order.products[productIndex].productId;
+            const productIdValue = productIdObject._id;
+
+            await Product.findByIdAndUpdate(productIdValue, { $inc: { quantity: returnedQuantity } }, { new: true });
         }
 
         order.products[productIndex].status = productStatus;
+
+        if (productStatus === 'Cancelled' && (order.paymentMethod === 'Razor Payment' || order.paymentMethod === 'Wallet Transfer')) {
+            // Refund the amount to the user's wallet
+            const refundAmount = order.products[productIndex].subtotal; // Assuming refund the entire amount
+
+            // Update user's wallet balance and add a wallet transaction record
+            const user = await User.findById(order.user);
+
+            if (user) {
+                user.wallet += refundAmount;
+                user.walletHistory.push({
+                    transactionDetails: `Refund for order ${order.orderTrackId}`,
+                    transactionType: 'refund',
+                    transactionAmount: refundAmount,
+                    currentBalance: user.wallet,
+                });
+
+                await user.save();
+            }
+        }
 
         const updatedOrder = await order.save();
 

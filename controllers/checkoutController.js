@@ -2,34 +2,40 @@ const User = require("../models/userModel");
 const { getTotalProductsInCart } = require("../number/cartNumber");
 const Address = require("../models/addressModel");
 const Cart = require("../models/cartModel");
+const Coupon = require("../models/couponModel");
+const Order = require("../models/orderModel");
 
 const loadCheckout = async (req, res) => {
     try {
         const userId = req.session.user_id;
 
         const totalProductsInCart = await getTotalProductsInCart(userId);
-        console.log(totalProductsInCart)
 
         if (!userId) {
             return res.status(401).json({ message: "Please log in to continue." });
         }
 
-        if(totalProductsInCart == 0){
+        if (totalProductsInCart == 0) {
             return res.status(402).json({ message: "Please add items in cart" });
         }
-      
+
         const userData = await User.findById({ _id: userId });
         const userAddress = await Address.findOne({ userId });
         const cartData = await Cart.findOne({ user_id: userId }).populate("items.product");
-   
+        const couponData = await Coupon.find().sort({ minimumPurchase:1 })
 
         const totalAmount = cartData.items.reduce((total, item) => {
             return total + item.product.price * item.quantity;
         }, 0);
-      
-            res.render("checkout", { user: userData, address: userAddress, cart: cartData, totalAmount, count: totalProductsInCart });
-        
-        
+
+        res.render("checkout", {
+            user: userData,
+            address: userAddress,
+            cart: cartData,
+            totalAmount,
+            count: totalProductsInCart,
+            coupon: couponData,
+        });
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Internal Server Error");
@@ -124,9 +130,53 @@ const addAddress = async (req, res) => {
     }
 };
 
+const applyCoupon = async (req, res) => {
+    try {
+        const { couponName } = req.body;
+        const userId = req.session.user_id;
+
+        const cartData = await Cart.findOne({ user_id: userId }).populate("items.product");
+
+        const totalAmount = cartData.items.reduce((total, item) => {
+            return total + item.product.price * item.quantity;
+        }, 0);
+
+        const coupon = await Coupon.findOne({ couponName });
+
+        if (!coupon) {
+            return res.json({ success: false, error: "Invalid coupon code" });
+        }
+
+        if (totalAmount < coupon.minimumPurchase) {
+            return res.json({ success: false, error: "Coupon can only be applied for orders above a certain amount" });
+        }
+
+        const userHasUsedCoupon = coupon.users.includes(userId);
+        if (userHasUsedCoupon) {
+            return res.json({ success: false, error: "You have already used this coupon" });
+        }
+
+        const discount = Math.min((coupon.discountPercentage / 100) * totalAmount, coupon.maximumDiscount);
+        const totalAmountAfterDiscount = totalAmount - discount; 
+
+        res.json({
+            success: true,
+            discount: discount,
+            totalAmount: totalAmountAfterDiscount, 
+        });
+
+        coupon.users.push(userId);
+        await coupon.save();
+    } catch (error) {
+        console.error("Error applying coupon:", error.message);
+        res.json({ success: false, error: "Internal server error" });
+    }
+};
+
 module.exports = {
     loadCheckout,
     getAddressById,
     updateAddress,
     addAddress,
+    applyCoupon
 };

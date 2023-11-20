@@ -113,6 +113,10 @@ admin_route.get('/orderDetailss', adminOrderController.viewDetails);
 
 admin_route.post('/updateProductStatus', adminOrderController.updateProductStatus);
 
+admin_route.post('/refund', auth.isLogin, adminOrderController.proceedRefund);
+
+admin_route.post('/returnProduct', auth.isLogin, adminOrderController.returnProduct);
+
 //===================== C O U P O N - S E C T I O N  ======================================================================
 
 admin_route.get("/coupons", auth.isLogin, couponController.loadCoupons);

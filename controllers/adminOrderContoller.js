@@ -140,8 +140,78 @@ const updateProductStatus = async (req, res) => {
     }
 };
 
+const proceedRefund = async (req, res) => {
+    try {
+        const { orderId, productId } = req.body;
+
+        const order = await Order.findById(orderId);
+        const product = order.products.find((p) => p._id.toString() === productId);
+
+        if (!order || !product) {
+            return res.status(400).json({ success: false, error: 'Invalid order or product' });
+        }
+
+        const user = await User.findById(order.user);
+        if (!user) {
+            return res.status(400).json({ success: false, error: 'User not found' });
+        }
+
+        user.wallet += product.subtotal;
+
+        // Add an entry to the user's wallet history
+        const transactionDetails = `Refund for product: ${product.productId.productname}`;
+        const transactionAmount = product.subtotal;
+        const currentBalance = user.wallet;
+
+        user.walletHistory.push({
+            transactionDetails,
+            transactionType: 'refund',
+            transactionAmount,
+            currentBalance,
+        });
+
+        product.status = 'Return'; // Keep the status consistent
+
+        await user.save();
+        await order.save();
+
+        res.json({ success: true, message: 'Refund processed successfully' });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
+
+const returnProduct = async (req, res) => {
+    try {
+        const { orderId, productId } = req.body;
+
+        const order = await Order.findById(orderId);
+        const product = order.products.find((p) => p._id.toString() === productId);
+
+        if (!order || !product) {
+            return res.status(400).json({ success: false, error: 'Invalid order or product' });
+        }
+
+        product.status = 'Return';
+
+        // Update the product quantity in the database for user-initiated returns
+        await Product.updateOne({ _id: productId }, { $inc: { quantity: product.quantity } });
+
+        await order.save();
+
+        res.json({ success: true, message: 'Return request processed successfully' });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
+
+
 module.exports = {
     loadOrder,
     viewDetails,
     updateProductStatus,
+    proceedRefund,
+    returnProduct,
 };

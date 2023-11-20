@@ -263,11 +263,31 @@
                             name="c_order_notes"
                             id="c_order_notes"
                             cols="30"
-                            rows="5"
+                            rows="3"
                             class="form-control"
                             placeholder="Write your notes here..."
                         ></textarea>
                     </div>
+
+                   
+
+                    <div class="col">
+                        <h3>Coupons Available</h3>
+                        <% coupon.forEach(coupon => { %>
+                            <div class="coupon-container" style="background-color: rgb(210, 246, 246);">
+                                <h6 class="m-0" style="background-color: darkseagreen; display: inline-block;"><%= coupon.couponName %></h6>                      
+                                <p class="m-0">A Discount of <span style="font-weight: bold;"><%= coupon.discountPercentage %>%</span> on Min. Purchase of <span style="font-weight: bold;">₹<%= coupon.minimumPurchase %></span></p>
+                                <div class="coupon-dates mb-1" style="display: flex; justify-content: space-between;">
+                                    <span class="start-date">Start Date: <%= coupon.startingDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></span>
+                                    <span class="expiry-date">Expiry Date: <%= coupon.expiryDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></span>
+                                </div>
+                                
+                            </div>
+                        <% }); %>
+            
+                    </div>
+
+
                 </div>
                 <div class="col-md-6">
                     <div class="row mb-5 ml-5 mt-4">
@@ -285,12 +305,14 @@
                                         aria-describedby="button-addon2"
                                     />
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="button" id="button-addon2">
+                                        <button class="btn btn-primary btn-sm" type="button" id="applyCouponButton">
                                             Apply
                                         </button>
                                     </div>
                                 </div>
-                            </div>
+                                <h6 id="invalid-msg" class="text-danger text-center"></h6>
+                            <h6 id="discount-msg" class="text-success text-center"></h6>
+                            </div>                                                
                         </div>
                     </div>
 
@@ -374,7 +396,7 @@
                                                     <p style="color: black">Coupon Discount :</p>
                                                 </div>
                                                 <div style="display: inline-block">
-                                                    <p style="color: black">₹ 0.00</p>
+                                                    <p style="color: black" id="discountElement">₹ 0.00</p>
                                                 </div>
                                             </div>
                                         </h6>
@@ -386,7 +408,7 @@
                                                     <p style="color: black">Total Amount :</p>
                                                 </div>
                                                 <div id="purchaseAmountElement" style="display: inline-block">
-                                                    <p style="color: black">₹ <%= totalAmount.toFixed(2) %></p>
+                                                    <p style="color: black" id="totalElement">₹ <%= totalAmount.toFixed(2) %></p>
                                                 </div>
                                             </div>
                                         </h6>
@@ -499,6 +521,53 @@
 </div>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- <script>
+    setTimeout(function () {
+        document.getElementById("invalid-msg").style.display = "none";
+        document.getElementById("discount-msg").style.display = "none";
+    }, 3000);
+</script> -->
+
+<script>
+    document.getElementById("applyCouponButton").addEventListener("click", async () => {
+        const couponName  = document.getElementById("c_code").value;
+
+        // Send an asynchronous request to apply the coupon
+        try {
+            const response = await fetch("/applyCoupon", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ couponName  }),
+            });
+
+            const data = await response.json();
+
+            console.log("coupon",data)
+
+            if (data.success) {
+
+                console.log("Coupon applied successfully:", data);
+
+                document.getElementById("totalElement").innerHTML = `<p style="color: black">₹ ${data.totalAmount.toFixed(2)}</p>`;
+                document.getElementById("discountElement").innerHTML = `<p style="color: black">₹ ${data.discount.toFixed(2)}</p>`;
+                document.getElementById("invalid-msg").innerText = ""; // Clear any previous error message
+                document.getElementById("discount-msg").innerText = `Coupon applied successfully! Discount: ₹ ${data.discount.toFixed(2)}`;
+            } else {
+                console.error("Failed to apply coupon:", data.error);
+                document.getElementById("invalid-msg").innerText = data.error;
+                document.getElementById("discount-msg").innerText = ""; 
+            }
+        } catch (error) {
+            console.error("Error applying coupon:", error.message);
+            document.getElementById("invalid-msg").innerText = "Internal server error";
+            document.getElementById("discount-msg").innerText = ""; // Clear any previous discount message
+        }
+    });
+</script>
+
 
 <script>
     async function checkWalletBalance() {
@@ -619,11 +688,14 @@
                     const state = document.getElementById("data-state").textContent;
                     const pincode = document.getElementById("data-pincode").textContent;
 
-                    console.log(district);
+                    const discountElement = document.getElementById("discountElement");
+                    const discountText = discountElement.textContent.trim().replace("₹", "");
+                    const couponDiscount = parseFloat(discountText);
+
+                    console.log("discount", couponDiscount)
 
                     const paymentMethod = "Razor Payment"; // Set the payment method to Razor Payment
 
-                    console.log("dsfljsfhlkjdsf", paymentMethod);
                     const notes = document.getElementById("c_order_notes").value;
 
                     const products = [];
@@ -662,6 +734,7 @@
                         notes: notes,
                         productsData: products,
                         totalAmount: products.reduce((total, product) => total + product.subtotal, 0),
+                        couponDiscount:couponDiscount
                     };
 
                     const response = await fetch("/place-order", {
@@ -757,11 +830,13 @@
             const state = document.getElementById("data-state").textContent;
             const pincode = document.getElementById("data-pincode").textContent;
 
-            console.log(district);
+                    const discountElement = document.getElementById("discountElement");
+                    const discountText = discountElement.textContent.trim().replace("₹", "");
+                    const couponDiscount = parseFloat(discountText);
+                    console.log("discount", couponDiscount)
 
             const paymentMethod = document.querySelector('input[name="paymentOption"]:checked').value;
 
-            console.log("dsfljsfhlkjdsf", paymentMethod);
             const notes = document.getElementById("c_order_notes").value;
 
             const products = [];
@@ -781,8 +856,6 @@
                 });
             });
 
-            console.log(products);
-
             const address = {
                 fullName: fullName,
                 mobile: mobile,
@@ -799,6 +872,7 @@
                 notes: notes,
                 productsData: products,
                 totalAmount: products.reduce((total, product) => total + product.subtotal, 0),
+                couponDiscount:couponDiscount,
             };
 
             console.log(orderData);

@@ -1,221 +1,97 @@
-<%- include('../userLayouts/header.ejs') %>
-<%- include('../userLayouts/navbar.ejs') %>
+<%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
-<style>
-  body {
-    background-color: #f8f9fa;
-  }
 
-  .order-icon {
-    font-size: 4rem;
-    color: #ff8c00;
-    /* Orange color */
-  }
+<div id="content" class="row">
+  <div id="sidebar" class="col-md-3 col-lg-2">
+      <h3 class="text-center my-3">My Account</h3>
+      <ul class="nav flex-column">
+          <li class="nav-item">
+              <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Profile</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Address</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/viewOrder"><i class="fa fa-shopping-cart"></i>Orders</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Coupons</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/wallet"><i class="fa fa-ticket"></i>Wallet</a>
+          </li>
+      </ul>
+  </div>
 
-  .order-title {
-    color: #ff8c00;
-    /* Orange color */
-  }
+  <div id="main-content" class="col">
+      <div class="container mt-4">
+          <div class="row">
+              <div class="col-md-6">
+                  <h3 class="mb-4">My Orders</h3>
+              </div>
+          </div>
 
-  .order-id {
-    font-size: 1.2rem;
-  }
-
-  .table th {
-    background-color: #ff8c00;
-    /* Orange color */
-    color: #fff;
-  }
-
-  .continue-btn {
-    background-color: #ff8c00;
-    /* Orange color */
-    border-color: #ff8c00;
-    /* Orange color */
-  }
-
-  .continue-btn:hover {
-    background-color: #e67800;
-    /* Slightly darker orange color */
-    border-color: #e67800;
-    /* Slightly darker orange color */
-  }
-
-  .card {
-    border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .table img {
-    max-height: 100px;
-    border-radius: 8px;
-  }
-  .action-column {
-  width: 100px; /* Adjust the width as needed */
-}
-
-/* Define the button size */
-.small-btn {
- 
-
-  width: 70px; /* Adjust the width to make the button narrower */
-}
-
-</style>
-
-<div class="container mt-5">
-  <div class="row justify-content-center m-t-100">
-    <div class="col-md-8">
-      <div class="card border-0 shadow">
-        <div class="card-body text-center">
-          <i class="bi bi-check2-circle-fill order-icon"></i>
-          <h1 class="order-title mt-4">Your Order Details</h1>
-          <p class="order-id">Your tracking ID is: <strong><%= order.orderTrackId %></strong></p>
-        </div>
-      </div>
-      <div class="card mt-4 border-0 shadow">
-        <div class="card-body">
-          <h2 class="mb-4">Order Details</h2>
-          <% if (order && order.products && order.products.length > 0) { %>
-            <% for (let i = 0; i < order.products.length; i++) { %>
-              <div class="table-responsive">
-                <table class="table table-bordered table-striped text-center">
+          <!-- Display order details -->
+          <div class="order-container">
+              <table class="table table-cart table-mobile">
                   <thead>
-                    <tr>
-                      <th scope="col">Image</th>
-                      <th scope="col">Product Name</th>
-                      <th scope="col">Price</th>
-                      <th scope="col">Quantity</th>
-                      <th scope="col">Total Price</th>
-                      <th scope="col">Action</th>
-                    </tr>
+                      <tr>
+                          <th>No.</th>
+                          <th>Order Date</th>
+                          <th>Amount</th>
+                          <th>Payment</th>
+                          <th>Expected Delivery</th>
+                          <th>Order Id</th>
+                          <th>Details</th>
+                      </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>
-                        <img src="/static/admin/Assets/images/products/<%= order.products[i].productId.image[0] %>" alt="Product Image">
-                      </td>
-                      <td class="align-middle">
-                        <%= order.products[i].productId.productname %>
-                      </td>
-                      <td class="align-middle">
-                        ₹ <%= order.products[i].productId.price %>
-                      </td>
-                      <td class="align-middle">
-                        <%= order.products[i].quantity %>
-                      </td>
-                      <td class="align-middle">
-                        ₹ <%- (order.products[i].productId.price) * (order.products[i].quantity) %>
-                      </td>
-                      <td class="align-middle action-column">
-                        <% if (order.products[i] && order.products[i].status !== 'Cancelled' && order.products[i].status !== 'Delivered') { %>
-                          <button class="btn btn-danger cancel-product mall-btn" 
-                                  onclick="confirmCancelOrder('<%= order._id %>','<%= order.products[i].productId._id %>')">
-                            Cancel
-                          </button>
-                        <% } %>
-                      </td>
-                    </tr>
+                      <% if (orders.length > 0) { %> 
+                          <% for (let i = 0; i < orders.length; i++) { %>
+                              <tr>
+                                  <td><%= i + 1 %></td>
+                                  <td>
+                                      <%= orders[i].createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
+                                      'short', day: '2-digit' }).replace(/\//g, '-') %>
+                                  </td>
+                                  <td>₹ <%= orders[i].totalAmount %></td>
+                                  <td><%= orders[i].paymentMethod %></td>
+                                  <td><%= orders[i].formattedDeliveryDate %></td>
+                                  <td><%= orders[i].orderTrackId %></td>
+                                  <td>
+                                      <a href="/orderDetails?id=<%= orders[i]._id %>" class="btn-sm btn-outline-dark btn-round btn-primary" style="color: white;">
+                                          View Details
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <a href="/downloadInvoice?orderId=<%= orders[i]._id %>" class="btn-sm btn-round" style="color: black; background-color: gray;">
+                                          Download Invoice
+                                      </a>
+                                  </td>
+                              </tr>
+                          <% } %> 
+                      <% } else { %>
+                          <tr>
+                              <td colspan="7">
+                                  <div class="error-content text-center">
+                                      <div class="container">
+                                          <h1 class="error-title">No Orders</h1>
+                                          <p>You have not placed any orders yet.</p>
+                                          <a href="/products" class="btn btn-outline-primary-2 btn-minwidth-lg">
+                                              <span>SHOPPING</span>
+                                              <i class="icon-long-arrow-right"></i>
+                                          </a>
+                                      </div>
+                                  </div>
+                              </td>
+                          </tr>
+                      <% } %>
                   </tbody>
-                </table>
-                <div class="card mt-4 border-0 shadow mb-4">
-                  <div class="card-body">
-                    <h2 class="mb-4">Delivery Information</h2>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <h5>Order Date:</h5>
-                        <p><%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></p>
-                      </div>
-                      <!-- ... rest of the code ... -->
-                    </div>
-                  </div>
-                  <div class="col-md-9 mx-auto">
-                    <h3 class="text-center py-4">Order Status</h3>
-                    <% if (order.products.length > 0 && order.products[0].status !== "Cancelled") { %>
-                      <div class="progress-track">
-                        <ul id="progressbar">
-                          <li class="step0 active" id="step1">Order placed</li>
-                          <li class="step0 text-center <%= order.products[0].StatusLevel >= 2 ? 'active' : '' %>" id="step2">Shipped</li>
-                          <li class="step0 text-right <%= order.products[0].StatusLevel >= 3 ? 'active' : '' %>" id="step3">Out for Delivery</li>
-                          <li class="step0 text-right text-success <%= order.products[0].StatusLevel >= 4 ? 'active' : '' %>" id="step4">Delivered</li>
-                        </ul>
-                      </div>
-                    <% } else if (order.products.length > 0 && order.products[0].status === "Cancelled") { %>
-                      <div class="progress-track col-12">
-                        <ul id="progressbar">
-                          <li class="step0 active " style="width: 50%; font-size: 1rem;" id="step1">
-                            Order placed
-                          </li>
-                          <li class="step0 active text-right text-danger" style="width: 50%; font-size: 1rem;" id="step4">
-                            Cancelled
-                          </li>
-                        </ul>
-                      </div>
-                    <% } %>
-                  </div>
-                </div>
-              </div>
-            <% } %>
-          <% } %>
-        </div>
-      
-
-      <div class="card mt-4 border-0 shadow">
-        <div class="card-body">
-          <h2 class="mb-4">Shipping Address</h2>
-          <p><%= order.address.fullName %></p>
-          <p>Mobile: <%= order.address.mobile %></p>
-          <p>Location: <%= order.address.city %>, <%= order.address.district %>, <%= order.address.state %></p>
-          <p>Pincode: <%= order.address.pincode %></p>
-        </div>
+              </table>
+          </div>
       </div>
-    </div>
-    </div>
   </div>
 </div>
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-  function confirmCancelOrder(orderId, productId) {
-    console.log(productId);
-    console.log(orderId);
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'You are about to cancel this order!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, cancel it!',
-      cancelButtonText: 'No, keep it'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        console.log('oder',orderId);
-        console.log('produ',productId);
-        $.ajax({
-    url: '/cancelOrder',
-    method: 'POST', // Use 'POST' instead of 'post'
-    data: { orderId, productId },
-    dataType: 'json', // Specify the expected data type
-    success: function (response) {
-        console.log(response);
-        if (response.cancel === 1) {
-            location.reload();
-        }
-    },
-    error: function (error) {
-        console.error('Error:', error);
-    }
-});
-      } else {
-        // If the user clicks "No, keep it", you can add additional logic or leave it empty
-        console.log('User clicked No');
-      }
-    });
-  }
-</script>
 
 <%- include('../userLayouts/footer.ejs') %>

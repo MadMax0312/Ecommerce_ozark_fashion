@@ -37,6 +37,9 @@ const orderSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        couponDiscount: {
+            type: Number,
+        },
         orderTrackId: {
             type: Number,
             required: true,

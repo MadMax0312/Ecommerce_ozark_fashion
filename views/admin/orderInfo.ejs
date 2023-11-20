@@ -30,7 +30,7 @@
                                     <option value="Out for Delivery" <%= order.orderStatus === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
                                 </select>
                             </p>
-                            <p><strong>Order Date:</strong> <%= order.createdAt.toLocaleString() %></p>
+                            <p><strong>Order Date:</strong> <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></p>
                             <p><strong>Payment Method: </strong> <%= order.paymentMethod %></p>
                             <p><strong>Payment Status: </strong> <%= order.paymentStatus %></p>
                             <p><strong>Instructions: </strong> <%= order.notes %></p>
@@ -76,18 +76,24 @@
                                         <p><strong>Status:</strong>
                                             <select class="form-select productStatus <%= product.status === 'Cancelled' ? 'cancelled' : '' %>"
                                                 data-product-id="<%= product._id %>"
+                                                id="productStatus_<%= product._id %>"
                                                 onchange="updateProductStatus('<%= order._id %>', '<%= product._id %>')"
-                                                <%= product.status === 'Cancelled' ? 'disabled' : '' %>>
+                                                <%= product.status === 'Cancelled' ? 'disabled' : '' %>
+                                                <%= product.status === 'Return' ? 'disabled' : '' %>
+                                                >
                                                 <option value="Pending" <%= product.status === 'Order Placed' ? 'selected' : '' %>>Order Placed</option>
                                                 <option value="Shipped" <%= product.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                                 <option value="Out for Delivery" <%= product.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
                                                 <option value="Delivered" <%= product.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                <option value="Cancelled" <%= product.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                <option value="Cancelled" <%= product.status === 'Cancelled' ? 'selected' : '' %>>Cancel</option>
                                                 <option value="Return" <%= product.status === 'Return' ? 'selected' : '' %>>Return</option>
+                                       
                                             </select>
-                                            
-                                        
                                         </p>
+                                     <!-- Add a button for refund -->
+                                     <button class="btn btn-md btn-warning refund-btn" style="color: black;" disabled>Refund</button>
+                           
+                                   
                                     </div>
                                 </div>
                             <% }); %>
@@ -98,6 +104,7 @@
         </div>
     </div>
 </div>
+
 
 
 

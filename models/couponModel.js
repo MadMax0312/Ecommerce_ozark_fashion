@@ -16,6 +16,12 @@ const couponSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+      
+        maximumDiscount: {
+            type: Number,
+            required: true,
+            default: 10000, // Set a default value of 10,000
+        },
 
         discountPercentage: {
             type: Number,
@@ -36,7 +42,7 @@ const couponSchema = new mongoose.Schema(
 
         startingDate: {
             type: Date,
-            default: Date.now, // use a function for default value
+            default: Date.now,
             required: true,
         },
     },

@@ -1,91 +1,114 @@
 <%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
-<link rel="stylesheet" href="/static/userAssets/css/profile.css" />
+<style>
+    #main-content {
+    padding: 10px;
+}
+</style>
 
-<main class="main">
-    <div class="page-header text-center m-t-85" style="background-image: url('assets/images/page-header-bg.jpg')">
-        <div class="container">
-            <h1 class="page-title">Orders</h1>
+
+<div id="content" class="row">
+  <div id="sidebar" class="col-md-3 col-lg-2">
+      <h3 class="text-center my-3">My Account</h3>
+      <ul class="nav flex-column">
+          <li class="nav-item">
+              <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Profile</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Address</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/viewOrder"><i class="fa fa-shopping-cart"></i>Orders</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Coupons</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/wallet"><i class="fa fa-ticket"></i>Wallet</a>
+          </li>
+      </ul>
+  </div>
+
+  <div id="main-content" class="col">
+      <div class="container mt-4">
+          <div class="row">
+              <div class="col-md-6">
+                  <h3 class="mb-4">My Orders</h3>
+              </div>
+          </div>
+
+          <!-- Display order details -->
+          <div class="order-container">
+              <table class="table table-cart table-mobile">
+                  <thead>
+                      <tr>
+                          <th>No.</th>
+                          <th>Order Date</th>
+                          <th>Amount</th>
+                          <th>Payment</th>
+                          <th>Expected Delivery</th>
+                          <th>Order Id</th>
+                          <th class="text-center">Action</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <% if (orders.length > 0) { %> 
+                          <% for (let i = 0; i < orders.length; i++) { %>
+                              <tr>
+                                  <td><%= (currentPage - 1) * 7 + i + 1 %></td>
+                                  <td>
+                                      <%= orders[i].createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
+                                      'short', day: '2-digit' }).replace(/\//g, '-') %>
+                                  </td>
+                                  <td>₹ <%= orders[i].totalAmount %></td>
+                                  <td><%= orders[i].paymentMethod %></td>
+                                  <td><%= orders[i].formattedDeliveryDate %></td>
+                                  <td><%= orders[i].orderTrackId %></td>
+                                  <td>
+                                      <a href="/orderDetails?id=<%= orders[i]._id %>" class="btn-sm btn-outline-dark btn-round btn-primary" style="color: white;">
+                                          View Details
+                                      </a>
+                                  </td>
+                                  <td>
+                                      <a href="/downloadInvoice?orderId=<%= orders[i]._id %>" class="btn-sm btn-round" style="color: black; background-color: gray;">
+                                          Download Invoice
+                                      </a>
+                                  </td>
+                              </tr>
+                          <% } %> 
+                      <% } else { %>
+                          <tr>
+                              <td colspan="7">
+                                  <div class="error-content text-center">
+                                      <div class="container">
+                                          <h1 class="error-title">No Orders</h1>
+                                          <p>You have not placed any orders yet.</p>
+                                          <a href="/products" class="btn btn-outline-primary-2 btn-minwidth-lg">
+                                              <span>SHOPPING</span>
+                                              <i class="icon-long-arrow-right"></i>
+                                          </a>
+                                      </div>
+                                  </div>
+                              </td>
+                          </tr>
+                      <% } %>
+                  </tbody>
+              </table>
+          </div>
+
+          <div class="pagination-container">
+            <ul class="pagination">
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+            </ul>
         </div>
-    </div>
-    <nav aria-label="breadcrumb" class="breadcrumb-nav">
-        <div class="container">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Home</a></li>
 
-                <li class="breadcrumb-item active" aria-current="page">Orders</li>
-            </ol>
-        </div>
-    </nav>
+      </div>
+  </div>
+</div>
 
-    <div class="page-content">
-        <div class="cart">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <table class="table table-cart table-mobile">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Order Date</th>
-                                    <th>Amount</th>
-                                    <th>Payment</th>
-                                    <th>Expected Delivery</th>
-                                    <th>Order Id</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (orders.length > 0) { %> <% for (let i = 0; i < orders.length; i++) { %>
-                                <tr>
-                                    <td><%= i + 1 %></td>
-                                    <td>
-                                        <%= orders[i].createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
-                                        'short', day: '2-digit' }).replace(/\//g, '-') %>
-                                    </td>
-                                    <td>₹ <%= orders[i].totalAmount %></td>
-                                    <td><%= orders[i].paymentMethod %></td>
-
-                             
-
-                                    <td><%= orders[i].formattedDeliveryDate %></td>
-                                    <td><%= orders[i].orderTrackId %></td>
-                                    <td>
-                                        <a href="/orderDetails?id=<%= orders[i]._id %>" class="btn-sm btn-outline-dark btn-round btn-primary" style="color: white;"
-                                            >View Details</a
-                                        >
-                                    </td>
-                                    <td>
-                                        <a href="/downloadInvoice?orderId=<%= orders[i]._id %>" class="btn-sm btn-round" style="color: black; background-color: gray;">
-                                            Download Invoice
-                                        </a>
-                                    </td>
-                                    
-                                </tr>
-                                <% } %> <% } else { %>
-                                <tr>
-                                    <td colspan="7">
-                                        <div class="error-content text-center">
-                                            <div class="container">
-                                                <h1 class="error-title">No Orders</h1>
-                                                <p>You have not placed any orders yet.</p>
-                                                <a href="/products" class="btn btn-outline-primary-2 btn-minwidth-lg">
-                                                    <span>SHOPPING</span>
-                                                    <i class="icon-long-arrow-right"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
-<!-- End .main -->
 
 <%- include('../userLayouts/footer.ejs') %>

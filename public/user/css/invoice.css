@@ -25,6 +25,14 @@ body {
     padding-left: 0;
     margin-top: 3vh;
   }
+
+  #return-progressbar {
+    margin-bottom: 3vh;
+    overflow: hidden;
+    color: #000;
+    padding-left: 0;
+    margin-top: 3vh;
+  }
   
   /* Rest of your existing styles for #progressbar and #cancelled-progressbar */
   
