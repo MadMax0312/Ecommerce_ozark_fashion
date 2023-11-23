@@ -18,6 +18,7 @@
                           <th> # </th>
                           <th> Category </th>
                           <th> Category Description</th>
+                          <th> Offer(%) </th>
                           <th> Edit </th>
                           <th> Action </th>
                         </tr>
@@ -31,6 +32,7 @@
                               <td>*</td>
                               <td><%= Category[i].categoryname %></td>
                               <td><%= Category[i].description %></td>
+                              <td><%= Category[i].discount %></td>
                               <td> <a href="/admin/editCategories">
                                 <a href="/admin/editCategories?id=<%= Category[i]._id %>" class="btn btn-outline-secondary btn-icon-text">
                                   Edit <i class="mdi mdi-file-check btn-icon-append"></i>

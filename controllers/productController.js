@@ -72,14 +72,15 @@ const loadaddProducts = async (req, res) => {
 
 const addProducts = async (req, res) => {
   try {
-    console.log("Enterrrr");
+    console.log("Enter");
+
     const productname = req.body.productname;
     const category = req.body.category;
     const size = req.body.size;
     const description = req.body.description;
     const price = req.body.price;
     const quantity = req.body.quantity;
-    const discount = req.body.discountPrice
+    const discount = req.body.discount;
 
     const categories = await Category.find();
    
@@ -94,7 +95,9 @@ const addProducts = async (req, res) => {
       return res.status(400).json({ error: "All fields are required." });
     }
 
-    console.log("kjhgffg");
+    // Calculate discounted price
+    const discountedPrice = calculateDiscountedPrice(price, discount);
+
     const newProduct = new Product({
       productname: productname,
       category: category,
@@ -103,28 +106,31 @@ const addProducts = async (req, res) => {
       price: price,
       image: images,
       quantity: quantity,
-      discount: discount,
+      discountPercentage: discount,
+      discountedPrice: discountedPrice, // Store the discounted price
       createdAt: Date.now(),
       status: true,
     });
 
     const productData = await newProduct.save();
-    console.log(productData);
 
     if (productData) {
-     
-        res.render("addproducts", { Category: categories, message: "Product Added Successfully" });
-     
+      res.render("addproducts", { Category: categories, message: "Product Added Successfully" });
     } else {
-    
-        res.render("addProducts", { message: "Something went wrong" });
-     
+      res.render("addProducts", { message: "Something went wrong" });
     }
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 };
+
+// Function to calculate discounted price
+const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
+  const discountedPrice = (originalPrice * (100 - discountPercentage)) / 100;
+  return discountedPrice.toFixed(2); // Ensure the result has two decimal places
+};
+
 
 ///--------------Unlisting products-----------------------------
 
@@ -182,7 +188,7 @@ const editProduct = async (req, res) => {
           product.price = req.body.price;
           product.quantity = req.body.quantity;
           product.size = req.body.size;
-          product.discount = req.body.discountPrice;
+          product.discountPercentage = req.body.discount;
 
           // Handle new images
           if (req.files && req.files.length > 0) {
@@ -193,23 +199,26 @@ const editProduct = async (req, res) => {
               }
           }
 
-          // Save the updated product
-          const updatedProduct = await product.save();
+          if (product.discountPercentage) {
+            product.discountedPrice = calculateDiscountedPrice(product.price, product.discountPercentage);
+        }
 
-          if (updatedProduct) {
-              res.redirect("/admin/view-products");
-          } else {
-              res.render("edit-product", { data: product, message: "Failed to update the product" });
-          }
-      } else {
-          res.redirect("/admin/view-products");
-      }
-  } catch (error) {
-      console.error(error);
-      res.status(500).send("Internal Server Error");
-  }
+        // Save the updated product
+        const updatedProduct = await product.save();
+
+        if (updatedProduct) {
+            res.redirect("/admin/view-products");
+        } else {
+            res.render("edit-product", { data: product, message: "Failed to update the product" });
+        }
+    } else {
+        res.redirect("/admin/view-products");
+    }
+} catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+}
 };
-
 
 const deleteImage = async (req, res) => {
   try {

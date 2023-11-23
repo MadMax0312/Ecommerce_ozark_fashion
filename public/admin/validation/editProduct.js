@@ -16,7 +16,7 @@ function productValiddForm() {
     const price = document.getElementById("price").value;
     const quantity = document.getElementById("quantity").value;
     const description = document.getElementById("description").value;
-    const discountPrice = document.getElementById("discountPrice").value;
+    const discountPrice = document.getElementById("discount").value;
 
     if (!productname && !size && !price && !quantity && !description) {
         document.getElementById("productname-error").textContent = "Name field should not be empty";
@@ -36,14 +36,20 @@ function productValiddForm() {
         return false;
     }
 
-    if (discountPrice !== "" && (parseFloat(discountPrice) < 0 || parseFloat(discountPrice) > parseFloat(price) / 2)) {
-        document.getElementById("discountPrice-error").textContent =
-            "Discount price should be a non-negative number and should not exceed half of the product price.";
+    if (
+        discountPrice !== "" &&
+        (!isValidPrice(discountPrice) ||
+            parseFloat(discountPrice) < 0 ||
+            parseFloat(discountPrice) > 50) // Updated condition to check if discount is greater than 70%
+    ) {
+        document.getElementById("discount-error").textContent =
+            "Discount percentage should be a non-negative number and should not exceed 50%.";
         setTimeout(function () {
-            document.getElementById("discountPrice-error").textContent = "";
+            document.getElementById("discount-error").textContent = "";
         }, 3000);
         return false;
     }
+    
     
     
 

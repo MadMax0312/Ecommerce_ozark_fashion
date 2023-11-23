@@ -15,14 +15,10 @@ const categorySchema = new mongoose.Schema({
     required:true,
     default:0
   },
-  offers: [
-    {
-      offerName: { type: String, required:true },
-      discountPercentage: { type: Number, required: true },
-      startDate: { type: Date, required: true },
-      endDate: { type: Date, required: true },
-    },
-  ],
+  discount: {
+    type: String,
+    default: 0,  
+},
 
 })
 

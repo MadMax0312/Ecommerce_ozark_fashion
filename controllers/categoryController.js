@@ -34,6 +34,7 @@ const addCategory = async (req, res) => {
     try {
       const categoryname = req.body.categoryname;
       const categorydes = req.body.categorydes;
+      const discount = req.body.Offer;
   
       // Check if the category with the same name already exists
       const existingCategory = await Category.findOne({ categoryname: categoryname });
@@ -47,6 +48,7 @@ const addCategory = async (req, res) => {
       const newCategory = new Category({
         categoryname: categoryname,
         description: categorydes,
+        discount: discount,
         status: true,
       });
   
@@ -112,7 +114,7 @@ const editCategory = async (req, res) => {
   try {
       const editData = await Category.findByIdAndUpdate(
           { _id: req.body.id },
-          { $set: { categoryname: req.body.categoryname, description: req.body.categorydes } }
+          { $set: { categoryname: req.body.categoryname, description: req.body.categorydes, discount: req.body.Offer } }
       );
 
       res.redirect("/admin/categories");

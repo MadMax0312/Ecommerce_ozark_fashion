@@ -40,28 +40,21 @@ include('../adminLayouts/navbar.ejs') %>
 
                         <!-- Offer-related fields -->
                         <div class="form-group">
-                            <label for="offerName">Offer Name</label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="offerName"
-                                name="offerName"
-                                placeholder="Offer Name"
-                            />
-                            <p id="offerName-error" class="error-message" style="color: red"></p>
+                          <label for="offerName">Offer(%)</label>
+                          <input
+                          type="text"
+                          class="form-control"
+                          id="Offer"
+                          name="Offer"
+                          placeholder="Offer"
+                          value="0"
+                      />
+                      <p id="discountPrice-error" class="error-message" style="color: red"></p>
                         </div>
 
-                        <div class="form-group">
-                            <label for="offerStartDate">Offer Start Date</label>
-                            <input type="date" class="form-control" id="offerStartDate" name="offerStartDate" />
-                            <p id="offerStartDate-error" class="error-message" style="color: red"></p>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="offerEndDate">Offer End Date</label>
-                            <input type="date" class="form-control" id="offerEndDate" name="offerEndDate" />
-                            <p id="offerEndDate-error" class="error-message" style="color: red"></p>
-                        </div>
+                        <div class="input-container">
+                          <input type="hidden" name="id" value="<%= data._id %>" />
+                      </div>
 
                         <button type="submit" class="btn btn-primary mr-2">Submit</button>
                         <button class="btn btn-dark">Cancel</button>

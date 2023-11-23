@@ -138,11 +138,6 @@ admin_route.get("/sales", auth.isLogin, salesController.loadSales);
 admin_route.get("/export-sales", auth.isLogin, salesController.exportReport);
 
 
-
-
-
-
-
 admin_route.get("*", function (req, res) {
     res.redirect("/admin");
 });

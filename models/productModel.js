@@ -45,7 +45,11 @@ const productSchema = new mongoose.Schema(
             type: Date,
             default: Date.now,
         },
-        discount: {
+        discountPercentage: {
+            type: String,
+            default: 0,  
+        },
+        discountedPrice: {
             type: String,
             default: 0,  
         },
