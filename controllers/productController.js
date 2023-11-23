@@ -79,6 +79,9 @@ const addProducts = async (req, res) => {
     const description = req.body.description;
     const price = req.body.price;
     const quantity = req.body.quantity;
+    const discount = req.body.discountPrice
+
+    const categories = await Category.find();
    
     const images = [];
 
@@ -100,6 +103,7 @@ const addProducts = async (req, res) => {
       price: price,
       image: images,
       quantity: quantity,
+      discount: discount,
       createdAt: Date.now(),
       status: true,
     });
@@ -109,7 +113,7 @@ const addProducts = async (req, res) => {
 
     if (productData) {
      
-        res.render("addproducts", { message: "Product Added Successfully" });
+        res.render("addproducts", { Category: categories, message: "Product Added Successfully" });
      
     } else {
     
@@ -148,9 +152,7 @@ const loadEditProducts = async (req, res) => {
   try {
       const id = req.query.id;
 
-
       const product = await Product.findById(id)
-
 
       const categories = await Category.find();
 
@@ -180,6 +182,7 @@ const editProduct = async (req, res) => {
           product.price = req.body.price;
           product.quantity = req.body.quantity;
           product.size = req.body.size;
+          product.discount = req.body.discountPrice;
 
           // Handle new images
           if (req.files && req.files.length > 0) {

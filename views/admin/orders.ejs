@@ -20,6 +20,10 @@
     .table th, .table td {
         white-space: nowrap;
     }
+    .table thead th, .jsgrid .jsgrid-table thead th {
+    font-weight: 700;
+    color: #fff;
+}
 </style>
 
 <div class="main-panel">
@@ -70,7 +74,7 @@
                                             <th>Order Date</th>
                                             <th>Amount</th>
                                             <th>Payment</th>
-                                            <th>Status</th>
+                                            <!-- <th>Status</th> -->
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -84,12 +88,12 @@
                                                     <td><%= orders[i].createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></td>
                                                     <td>₹ <%= orders[i].totalAmount %></td>
                                                     <td><%= orders[i].paymentMethod %></td>
-                                                    <td>
+                                                    <!-- <td>
                                                         <span class="status-indicator <%= orders[i].products[0].status.toLowerCase().replace(/\s/g, '') %>">
                                                             <%= orders[i].products[0].status %>
                                                         </span>
                                                         
-                                                    </td>
+                                                    </td> -->
                                                     <td>
                                                         <div class="btn-group" role="group">
                                                             <a href="/admin/orderDetailss?id=<%= orders[i]._id %>" class="btn btn-info btn-sm">Manage</a>

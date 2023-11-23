@@ -30,7 +30,8 @@ const loadOrder = async (req, res) => {
         const orders = await Order.find(filter)
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
-            .limit(limit);
+            .limit(limit)
+
 
         const totalOrders = await Order.countDocuments(filter);
         const totalPages = Math.ceil(totalOrders / limit);
@@ -39,6 +40,8 @@ const loadOrder = async (req, res) => {
             const orderDate = new Date(order.createdAt);
             const expectedDeliveryDate = new Date(orderDate);
             expectedDeliveryDate.setDate(orderDate.getDate() + 7);
+
+          
 
             const formattedDeliveryDate = expectedDeliveryDate
                 .toLocaleDateString("en-US", {
@@ -65,6 +68,8 @@ const loadOrder = async (req, res) => {
             totalSales: totalSales.length > 0 ? totalSales[0].totalAmount : 0,
             averageOrderValue: totalOrders > 0 ? totalSales[0].totalAmount / totalOrders : 0,
         };
+
+  
 
         res.render("orders", {
             orders: ordersWithFormattedDeliveryDate,

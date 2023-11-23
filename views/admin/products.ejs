@@ -31,6 +31,7 @@
                                     <th>Category</th>
                                     <th>Size</th>
                                     <th>Price</th>
+                                    <th>Discount</th>
                                     <th>Quantity</th>
                                     <th>Image</th>
                                     <th>Edit</th>
@@ -45,6 +46,7 @@
                                     <td><%= Product[i].category.categoryname %></td>
                                     <td><%= Product[i].size %></td>
                                     <td><%= Product[i].price %></td>
+                                    <td><%= Product[i].discount %></td>
                                     <td><%= Product[i].quantity %></td>
                                     <td>
                                         <% if (Product[i].image && Product[i].image.length > 0) { 
@@ -62,11 +64,11 @@
                                     <td>
                                         <% if (Product[i].status === false) { %>
                                         <a href="/admin/unlist-product?id=<%= Product[i]._id %>">
-                                            <button data-product-id="<%= Product[i]._id %>" type="button" class="btn btn-inverse-success btn-fw yy">List</button>
+                                            <button data-product-id="<%= Product[i]._id %>" type="button" class="btn btn-inverse-success yy">List</button>
                                         </a>
                                         <% } else { %>
                                         <a href="/admin/unlist-product?id=<%= Product[i]._id %>">
-                                            <button data-product-id="<%= Product[i]._id %>" type="button" class="btn btn-inverse-danger btn-fw yy">Unlist</button>
+                                            <button data-product-id="<%= Product[i]._id %>" type="button" class="btn btn-inverse-danger yy">Unlist</button>
                                         </a>
                                         <% } %>
                                     </td>
@@ -80,13 +82,39 @@
                         </table>
 
                         <!-- Pagination -->
-                        <div class="pagination-container">
-                            <% if (typeof totalPages !== 'undefined') { 
-                                for (let j = 1; j <= totalPages; j++) { %>
-                                <a href="?page=<%= j %>"><%= j %></a>
-                            <% } 
-                            } %>
-                        </div>
+                        <div class="pagination-container ty">
+                            <% if (typeof totalPages !== 'undefined') { %>
+                              <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                          
+                                  <% if (currentPage > 1) { %>
+                                    <li class="page-item">
+                                      <a class="page-link" href="?page=1" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                      </a>
+                                    </li>
+                                  <% } %>
+                          
+                                  <% for (let j = 1; j <= totalPages; j++) { %>
+                                    <li class="page-item <%= j === currentPage ? 'active' : '' %>">
+                                      <a class="page-link" href="?page=<%= j %>"><%= j %></a>
+                                    </li>
+                                  <% } %>
+                          
+                                  <% if (currentPage < totalPages) { %>
+                                    <li class="page-item">
+                                      <a class="page-link" href="?page=<%= totalPages %>" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                      </a>
+                                    </li>
+                                  <% } %>
+                          
+                                </ul>
+                              </nav>
+                            <% } %>
+                          </div>
+                          
+                          
                     </div>
                 </div>
             </div>

@@ -156,9 +156,8 @@ const handleRazorpayPayment = async (req, res) => {
 const orderDetails = async (req, res) => {
     try {
         const userId = req.session.user_id;
-
         const totalProductsInCart = await getTotalProductsInCart(userId);
-        const userData = await User.findById({ _id: userId });
+        const userData = await User.findById(userId);
 
         const productId = req.query.productId;
         const productsObjectId = req.query.productIdss;
@@ -175,9 +174,7 @@ const orderDetails = async (req, res) => {
             path: 'products.productId'
         });
 
-        const product = orderData.products.find(item => {
-            return item._id.toString() === productsObjectId.toString();
-        });
+        const product = orderData.products.find(item => item._id.toString() === productsObjectId.toString());
 
         res.render('orderDetails', {
             user: userId,
@@ -187,7 +184,7 @@ const orderDetails = async (req, res) => {
             product: product,
         });
     } catch (error) {
-        console.log(error.message);
+        console.error('Error fetching order details:', error.message);
         res.status(500).send('Internal Server Error');
     }
 };
@@ -195,7 +192,6 @@ const orderDetails = async (req, res) => {
 const updateStatus = async (req, res) => {
     try {
         const { orderId, productId, productStatus } = req.body;
-
         const order = await Order.findOne({ _id: orderId, "products._id": productId });
 
         if (!order) {
@@ -207,29 +203,22 @@ const updateStatus = async (req, res) => {
 
         if (productStatus === "Cancelled" && originalStatus !== "Cancelled") {
             const cancelledQuantity = order.products[productIndex].quantity;
-
-            // Assuming productId is an object with an _id property
-            const productIdObject = order.products[productIndex].productId;
-            const productIdValue = productIdObject._id;
+            const productIdValue = order.products[productIndex].productId._id;
 
             await Product.findByIdAndUpdate(productIdValue, { $inc: { quantity: cancelledQuantity } }, { new: true });
         } else if (productStatus === "Return" && originalStatus === "Delivered") {
             const returnedQuantity = order.products[productIndex].quantity;
-
-            // Assuming productId is an object with an _id property
-            const productIdObject = order.products[productIndex].productId;
-            const productIdValue = productIdObject._id;
+            const productIdValue = order.products[productIndex].productId._id;
 
             await Product.findByIdAndUpdate(productIdValue, { $inc: { quantity: returnedQuantity } }, { new: true });
         }
 
         order.products[productIndex].status = productStatus;
 
-        if (productStatus === 'Cancelled' && (order.paymentMethod === 'Razor Payment' || order.paymentMethod === 'Wallet Transfer')) {
+        if ((productStatus === 'Cancelled' || productStatus === 'Return') && (order.paymentMethod === 'Razor Payment' || order.paymentMethod === 'Wallet Transfer')) {
             // Refund the amount to the user's wallet
-            const refundAmount = order.products[productIndex].subtotal; // Assuming refund the entire amount
+            const refundAmount = order.products[productIndex].subtotal;
 
-            // Update user's wallet balance and add a wallet transaction record
             const user = await User.findById(order.user);
 
             if (user) {
@@ -249,10 +238,11 @@ const updateStatus = async (req, res) => {
 
         res.json({ success: true, product: updatedOrder });
     } catch (error) {
-        console.error('Error updating product status:', error);
+        console.error('Error updating product status:', error.message);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 };
+
 
 const checkWalletBalance = async(req, res) => {
     try{

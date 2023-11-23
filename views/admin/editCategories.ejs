@@ -1,51 +1,74 @@
-<%- include('../adminLayouts/header.ejs') %>
-<%- include('../adminLayouts/sidebar.ejs') %>
-<%- include('../adminLayouts/navbar.ejs') %>
-        <!-- partial -->
+<%- include('../adminLayouts/header.ejs') %> <%- include('../adminLayouts/sidebar.ejs') %> <%-
+include('../adminLayouts/navbar.ejs') %>
+<!-- partial -->
 
-        <!--============================ Adding categories table=============== -->
-        <div class="main-panel">
-          <div class="content-wrapper">
-
-            <div class="col-12 grid-margin stretch-card">
-              <div class="card">
+<!--============================ Adding categories table=============== -->
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
                 <div class="card-body">
-                  <h4 class="card-title">Edit Category</h4>
-                  <form class="forms-sample" action="" method="post" onsubmit="return validForm()">
+                    <h4 class="card-title">Add Category</h4>
+                    <form class="forms-sample" action="" method="post" onsubmit="return validForm()">
+                        <% if(typeof message !== 'undefined'){ %>
+                        <h6 id="invalid-msg" class="text-danger text-center"><%- message %></h6>
+                        <% } %>
 
-                    <% if (typeof message !== 'undefined') { %>
-                      <div id="invalid-msg" class="alert alert-danger text-center mt-3">
-                        <h4><%- message %></h4>
-                      </div>
-                    <% } %>
+                        <div class="form-group">
+                            <label for="exampleInputName1">Category Name</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="exampleInputName1"
+                                name="categoryname"
+                                placeholder=" Category Name"
+                            />
+                            <p id="categoryname-error" class="error-message" style="color: red"></p>
+                        </div>
 
-                    <div class="form-group">
-                      <label for="exampleInputName1">Category Name</label>
-                      <input type="text" class="form-control" id="exampleInputName1" name="categoryname" placeholder=" Category Name" value="<%= data.categoryname %>">
-                      <p id="categoryname-error" class="error-message" style="color: red;"></p>
-                    </div>      
-                    <div class="form-group">
-                      <label for="exampleTextarea1">Category Description</label>
-                      <textarea class="form-control" id="exampleTextarea1" rows="4" name="categorydes" placeholder="Category Description"><%= data.description %></textarea>
-                      <p id="categorydes-error" class="error-message" style="color: red;"></p>
-                    </div>
-                    <div class="input-container">
-                      <input type="hidden" name="id" value="<%= data._id %>">
-                    </div>
-                    <button type="submit" class="btn btn-primary mr-2">Submit</button>
-                    <button class="btn btn-dark" value="Update categories">Cancel</button>
-                  </form>
+                        <div class="form-group">
+                            <label for="exampleTextarea1">Category Description</label>
+                            <textarea
+                                class="form-control"
+                                id="exampleTextarea1"
+                                rows="4"
+                                name="categorydes"
+                                placeholder="Category Description"
+                            ></textarea>
+                            <p id="categorydes-error" class="error-message" style="color: red"></p>
+                        </div>
+
+                        <!-- Offer-related fields -->
+                        <div class="form-group">
+                            <label for="offerName">Offer Name</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="offerName"
+                                name="offerName"
+                                placeholder="Offer Name"
+                            />
+                            <p id="offerName-error" class="error-message" style="color: red"></p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="offerStartDate">Offer Start Date</label>
+                            <input type="date" class="form-control" id="offerStartDate" name="offerStartDate" />
+                            <p id="offerStartDate-error" class="error-message" style="color: red"></p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="offerEndDate">Offer End Date</label>
+                            <input type="date" class="form-control" id="offerEndDate" name="offerEndDate" />
+                            <p id="offerEndDate-error" class="error-message" style="color: red"></p>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                        <button class="btn btn-dark">Cancel</button>
+                    </form>
                 </div>
-              </div>+
             </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:../../partials/_footer.html -->
-       
-          <!-- partial -->
         </div>
-        <!-- main-panel ends -->
-      </div>
-      <!-- page-body-wrapper ends -->
     </div>
-
-    <%- include('../adminLayouts/footer.ejs') %>
+</div>
+<%- include('../adminLayouts/footer.ejs') %>

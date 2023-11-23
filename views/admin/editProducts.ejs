@@ -15,7 +15,7 @@ include('../adminLayouts/navbar.ejs') %>
                         onsubmit="return productValiddForm()"
                     >
                         <div class="form-row">
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-4 form-group">
                                 <label for="exampleInputName1">Product Name</label>
                                 <input
                                     type="text"
@@ -27,7 +27,7 @@ include('../adminLayouts/navbar.ejs') %>
                                 />
                                 <p id="productname-error" style="color: red" class="error-message"></p>
                             </div>
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-4 form-group">
                                 <label for="size">Size</label>
                                 <input
                                     type="text"
@@ -38,6 +38,18 @@ include('../adminLayouts/navbar.ejs') %>
                                     value="<%= data.size %>"
                                 />
                                 <p id="size-error" style="color: red" class="error-message"></p>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label for="quantity">Quantity</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="quantity"
+                                    name="quantity"
+                                    placeholder="Quantity"
+                                    value="<%= data.quantity %>"
+                                />
+                                <p id="quantity-error" style="color: red" class="error-message"></p>
                             </div>
                         </div>
 
@@ -63,16 +75,16 @@ include('../adminLayouts/navbar.ejs') %>
                                 <p id="price-error" style="color: red" class="error-message"></p>
                             </div>
                             <div class="col-md-4 form-group">
-                                <label for="quantity">Quantity</label>
+                                <label for="quantity">Discount</label>
                                 <input
                                     type="text"
                                     class="form-control"
-                                    id="quantity"
-                                    name="quantity"
-                                    placeholder="Quantity"
-                                    value="<%= data.quantity %>"
+                                    id="discountPrice"
+                                    name="discountPrice"
+                                    placeholder="Discount Price"
+                                    value="0"
                                 />
-                                <p id="quantity-error" style="color: red" class="error-message"></p>
+                                <p id="discountPrice-error" class="error-message" style="color: red"></p>
                             </div>
                         </div>
 
@@ -113,12 +125,10 @@ include('../adminLayouts/navbar.ejs') %>
                             </div>
                         </div>
 
-                        <!-- ... rest of the form ... -->
-
                         <div class="row mt-5">
                             <div class="col-md-12 text-center">
                                 <button type="submit" class="btn btn-primary mr-2">Submit</button>
-                                <button class="btn btn-dark">Cancel</button>
+           
                             </div>
                         </div>
 
@@ -174,6 +184,7 @@ include('../adminLayouts/navbar.ejs') %>
 
             const productId = event.target.getAttribute("data-product-id");
             const imageName = event.target.getAttribute("data-image");
+            const imageContainer = event.target.parentElement;
 
             try {
                 const response = await fetch(`/admin/delete-image?productId=${productId}&imageName=${imageName}`, {
@@ -185,7 +196,7 @@ include('../adminLayouts/navbar.ejs') %>
 
                 if (response.ok) {
                     // After successful image removal, remove the image element from the DOM
-                    event.target.parentElement.remove();
+                    imageContainer.remove();
                 } else {
                     // Handle error response
                     console.error("Error removing image:", response.statusText);
@@ -197,69 +208,75 @@ include('../adminLayouts/navbar.ejs') %>
         });
     });
 
-newImageInput.addEventListener("change", async (event) => {
-    const productId = document.querySelector("[name='id']").value;
-    const formData = new FormData();
-    formData.append("productId", productId);
+    newImageInput.addEventListener("change", async (event) => {
+        const productId = document.querySelector("[name='id']").value;
+        const formData = new FormData();
+        formData.append("productId", productId);
 
-    // Append selected images to FormData
-    for (const file of event.target.files) {
-        formData.append("images", file);
-    }
+        // Ensure only up to 4 images are added
+        if (event.target.files.length > 4) {
+            alert("You can upload a maximum of 4 images.");
+            return;
+        }
 
-    try {
-        const response = await fetch("/admin/add-images", {
-            method: "POST",
-            body: formData,
-        });
+        // Append selected images to FormData
+        for (const file of event.target.files) {
+            formData.append("images", file);
+        }
 
-        if (response.ok) {
-            const imagesContainer = document.querySelector(".dynamic-image-inputs");
-            const responseData = await response.json();
-
-            // Create and append new image elements to the DOM
-            responseData.images.forEach((image) => {
-                const imageDiv = document.createElement("div");
-                imageDiv.className = "col-md-3 mb-2 existing-image";
-                const img = document.createElement("img");
-                img.src = `/static/admin/Assets/images/products/${image}`;
-                img.style.width = "100px";
-                img.style.height = "100px";
-                img.alt = "Image";
-                img.className = "product-image";
-                const hiddenInput = document.createElement("input");
-                hiddenInput.type = "hidden";
-                hiddenInput.className = "existing-image-input";
-                hiddenInput.name = "existingImageName";
-                hiddenInput.value = image;
-                const removeBtn = document.createElement("button");
-                removeBtn.className = "remove-image-btn";
-                removeBtn.innerText = "Remove";
-                removeBtn.setAttribute("data-image", image);
-                removeBtn.setAttribute("data-product-id", productId);
-                removeBtn.addEventListener("click", async (event) => {
-                    event.preventDefault();
-                    // Add your image removal logic here
-                });
-
-                imageDiv.appendChild(img);
-                imageDiv.appendChild(hiddenInput);
-                imageDiv.appendChild(removeBtn);
-                imagesContainer.appendChild(imageDiv);
+        try {
+            const response = await fetch("/admin/add-images", {
+                method: "POST",
+                body: formData,
             });
 
-            // Handle successful addition of images (if needed)
-            console.log("Images added successfully.");
-        } else {
-            // Handle error response
-            console.error("Error adding images:", response.statusText);
+            if (response.ok) {
+                const imagesContainer = document.querySelector(".dynamic-image-inputs");
+                const responseData = await response.json();
+
+                // Create and append new image elements to the DOM
+                responseData.images.forEach((image) => {
+                    const imageDiv = document.createElement("div");
+                    imageDiv.className = "col-md-3 mb-2 existing-image";
+                    const img = document.createElement("img");
+                    img.src = `/static/admin/Assets/images/products/${image}`;
+                    img.style.width = "100px";
+                    img.style.height = "100px";
+                    img.alt = image; // Set alt dynamically
+                    img.className = "product-image";
+                    const hiddenInput = document.createElement("input");
+                    hiddenInput.type = "hidden";
+                    hiddenInput.className = "existing-image-input";
+                    hiddenInput.name = "existingImageName";
+                    hiddenInput.value = image;
+                    const removeBtn = document.createElement("button");
+                    removeBtn.className = "remove-image-btn";
+                    removeBtn.innerText = "Remove";
+                    removeBtn.setAttribute("data-image", image);
+                    removeBtn.setAttribute("data-product-id", productId);
+                    removeBtn.addEventListener("click", async (event) => {
+                        event.preventDefault();
+                        // Add your image removal logic here
+                    });
+
+                    imageDiv.appendChild(img);
+                    imageDiv.appendChild(hiddenInput);
+                    imageDiv.appendChild(removeBtn);
+                    imagesContainer.appendChild(imageDiv);
+                });
+
+                // Handle successful addition of images (if needed)
+                console.log("Images added successfully.");
+            } else {
+                // Handle error response
+                console.error("Error adding images:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error adding images:", error);
+            // Handle network error or JSON parsing error
         }
-    } catch (error) {
-        console.error("Error adding images:", error);
-        // Handle network error or JSON parsing error
-    }
-});
-  })
+    });
+  });
 
 </script>
 

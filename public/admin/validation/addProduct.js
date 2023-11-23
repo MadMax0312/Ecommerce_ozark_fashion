@@ -20,7 +20,6 @@ function validateForm() {
   const descriptionError = document.getElementById("description-error");
   const sizeError = document.getElementById("size-error");
 
-
   priceError.textContent = "";
   nameError.textContent = "";
   quantityError.textContent = "";
@@ -33,6 +32,7 @@ function validateForm() {
   const price = document.getElementById("price").value;
   const quantity = document.getElementById("quantity").value;
   const description = document.getElementById("description").value;
+  const discountPrice = document.getElementById("discountPrice").value;
 
 
   // Regular expressions for validation
@@ -59,6 +59,17 @@ if (!productname) {
     }, 3000);
     return false;
 }
+
+if (discountPrice !== "" && (!isValidPrice(discountPrice) || parseFloat(discountPrice) < 0 || parseFloat(discountPrice) > parseFloat(price) / 2)) {
+  document.getElementById("discountPrice-error").textContent =
+      "Discount price should be a non-negative number and should not exceed half of the product price.";
+  setTimeout(function () {
+      document.getElementById("discountPrice-error").textContent = "";
+  }, 3000);
+  return false;
+}
+
+
 
 if (productname.length > 15) {
     document.getElementById("nameError").textContent = "Product name must be maximum 15 characters long";
