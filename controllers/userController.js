@@ -5,6 +5,7 @@ const Category = require("../models/categoryModel");
 const bcrypt = require("bcrypt");
 const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
+const Order = require("../models/orderModel");
 const randomstring = require("randomstring");
 const { getTotalProductsInCart } = require("../number/cartNumber")
 require('dotenv').config();
@@ -381,70 +382,140 @@ const login = async (req, res) => {
 
 //-------loading shop page------------//
 
+const getCategoryProductCounts = async () => {
+    try {
+      const categoryCounts = await Product.aggregate([
+        {
+          $group: {
+            _id: '$category',
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+  
+      const results = await Promise.all(
+        categoryCounts.map(async (categoryCount) => {
+          const category = await Category.findById(categoryCount._id);
+          return {
+            categoryName: category.categoryname,
+            productCount: categoryCount.count,
+          };
+        })
+      );
+  
+      return results;
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
 
-
-const loadShop = async (req, res) => {
+  const loadShop = async (req, res) => {
     try {
         const page = req.query.page ? parseInt(req.query.page) : 1;
         const search = req.query.search ? req.query.search : "";
-
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
+        const limit = 9;
 
-     
-        const limit = 6;
+        const filterOptions = {};
 
-        let sortOption = {};
-        if (req.query.sort === "price_low_to_high") {
-            sortOption = { price: 1 };
-        } else if (req.query.sort === "price_high_to_low") {
-            sortOption = { price: -1 };
+        // Price Filter
+        if (req.query.minPrice && req.query.maxPrice) {
+            filterOptions.price = {
+                $gte: parseFloat(req.query.minPrice),
+                $lte: parseFloat(req.query.maxPrice),
+            };
         }
 
-        const category = await Category.find();
-        const categoryNames = category.map((categoryObj) => categoryObj.categoryname);
-        const cname = categoryNames.join("\n");
-
-        let categoryFilter = {};
-        if (req.query.gender) {
-            categoryFilter = { "category.categoryname": req.query.gender };
+        // Size Filter
+        if (req.query.size) {
+            filterOptions.size = req.query.size;
         }
 
-        const count = await Product.countDocuments({
-            $and: [
-                {
-                    $or: [
-                        { productname: { $regex: ".*" + search + ".*", $options: "i" } },
-                        { size: { $regex: ".*" + search + ".*", $options: "i" } },
-                        { price: { $regex: ".*" + search + ".*", $options: "i" } },
+        const countPipeline = [
+            {
+                $match: {
+                    $and: [
+                        {
+                            $or: [
+                                { productname: { $regex: ".*" + search + ".*", $options: "i" } },
+                                { size: { $regex: ".*" + search + ".*", $options: "i" } },
+                            ],
+                        },
+                        filterOptions,
+                        { status: true }, // Only get products with status true
                     ],
                 },
-                { status: true }, // Only get products with status true
-            ],
-        });
+            },
+            {
+                $count: "count",
+            },
+        ];
+
+        const countResult = await Product.aggregate(countPipeline);
+
+        const count = countResult.length > 0 ? countResult[0].count : 0;
 
         const totalPages = Math.ceil(count / limit);
 
-        const productData = await Product.find({
-            $and: [
-                {
-                    $or: [
-                        { productname: { $regex: ".*" + search + ".*", $options: "i" } },
-                        { size: { $regex: ".*" + search + ".*", $options: "i" } },
-                        { price: { $regex: ".*" + search + ".*", $options: "i" } },
+        const pipeline = [
+            {
+                $match: {
+                    $and: [
+                        {
+                            $or: [
+                                { productname: { $regex: ".*" + search + ".*", $options: "i" } },
+                                { size: { $regex: ".*" + search + ".*", $options: "i" } },
+                            ],
+                        },
+                        filterOptions,
+                        { status: true }, // Only get products with status true
                     ],
                 },
-                { status: true }, // Only get products with status true
-            ],
-        })
-            .populate("category")
-            .sort(sortOption)
-            .skip((page - 1) * limit)
-            .limit(limit);
+            },
+            {
+                $skip: (page - 1) * limit,
+            },
+            {
+                $limit: limit,
+            },
+            {
+                $lookup: {
+                    from: "categories", // Assuming your category collection is named "categories"
+                    localField: "category",
+                    foreignField: "_id",
+                    as: "category",
+                },
+            },
+            {
+                $unwind: "$category",
+            },
+            {
+                $project: {
+                    _id: 1,
+                    productname: 1,
+                    size: 1,
+                    price: 1,
+                    description: 1,
+                    image: 1,
+                    quantity: 1,
+                    status: 1,
+                    createdAt: 1,
+                    discountPercentage: 1,
+                    discountedPrice: 1,
+                    "category.categoryname": 1,
+                },
+            },
+        ];
+
+        const productData = await Product.aggregate(pipeline);
 
         productData.forEach((product) => {
-            product.price = parseFloat(product.price); // or parseInt(product.price) for integer values
+            product.price = parseFloat(product.price);
         });
+
+        const categoryProductCounts = await getCategoryProductCounts();
 
         res.render("shop", {
             user: req.session.user_id,
@@ -453,13 +524,72 @@ const loadShop = async (req, res) => {
             currentPage: page,
             search: search,
             sortOption: req.query.sort,
-            count: totalProductsInCart
+            count: totalProductsInCart,
+            categoryProductCounts: categoryProductCounts,
+            filterOptions: {
+                minPrice: req.query.minPrice,
+                maxPrice: req.query.maxPrice,
+                size: req.query.size,
+            },
         });
     } catch (error) {
         console.log(error.message);
-        // Handle error and send appropriate response
+        // Handle error and send an appropriate response
+        res.status(500).send('Internal Server Error');
     }
-}; 
+};
+
+
+const getProductsByCategory = async (req, res) => {
+    try {
+        const { categoryName } = req.params;
+        const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+
+        const categoryObjectId = await Category.findOne({ categoryname: categoryName }).select('_id');
+
+        if (!categoryObjectId) {
+            console.log(`Category not found for name: ${categoryName}`);
+            return res.status(404).send('Category not found');
+        }
+
+        const limit = 6; // Number of products per page
+        const skip = (page - 1) * limit;
+
+        const products = await Product.find({
+            'category': categoryObjectId,
+            status: true,
+        })
+        .populate('category')
+        .skip(skip)
+        .limit(limit);
+
+        const totalProductsCount = await Product.countDocuments({
+            'category': categoryObjectId,
+            status: true,
+        });
+
+        const categoryProductCounts = await getCategoryProductCounts();
+        categoryProductCounts.sort((a, b) => a.categoryName.localeCompare(b.categoryName));
+
+        // Debugging output
+        console.log('categoryName:', categoryName);
+        console.log('products:', products);
+        console.log('categoryProductCounts:', categoryProductCounts);
+
+        res.render('categoryMen', {
+            user: req.session.user_id,
+            categoryName: categoryName,
+            products: products,
+            categoryProductCounts: categoryProductCounts,
+            currentPage: page,
+            totalPages: Math.ceil(totalProductsCount / limit),
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
 
 
 ///===========Rendering product info page -=-----------//
@@ -471,9 +601,33 @@ const loadProductInfo = async (req, res) => {
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
 
-        const products = await Product.find({ status: true });
+        const productSales = await Order.aggregate([
+            { $unwind: "$products" },
+            {
+              $group: {
+                _id: "$products.productId",
+                totalQuantitySold: { $sum: "$products.quantity" },
+              },
+            },
+          ]);
+          
+          const sortedProducts = productSales.sort((a, b) => b.totalQuantitySold - a.totalQuantitySold);
+          
+          const mostSellingProductIds = sortedProducts.map((product) => product._id);
+          
+          // Fetch product details based on the sorted IDs
+          const mostSellingProducts = await Product.find({ _id: { $in: mostSellingProductIds } });
+          
+          // Ensure each product has an 'image' property (an array)
+          const mostSellingProductsWithImages = mostSellingProducts.map((product) => {
+            const productWithImage = { ...product.toObject() }; // Convert Mongoose document to plain JavaScript object
+            productWithImage.image = productWithImage.image || []; // Ensure 'image' is an array
+            return productWithImage;
+          });
+          
+          console.log("Most Selling Products:", mostSellingProductsWithImages);
 
-        res.render("productDetails", { Product: product, data: products, user: req.session.user_id, count: totalProductsInCart });
+        res.render("productDetails", { Product: product, data: mostSellingProducts, user: req.session.user_id, count: totalProductsInCart });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
@@ -508,8 +662,9 @@ module.exports = {
     loadForgotPassword,
     forgotVerify,
     loadChangePassword,
-    updatePassword,
+    updatePassword, 
     loadShop,
+    getProductsByCategory,
     loadProductInfo,
     loadAbout,
 

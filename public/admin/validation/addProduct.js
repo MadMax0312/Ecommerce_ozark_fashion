@@ -170,7 +170,8 @@ function isValidQuantity(quantity) {
 }
 
 function isValidSize(size) {
-  // This function checks if the input is a positive integer
+  // This function checks if the input is a positive integer between 10 and 45
   const regex = /^[1-9]\d*$/;
-  return regex.test(size) && parseFloat(size) > 0;
+  const numericSize = parseFloat(size);
+  return regex.test(size) && numericSize >= 10 && numericSize <= 45;
 }

@@ -12,6 +12,34 @@
       width: auto; /* Ensure images scale proportionally */
       margin: 0 5px; /* Add some margin between thumbnail images */
     }
+    .price-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .discounted-price {
+        color: #e44d26; /* Set the color for the discounted price */
+        font-size: 24px; /* Set the font size for the discounted price */
+    }
+
+    .center-line {
+        flex-grow: 1;
+        height: 2px;
+        background-color: #333; /* Set the color for the center line */
+        margin: 0 10px; /* Set the margin for spacing between prices and the line */
+    }
+
+    .actual-price {
+        color: #333; /* Set the color for the actual price */
+        font-size: 24px; /* Set the font size for the actual price */
+    }
+
+    .discount-percentage {
+        color: #e44d26; /* Set the color for the discount percentage */
+    }
+    .text-primary {
+    color: #0f1010!important;
+    }
   </style>
 
 <div class="site-wrap">
@@ -74,7 +102,16 @@
                 <div class="col-md-6">
                     <h2 class="text-black"><%= Product.productname %></h2>
                     <p><%= Product.description %></p>
-                    <p><strong class="text-primary h4">₹<%= Product.price %></strong></p>
+                    <% if (Product.discountPercentage && parseFloat(Product.discountPercentage) > 0) { %>
+                        <div class="price-container">
+                            <span class="discounted-price">₹<%= Product.discountedPrice %></span>
+                            <div class="center-line"></div>
+                            <span class="actual-price">₹<%= Product.price %></span>
+                        </div>
+                        <p><span class="discount-percentage">Discount: <%= Product.discountPercentage %>%</span></p>
+                    <% } else { %>
+                        <p><strong class="text-primary h4">₹<%= Product.price %></strong></p>
+                    <% } %>
 
                     <div class="mb-5">
                         <div class="input-group mb-3" style="max-width: 120px">

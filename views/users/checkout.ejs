@@ -355,8 +355,8 @@
                                                 />
                                             </td>
                                             <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= item.quantity %></td>
-                                            <td>₹ <%= item.product.price %></td>
-                                            <td>₹ <%= (item.product.price * item.quantity).toFixed(2) %></td>
+                                            <td>₹ <%= item.product.discountedPrice %></td>
+                                            <td class="font-weight-bold">₹ <%= (item.product.discountedPrice * item.quantity).toFixed(2) %></td>
                                         </tr>
                                         <% }); %> <% } else { %>
                                         <tr>
@@ -373,7 +373,7 @@
                                                 <p style="color: black">SubTotal Amount :</p>
                                             </div>
                                             <div style="display: inline-block">
-                                                <p style="color: black">₹ <%= totalAmount.toFixed(2) %></p>
+                                                <p class="font-weight-bold">₹ <%= totalAmount.toFixed(2) %></p>
                                             </div>
                                         </div>
                                     </h6>
@@ -408,7 +408,7 @@
                                                     <p style="color: black">Total Amount :</p>
                                                 </div>
                                                 <div id="purchaseAmountElement" style="display: inline-block">
-                                                    <p style="color: black" id="totalElement">₹ <%= totalAmount.toFixed(2) %></p>
+                                                    <p class="font-weight-bold" id="totalElement">₹ <%= totalAmount.toFixed(2) %></p>
                                                 </div>
                                             </div>
                                         </h6>

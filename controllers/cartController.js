@@ -86,8 +86,6 @@ const addToCart = async (req, res) => {
             return res.status(400).json({ message: "Exceeded maximum stock limit" });
         }
 
-       
-
         let cartItem = await Cart.findOne({ user_id });
 
         if (cartItem) {

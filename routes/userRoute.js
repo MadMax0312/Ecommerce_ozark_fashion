@@ -59,6 +59,8 @@ user_route.get("/", userController.login);
 
 user_route.get("/shop", userController.loadShop);
 
+user_route.get('/shop/category/:categoryName', userController.getProductsByCategory);
+
 //====================== P R O F I L E == S E C T I O N ==================================
 
 

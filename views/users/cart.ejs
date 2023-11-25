@@ -21,7 +21,8 @@
                                 <tr>
                                     <th class="product-thumbnail">Image</th>
                                     <th class="product-name">Product</th>
-                                    <th class="product-prices">Price</th>
+                                    <th class="product-prices">Actual Price</th>
+                                    <th class="product-prices">Discount Price</th>
                                     <th class="product-quantity">Quantity</th>
                                     <th class="product-total">Total</th>
                                     <th class="product-remove">Remove</th>
@@ -43,27 +44,24 @@
                                         />
                                     </td>
                                     <td class="product-name"><%= item.product.productname %></td>
-                                    <td class="product-price" data-product-price="<%= item.product.price %>">
-                                        <%= item.product.price %>
+                                    <td class="product-prices" data-product-prices="<%= item.product.price %>">
+                                        ₹<%= item.product.price %>
                                     </td>
-                                    <td style="text-align: center">
-                                        <div class="input-group mb-3" style="max-width: 170px; margin: 0 auto">
+                                    <td class="product-price" data-product-price="<%= item.product.price %>">
+                                        ₹<%= item.product.discountedPrice %>
+                                    </td>
+                                    <td style="text-align: center"> 
+                                        <div class="input-group mb-3" style="max-width: 130px; margin: 0 auto">
                                             <div class="input-group-prepend">
                                                 <button class="btn btn-outline-primary js-btn-minus" type="button">
                                                     &minus;
                                                 </button>
                                             </div>
-                                            <input
-                                                type="number"
-                                                class="form-control text-center quantity-input"
-                                                value="<%= item.quantity %>"
-                                                data-product-id="<%= item.product._id %>"
-                                                aria-label="Quantity"
-                                                aria-describedby="button-addon1"
-                                                id="minus"
-                                                min="1"
-                                                readonly
-                                            />
+                                            <input type="number" class="form-control text-center quantity-input pl-4" 
+                                            value="<%= item.quantity %>" data-product-id="<%= item.product._id %>" 
+                                            aria-label="Quantity" aria-describedby="button-addon1" id="minus"
+                                            min="1" readonly />
+
                                             <div class="input-group-append">
                                                 <button
                                                     class="btn btn-outline-primary js-btn-plus"
@@ -77,7 +75,7 @@
                                     </td>
                                     <td>
                                         <span class="total-price"
-                                            >₹ <%= (item.quantity * item.product.price).toFixed(2) %></span
+                                            >₹ <%= (item.quantity * item.product.discountedPrice).toFixed(2) %></span
                                         >
                                     </td>
                                     <td>

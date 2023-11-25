@@ -4,7 +4,11 @@
 <style>
   .featured-product-image {
     max-height: 400px;
-
+    margin: 0 auto;
+  }
+  .featured-product-images {
+    max-height: 200px;
+    width: 100%;
     margin: 0 auto;
   }
 
@@ -31,8 +35,52 @@
   }
 
   .zoom-container:hover .featured-product-image {
-    transform: scale(1.2); /* Adjust the scale factor as needed */
+    transform: scale(1.2); 
   }
+  .discounted-price {
+        color: #e44d26; 
+        font-size: 24px; 
+        margin-bottom: 0;
+    }
+
+    .actual-price {
+        color: #333; 
+        font-size: 18px; 
+        text-decoration: line-through; 
+        margin-bottom: 0;
+    }
+
+    .discount-percentage {
+        color: #e44d26; 
+    }
+    .item {
+        position: relative;
+    }
+
+    .block-4-text-new {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .actual-price-new {
+        text-decoration: line-through;
+        color: #333; 
+        font-size: 18px; 
+        margin-bottom: 0;
+    }
+
+    .discounted-price-new {
+        color: #e44d26; 
+        font-size: 24px; 
+        font-weight: bold;
+        margin-bottom: 0;
+    }
+
+    .discount-icon-new {
+        color: #e44d26; 
+        margin-left: 5px; 
+    }
 </style>
 
 <div class="site-wrap">
@@ -93,10 +141,16 @@
 
         <div class="col-md-6">
           <h2 class="text-black"><%= Product.productname %></h2>
-          <p><%= Product.description %></p>
-          <p><strong class="text-primary h4">₹<%= Product.price %></strong></p>
+          <p class="m-0"><%= Product.description %></p>
+          <% if (Product.discountPercentage && parseFloat(Product.discountPercentage) > 0) { %>
+            <p class="discounted-price">₹<%= Product.discountedPrice %></p>
+            <p class="actual-price">₹<%= Product.price %></p>
+            <p>Discount: <span class="discount-percentage"><%= Product.discountPercentage %>%</span></p>
+        <% } else { %>
+            <p><strong class="text-primary h4">₹<%= Product.price %></strong></p>
+        <% } %>
 
-          <div class="mb-5">
+          <div class="mb-3">
             <div class="input-group mb-3" style="max-width: 120px">
               <div class="input-group-prepend">
                 <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
@@ -185,14 +239,21 @@
                                     <img
                                     src="/static/admin/Assets/images/products/<%= data[i].image[0] %>"
                                     alt="Image placeholder"
-                                    class="img-fluid featured-product-image"
+                                    class="img-fluid featured-product-images"
                                 />
                                   </a>
                                 </figure>
                                 <div class="block-4-text p-1">
                                     <h3 style="color: black;"><%= data[i].productname %></h3>
                                     <p class="mb-0">Finding the perfect t-shirt</p>
-                                    <p class="font-weight-bold" style="color: black;">₹ <%= data[i].price %></p>
+                                    <% if (data[i].discountPercentage && parseFloat(data[i].discountPercentage) > 0) { %>
+                                      <span class="actual-price-new">₹<%= data[i].price %></span>
+                                      <span class="center-line"></span>
+                                      <span class="discounted-price-new">₹<%= data[i].discountedPrice %></span>
+                                      <i class="material-icons discount-icon-new">local_offer</i>
+                                  <% } else { %>
+                                      <span class="font-weight-bold" style="color: black;">₹<%= data[i].price %></span>
+                                  <% } %>
                                 </div>
                             </div>
                         </div>
@@ -200,6 +261,8 @@
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
 

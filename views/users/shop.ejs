@@ -1,10 +1,15 @@
 <%- include('../userLayouts/header.ejs') %> 
 <%- include('../userLayouts/navbar.ejs') %>
 
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+
 <style>
     .product-card {
         border: none;
         transition: box-shadow 0.3s ease;
+        height: 350px; 
     }
 
     .product-card:hover {
@@ -13,24 +18,71 @@
 
     .product-image {
         height: 200px;
-        object-fit: cover;
+        object-fit: cover; 
+        width: 100%; 
     }
 
     .category {
-        color: #777;
+        color: #444;
     }
 
     .description {
-        color: #444;
+        color: #777;
+    }
+
+    .offer-icon {
+        color: #e44d26; 
+        font-size: 18px; 
+    }
+
+    .center-line {
+        position: absolute;
+        height: 2px;
+        width: 100%;
+        background-color: #333; 
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+
+    .prices {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        margin-top: 10px;
+        font-weight: 700;
+    }
+
+    .actual-price {
+        position: relative;
+        z-index: 2;
+        padding-right: 5px; 
+    }
+
+    .discounted-price {
+        position: relative;
+        z-index: 2;
+        padding-left: 5px; 
+    }
+    .card-text{
+        color: black;
+    }
+    .card-title{
+        font-size: 22px;
+    }
+    #filterForm {
+        max-width: 100%;
+    }
+
+    #filterForm .form-group {
+        margin-bottom: 15px;
+    }
+
+    #filterForm button {
+        width: 100%;
     }
 </style>
-
-<script>
-    function calculateDiscountedPrice(originalPrice, discountPercentage) {
-        const discountAmount = (originalPrice * discountPercentage) / 100;
-        return (originalPrice - discountAmount).toFixed(2);
-    }
-</script>
 
 <div class="bg-light py-3">
     <div class="container">
@@ -57,10 +109,10 @@
                     </form>
                 </div>
 
-                <div class="row">
+                <div class="row" style="text-align: center;">
                     <% if (Product.length > 0) { 
                         for (let i = 0; i < Product.length; i++) { %>
-                            <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
+                            <div class="col-sm-6 col-md-4 mb-1 mb-md-0" data-aos="fade-up">
                                 <div class="card product-card">
                                     <div class="product-image-wrapper">
                                         <a href="/product-info?id=<%= Product[i]._id %>">
@@ -68,19 +120,26 @@
                                         </a>
                                     </div>
                                     <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a href="#" style="color: black"><%= Product[i].productname %></a>
+                                        <h5 class="card-title" style="margin-bottom: 0;">
+                                            <a href="/product-info?id=<%= Product[i]._id %>" style="color: black"><%= Product[i].productname %></a>
                                         </h5>
-                                        <p class="card-text category"><%= Product[i].category.categoryname %></p>
-                                        <p class="card-text description"><%= Product[i].description %></p>
-                                        <% if (Product[i].discount && parseFloat(Product[i].discount) > 0) { %>
-                                            <p class="card-text price text-black font-weight-bold">
-                                                Actual Price: ₹<%= Product[i].price %><br>
-                                                Discounted Price: ₹<%= calculateDiscountedPrice(Product[i].price, Product[i].discount) %>
-                                            </p>
-                                        <% } else { %>
-                                            <p class="card-text price text-black font-weight-bold">₹<%= Product[i].price %></p>
-                                        <% } %>
+                                        <p class="card-text category" style="margin-bottom: 0;"><%= Product[i].category.categoryname %></p>
+                                        <p class="card-text size" style="margin-bottom: 0;">Size: <%= Product[i].size %></p>
+                                        
+                                        <div class="prices">
+                                            <span class="actual-price pl-4">
+                                                <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) { %>
+                                                    <span class="center-line" style="width: 44px;"></span> ₹<%= Product[i].price %>
+                                                <% } else { %>
+                                                    <span class="font-weight-bold ml-5">Price: </span> ₹<%= Product[i].price %>
+                                                <% } %>
+                                            </span>
+                                            <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) { %>
+                                                <span class="discounted-price offer-icon">
+                                                    <i data-feather="tag"></i> ₹<%= Product[i].discountedPrice %>
+                                                </span>
+                                            <% } %>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -90,57 +149,91 @@
                         </div>
                     <% } %>
                 </div>
+                <br>
 
                 <% if (typeof totalPages !== 'undefined') { %>
-                    <div class="pagination-container">
-                        <% if (currentPage > 1) { %>
-                            <a href="?page=<%= currentPage - 1 %>"><i class="fas fa-chevron-left"></i> Previous</a>
-                        <% } %> 
-                        <% for(let j=1; j <= totalPages; j++){ %>
-                            <a href="?page=<%= j %>" class="<%= j === currentPage ? 'active' : '' %>"><%= j %></a>
-                        <% } %> 
-                        <% if (currentPage < totalPages) { %>
-                            <a href="?page=<%= currentPage + 1 %>">Next <i class="fas fa-chevron-right"></i></a>
-                        <% } %>
-                    </div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <% if (currentPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <% } %>
+                            <% for(let j=1; j <= totalPages; j++){ %>
+                                <li class="page-item <%= j === currentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="?page=<%= j %>"><%= j %></a>
+                                </li>
+                            <% } %>
+                            <% if (currentPage < totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
                 <% } %>
             </div>
 
             <div class="col-md-3 order-1 mb-5 mb-md-0">
                 <div class="border p-4 rounded mb-4">
                     <h3 class="mb-3 h6 text-uppercase text-black d-block">Categories</h3>
-                    <!-- Replace the href values with your actual category links -->
                     <ul class="list-unstyled mb-0">
-                        <li class="mb-1">
-                            <a href="/shop?category=category1" class="d-flex"><span>Category 1</span> <span class="text-black ml-auto">(2,220)</span></a>
-                        </li>
-                        <li class="mb-1">
-                            <a href="/shop?category=category2" class="d-flex"><span>Category 2</span> <span class="text-black ml-auto">(2,550)</span></a>
-                        </li>
-                        <!-- Add more categories as needed -->
-                    </ul>
+                        <% categoryProductCounts
+                          .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
+                          .forEach(categoryCount => { %>
+                            <li class="mb-1">
+                              <a href="/shop/category/<%= categoryCount.categoryName %>" class="d-flex">
+                                <span><%= categoryCount.categoryName %></span>
+                                <span class="text-black ml-auto">(<%= categoryCount.productCount %>)</span>
+                              </a>
+                            </li>
+                          <% }); %>
+                      </ul>                    
                 </div>
 
                 <div class="border p-4 rounded mb-4">
-                    <div class="mb-4">
-                        <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Price</h3>
-                        <div id="slider-range" class="border-primary"></div>
-                        <input
-                            type="text"
-                            name="text"
-                            id="amount"
-                            class="form-control border-0 pl-0 bg-white"
-                            disabled=""
-                        />
-                    </div>
-
-                    <!-- Your existing code for Size and Color filters goes here -->
+                    <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter</h3>
+                    <form id="filterForm">
+                        <div class="form-group">
+                            <label for="minPrice">Min Price:</label>
+                            <input type="text" class="form-control" id="minPrice" placeholder="Enter min price" />
+                        </div>
+                        <div class="form-group">
+                            <label for="text">Max Price:</label>
+                            <input type="text" class="form-control" id="maxPrice" placeholder="Enter max price" />
+                        </div>
+                        <div class="form-group">
+                            <label for="size">Size:</label>
+                            <input type="text" class="form-control" id="size" placeholder="Enter size" />
+                        </div>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="applyFilters()">Apply Filters</button>
+                    </form>                    
                 </div>
+                            
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+<script>
+    function applyFilters() {
+        const minPrice = document.getElementById('minPrice').value;
+        const maxPrice = document.getElementById('maxPrice').value;
+        const size = document.getElementById('size').value;
+
+        window.location.href = `/shop?page=1&minPrice=${minPrice || ''}&maxPrice=${maxPrice || ''}&size=${size || ''}`;
+    }
+</script>
+
+<script>
+    feather.replace();
+</script>
+
+
 <%- include('../userLayouts/footer.ejs') %>
-
-
