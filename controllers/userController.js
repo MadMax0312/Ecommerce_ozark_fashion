@@ -7,6 +7,7 @@ const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
 const Order = require("../models/orderModel");
 const randomstring = require("randomstring");
+const shortid = require("shortid")
 const { getTotalProductsInCart } = require("../number/cartNumber")
 require('dotenv').config();
 
@@ -53,7 +54,7 @@ const loadOtpPage = async (req, res) => {
     }
 };
 
-//ottp verification and otp storing in session
+//ottp sending and otp storing in session
 const verifyOtp = async (req, res) => {
     try {
         console.log("fbhjgdahfj");
@@ -81,7 +82,24 @@ const verifyOtp = async (req, res) => {
             req.session.mobile = req.body.mno;
             req.session.email = req.body.email;
 
-            if (req.body.firstname && req.body.email && req.body.lastname && req.body.mno) {
+                        // Check if a referral code is provided in the registration form
+            if (req.body.referralCode) {
+                // Check if the referral code provided by the user exists
+                const referringUser = await User.findOne({ referralCode: req.body.referralCode });
+        
+                if (referringUser) {
+                req.session.referralUserId = referringUser._id; // Save referring user ID in session
+                } else {
+                res.render('registration', { message: 'Invalid referral code. Please use a valid referral code.' });
+                return;
+                }
+            }
+        
+            // Generate a unique referral code using shortid
+            const referralCode = shortid.generate();
+            req.session.referralCode = referralCode; // Save referral code in session
+
+            if (req.body.firstname && req.body.email && req.body.mno) {
                 if (req.body.password === req.body.cpassword) {
                     req.session.password = spassword;
                     req.session.otp = {
@@ -156,8 +174,9 @@ const resendOtp = async (req, res) => {
 const insertUser = async (req, res) => {
     console.log("Request Body:", req.body);
     try {
-        console.log("ljhgghjg");
-        console.log("Password from form:", req.body.password);
+
+        const referralCode = req.session.referralCode;
+
         if (req.body.otp === req.session.otp.code) {
             const user = new User({
                 first_name: req.session.firstname,
@@ -166,10 +185,43 @@ const insertUser = async (req, res) => {
                 mobile: req.session.mobile,
                 password: req.session.password,
                 is_verified: 1,
+                referralCode: referralCode,
                 isBlock: false,
             });
 
             const userData = await user.save();
+
+            if (referralCode) {
+                const referringUserId = req.session.referralUserId;
+                const referringUser = await User.findById(referringUserId);
+        
+                if (referringUser) {
+                  referringUser.referredBy = userData._id;
+                  await referringUser.save();
+        
+                  // Award a bonus of 100 to both the referrer and the referred user
+                  const bonusAmount = 500;
+        
+                  referringUser.wallet += bonusAmount;
+                  referringUser.walletHistory.push({
+                    transactionDate: new Date(),
+                    transactionAmount: bonusAmount,
+                    transactionDetails: `Referral bonus for user ${userData.username}`,
+                    transactionType: 'Deposit',
+                  });
+                  await referringUser.save();
+        
+                  userData.wallet += bonusAmount;
+                  userData.walletHistory.push({
+                    transactionDate: new Date(),
+                    transactionAmount: bonusAmount,
+                    transactionDetails: 'Referral bonus',
+                    transactionType: 'Deposit',
+                  });
+                  await userData.save();
+                }
+              }
+
             console.log(userData);
             res.render("login");
         } else {
@@ -181,9 +233,6 @@ const insertUser = async (req, res) => {
 };
 
 //Login user methods started
-
-
-
 
 const loginLoad = async (req, res) => {
     try {
@@ -371,8 +420,14 @@ const login = async (req, res) => {
 
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
+        const categoryProductCounts = await getCategoryProductCounts();
 
-        res.render("home", { user: req.session.user_id, products, count: totalProductsInCart });
+        res.render("home", { 
+            user: req.session.user_id, 
+            products, 
+            count: totalProductsInCart ,
+            categoryProductCounts: categoryProductCounts,
+        });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
@@ -385,6 +440,9 @@ const login = async (req, res) => {
 const getCategoryProductCounts = async () => {
     try {
       const categoryCounts = await Product.aggregate([
+        {
+          $match: { status: true } // Add this $match stage to filter products with status true
+        },
         {
           $group: {
             _id: '$category',
@@ -408,6 +466,7 @@ const getCategoryProductCounts = async () => {
       console.error('Error:', error);
     }
   };
+
   
 
   const loadShop = async (req, res) => {
@@ -539,13 +598,30 @@ const getCategoryProductCounts = async () => {
     }
 };
 
+const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
+    const discountAmount = (originalPrice * parseFloat(discountPercentage)) / 100;
+    const discountedPrice = originalPrice - discountAmount;
+    return discountedPrice.toFixed(2); // Round to 2 decimal places
+};
+
 
 const getProductsByCategory = async (req, res) => {
     try {
         const { categoryName } = req.params;
+        const search = req.query.search ? req.query.search : "";
+        const userId = req.session.user_id;
+        const totalProductsInCart = await getTotalProductsInCart(userId);
         const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
 
         const categoryObjectId = await Category.findOne({ categoryname: categoryName }).select('_id');
+
+        const category = await Category.findOne({ categoryname: categoryName });
+        if (!category) {
+          console.log(`Category not found for name: ${categoryName}`);
+          return res.status(404).send("Category not found");
+        }
+    
+        const categoryDiscount = parseFloat(category.discountPercentage) || 0;
 
         if (!categoryObjectId) {
             console.log(`Category not found for name: ${categoryName}`);
@@ -571,10 +647,7 @@ const getProductsByCategory = async (req, res) => {
         const categoryProductCounts = await getCategoryProductCounts();
         categoryProductCounts.sort((a, b) => a.categoryName.localeCompare(b.categoryName));
 
-        // Debugging output
-        console.log('categoryName:', categoryName);
-        console.log('products:', products);
-        console.log('categoryProductCounts:', categoryProductCounts);
+        console.log("categoryDiscount", categoryDiscount)
 
         res.render('categoryMen', {
             user: req.session.user_id,
@@ -583,6 +656,9 @@ const getProductsByCategory = async (req, res) => {
             categoryProductCounts: categoryProductCounts,
             currentPage: page,
             totalPages: Math.ceil(totalProductsCount / limit),
+            search: search,
+            count: totalProductsInCart,
+            categoryDiscount: categoryDiscount,
         });
     } catch (error) {
         console.log(error.message);
@@ -597,9 +673,23 @@ const getProductsByCategory = async (req, res) => {
 const loadProductInfo = async (req, res) => {
     try {
         const id = req.query.id;
-        const product = await Product.findById(id);
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
+        const product = await Product.findById(id).populate("category");
+
+        if (!product) {
+            return res.status(404).send("Product not found");
+        }
+        
+        const categoryId = product.category;
+        
+        const category = await Category.findById(categoryId);
+        
+        if (!category) {
+            return res.status(404).send("Category not found");
+        }
+
+        const categoryDiscount = parseFloat(category.discountPercentage) || 0;
 
         const productSales = await Order.aggregate([
             { $unwind: "$products" },
@@ -609,25 +699,36 @@ const loadProductInfo = async (req, res) => {
                 totalQuantitySold: { $sum: "$products.quantity" },
               },
             },
-          ]);
-          
-          const sortedProducts = productSales.sort((a, b) => b.totalQuantitySold - a.totalQuantitySold);
-          
-          const mostSellingProductIds = sortedProducts.map((product) => product._id);
-          
-          // Fetch product details based on the sorted IDs
-          const mostSellingProducts = await Product.find({ _id: { $in: mostSellingProductIds } });
-          
-          // Ensure each product has an 'image' property (an array)
-          const mostSellingProductsWithImages = mostSellingProducts.map((product) => {
+        ]);
+
+        const sortedProducts = productSales.sort((a, b) => b.totalQuantitySold - a.totalQuantitySold);
+        const mostSellingProductIds = sortedProducts.map((product) => product._id);
+        
+        // Fetch product details based on the sorted IDs
+        const mostSellingProducts = await Product.find({ _id: { $in: mostSellingProductIds } });
+        
+        // Ensure each product has an 'image' property (an array)
+        const mostSellingProductsWithImages = mostSellingProducts.map((product) => {
             const productWithImage = { ...product.toObject() }; // Convert Mongoose document to plain JavaScript object
             productWithImage.image = productWithImage.image || []; // Ensure 'image' is an array
             return productWithImage;
-          });
-          
-          console.log("Most Selling Products:", mostSellingProductsWithImages);
+        });
 
-        res.render("productDetails", { Product: product, data: mostSellingProducts, user: req.session.user_id, count: totalProductsInCart });
+        // Calculate the minimum discounted price
+        const productDiscountedPrice = product.price - (product.price * product.discountPercentage / 100);
+        const categoryDiscountedPrice = product.price - (product.price * categoryDiscount / 100);
+        const finalDiscountedPrice = Math.min(productDiscountedPrice, categoryDiscountedPrice);
+
+        console.log("Most Selling Products:", mostSellingProductsWithImages);
+
+        res.render("productDetails", { 
+            Product: product, 
+            data: mostSellingProducts, 
+            user: req.session.user_id, 
+            count: totalProductsInCart,
+            categoryDiscount: categoryDiscount,
+            finalDiscountedPrice: finalDiscountedPrice,
+        });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");

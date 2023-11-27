@@ -35,6 +35,7 @@
     "ra": "^0.9.7",
     "randomstring": "^1.3.0",
     "razorpay": "^2.9.2",
+    "shortid": "^2.2.16",
     "sweetalert2": "^11.10.0"
   },
   "devDependencies": {

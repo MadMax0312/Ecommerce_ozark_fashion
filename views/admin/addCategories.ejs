@@ -46,15 +46,10 @@ include('../adminLayouts/navbar.ejs') %>
                           class="form-control"
                           id="Offer"
                           name="Offer"
-                          placeholder="Offer"
-                          value="0"
+                          placeholder="0"
                       />
-                      <p id="discountPrice-error" class="error-message" style="color: red"></p>
+                      <p id="discount-error" class="error-message" style="color: red"></p>
                         </div>
-
-                        <div class="input-container">
-                          <input type="hidden" name="id" value="<%= data._id %>" />
-                      </div>
 
                         <button type="submit" class="btn btn-primary mr-2">Submit</button>
                         <button class="btn btn-dark">Cancel</button>

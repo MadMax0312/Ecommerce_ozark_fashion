@@ -15,10 +15,10 @@ const categorySchema = new mongoose.Schema({
     required:true,
     default:0
   },
-  discount: {
-    type: String,
+  discountPercentage: {
+    type: Number,
     default: 0,  
-},
+  },
 
 })
 

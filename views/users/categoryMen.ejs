@@ -1,15 +1,12 @@
-<%- include('../userLayouts/header.ejs') %> 
-<%- include('../userLayouts/navbar.ejs') %>
-
+<%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-
 
 <style>
     .product-card {
         border: none;
         transition: box-shadow 0.3s ease;
-        height: 350px; 
+        height: 350px;
     }
 
     .product-card:hover {
@@ -18,8 +15,8 @@
 
     .product-image {
         height: 200px;
-        object-fit: cover; 
-        width: 100%; 
+        object-fit: cover;
+        width: 100%;
     }
 
     .category {
@@ -31,15 +28,15 @@
     }
 
     .offer-icon {
-        color: #e44d26; /* Set the color for the offer icon */
-        font-size: 18px; /* Set the font size for the offer icon */
+        color: #e44d26;
+        font-size: 18px;
     }
 
     .center-line {
         position: absolute;
         height: 2px;
         width: 100%;
-        background-color: #333; /* Set the color for the center line */
+        background-color: #333;
         top: 50%;
         transform: translateY(-50%);
         z-index: 1;
@@ -57,13 +54,34 @@
     .actual-price {
         position: relative;
         z-index: 2;
-        padding-right: 5px; /* Add some padding to separate the icon from the price */
+        padding-right: 5px;
     }
 
     .discounted-price {
         position: relative;
         z-index: 2;
-        padding-left: 5px; /* Add some padding to separate the icon from the price */
+        padding-left: 5px;
+    }
+    .card-text {
+        color: black;
+    }
+    .card-title {
+        font-size: 22px;
+    }
+    #filterForm {
+        max-width: 100%;
+    }
+
+    #filterForm .form-group {
+        margin-bottom: 15px;
+    }
+
+    #filterForm button {
+        width: 100%;
+    }
+    .d-block{
+      font-weight: 700;
+      color: #e44d26;
     }
 </style>
 
@@ -72,6 +90,7 @@
         <div class="row">
             <div class="col-md-12 mb-0">
                 <a href="/">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Shop</strong>
+                <span class="mx-2 mb-0">/</span> <strong class="text-black font-weight-bold"><%= categoryName %></strong>
             </div>
         </div>
     </div>
@@ -92,119 +111,137 @@
                     </form>
                 </div>
 
-                <div class="row" style="text-align: center;">
-                  <% if (products.length > 0) { 
-                    products.forEach(product => { %>
-                      <div class="col-sm-6 col-md-4 mb-1 mb-md-0" data-aos="fade-up">
+                <div class="row" style="text-align: center">
+                    <% if (products.length > 0) { products.forEach(product => { %>
+                    <div class="col-sm-6 col-md-4 mb-1 mb-md-0" data-aos="fade-up">
                         <div class="card product-card">
-                          <div class="product-image-wrapper">
-                            <a href="/product-info?id=<%= product._id %>">
-                              <img src="/static/admin/Assets/images/products/<%= product.image[0] %>" alt="Product Image" class="card-img-top product-image" />
-                            </a>
-                          </div>
-                          <div class="card-body">
-                            <h5 class="card-title" style="margin-bottom: 0;">
-                              <a href="#" style="color: black"><%= product.productname %></a>
-                            </h5>
-                            <p class="card-text category" style="margin-bottom: 0;"><%= product.category.categoryname %></p>
-                            <p class="card-text description" style="margin-bottom: 0;"><%= product.description %></p>
-                            
-                            <div class="prices">
-                              <span class="actual-price">
-                                <% if (product.discountPercentage && parseFloat(product.discountPercentage) > 0) { %>
-                                  <span class="center-line"></span> ₹<%= product.price %>
-                                <% } else { %>
-                                  ₹<%= product.price %>
-                                <% } %>
-                              </span>
-                              <% if (product.discountPercentage && parseFloat(product.discountPercentage) > 0) { %>
-                                <span class="discounted-price offer-icon">
-                                  <i data-feather="tag"></i> ₹<%= product.discountedPrice %>
-                                </span>
-                              <% } %>
+                            <div class="product-image-wrapper">
+                                <a href="/product-info?id=<%= product._id %>">
+                                    <img
+                                        src="/static/admin/Assets/images/products/<%= product.image[0] %>"
+                                        alt="Product Image"
+                                        class="card-img-top product-image"
+                                    />
+                                </a>
                             </div>
-                          </div>
+                            <div class="card-body">
+                                <h5 class="card-title" style="margin-bottom: 0">
+                                    <a href="#" style="color: black"><%= product.productname %></a>
+                                </h5>
+                                <p class="card-text category" style="margin-bottom: 0;">
+                                    <%= product.category.categoryname %>
+                                </p>
+                                <p class="card-text size" style="margin-bottom: 0;">Size: <%= product.size %></p>
+
+                                <div class="prices">
+                                  <span class="actual-price pl-4">
+                                      <% if (categoryDiscount > 0 || (product.discountPercentage && parseFloat(product.discountPercentage) > 0)) { %>
+                                          <span class="center-line" style="width: 44px;"></span> ₹<%= product.price %> 
+                                      <% } else { %> 
+                                          <span class="font-weight-bold ml-5">Price: </span> ₹<%= product.price %> 
+                                      <% } %>
+                                  </span>
+                                  <% if (categoryDiscount > 0 || (product.discountPercentage && parseFloat(product.discountPercentage) > 0)) { %>
+                                      <% 
+                                          const productDiscountedPrice = product.price - (product.price * product.discountPercentage / 100);
+                                          const categoryDiscountedPrice = product.price - (product.price * categoryDiscount / 100);
+                                          const finalDiscountedPrice = Math.min(productDiscountedPrice, categoryDiscountedPrice);
+                                      %>
+                                      <span class="discounted-price offer-icon">
+                                          <i data-feather="tag"></i> ₹<%= finalDiscountedPrice %>
+                                      </span>
+                                  <% } %>
+                              </div>
+
+                            </div>
                         </div>
-                      </div>
+                    </div>
                     <% }); } else { %>
-                      <div class="col-12">
+                    <div class="col-12">
                         <p class="text-center">No products available in this category.</p>
-                      </div>
+                    </div>
                     <% } %>
                 </div>
-              <<br>
+                <br/>
 
-              <% if (typeof totalPages !== 'undefined') { %>
-                  <nav aria-label="Page navigation">
-                      <ul class="pagination justify-content-center">
-                          <% if (currentPage > 1) { %>
-                              <li class="page-item">
-                                  <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                                      <span aria-hidden="true">&laquo;</span>
-                                  </a>
-                              </li>
-                          <% } %>
-                          <% for(let j=1; j <= totalPages; j++){ %>
-                              <li class="page-item <%= j === currentPage ? 'active' : '' %>">
-                                  <a class="page-link" href="?page=<%= j %>"><%= j %></a>
-                              </li>
-                          <% } %>
-                          <% if (currentPage < totalPages) { %>
-                              <li class="page-item">
-                                  <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
-                                      <span aria-hidden="true">&raquo;</span>
-                                  </a>
-                              </li>
-                          <% } %>
-                      </ul>
-                  </nav>
-              <% } %>
-          </div>
-
-          <div class="col-md-3 order-1 mb-5 mb-md-0">
-              <div class="border p-4 rounded mb-4">
-                  <h3 class="mb-3 h6 text-uppercase text-black d-block">Categories</h3>
-                  <!-- Replace the href values with your actual category links -->
-                  <ul class="list-unstyled mb-0">
-                      <% categoryProductCounts
-                        .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
-                        .forEach(categoryCount => { %>
-                          <li class="mb-1">
-                            <a href="/shop/category/<%= categoryCount.categoryName %>" class="d-flex">
-                              <span><%= categoryCount.categoryName %></span>
-                              <span class="text-black ml-auto">(<%= categoryCount.productCount %>)</span>
+                <% if (typeof totalPages !== 'undefined') { %>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
                             </a>
-                          </li>
+                        </li>
+                        <% } %> <% for(let j=1; j <= totalPages; j++){ %>
+                        <li class="page-item <%= j === currentPage ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= j %>"><%= j %></a>
+                        </li>
+                        <% } %> <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </nav>
+                <% } %>
+            </div>
+
+            <div class="col-md-3 order-1 mb-5 mb-md-0">
+                <div class="border p-4 rounded mb-4">
+                    <h3 class="mb-3 h6 text-uppercase text-black d-block ">Categories</h3>
+                    <ul class="list-unstyled mb-0">
+                        <% categoryProductCounts .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
+                        .forEach(categoryCount => { %>
+                        <li class="mb-1">
+                            <a href="/shop/category/<%= categoryCount.categoryName %>" class="d-flex">
+                                <span><%= categoryCount.categoryName %></span>
+                                <span class="text-black ml-auto">(<%= categoryCount.productCount %>)</span>
+                            </a>
+                        </li>
                         <% }); %>
                     </ul>
-                    
-                    
-              </div>
+                </div>
 
-              <div class="border p-4 rounded mb-4">
-                  <div class="mb-4">
-                      <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Price</h3>
-                      <div id="slider-range" class="border-primary"></div>
-                      <input
-                          type="text"
-                          name="text"
-                          id="amount"
-                          class="form-control border-0 pl-0 bg-white"
-                          disabled=""
-                      />
-                  </div>
-
-                  <!-- Your existing code for Size and Color filters goes here -->
-              </div>
-          </div>
-      </div>
-  </div>
+                <div class="border p-4 rounded mb-4">
+                    <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter</h3>
+                    <form id="filterForm">
+                        <div class="form-group">
+                            <label for="minPrice">Min Price:</label>
+                            <input type="text" class="form-control" id="minPrice" placeholder="Enter min price" />
+                        </div>
+                        <div class="form-group">
+                            <label for="text">Max Price:</label>
+                            <input type="text" class="form-control" id="maxPrice" placeholder="Enter max price" />
+                        </div>
+                        <div class="form-group">
+                            <label for="size">Size:</label>
+                            <input type="text" class="form-control" id="size" placeholder="Enter size" />
+                        </div>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="applyFilters()">Apply Filters</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
 <script>
-  feather.replace();
+    function applyFilters() {
+        const minPrice = document.getElementById("minPrice").value;
+        const maxPrice = document.getElementById("maxPrice").value;
+        const size = document.getElementById("size").value;
+
+        window.location.href = `/shop?page=1&minPrice=${minPrice || ""}&maxPrice=${maxPrice || ""}&size=${size || ""}`;
+    }
 </script>
 
+<script>
+    feather.replace();
+</script>
 
 <%- include('../userLayouts/footer.ejs') %>

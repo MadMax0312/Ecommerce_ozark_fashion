@@ -81,6 +81,9 @@
         color: #e44d26; 
         margin-left: 5px; 
     }
+    .cake{
+      font-size: 20px;
+    }
 </style>
 
 <div class="site-wrap">
@@ -141,13 +144,18 @@
 
         <div class="col-md-6">
           <h2 class="text-black"><%= Product.productname %></h2>
-          <p class="m-0"><%= Product.description %></p>
-          <% if (Product.discountPercentage && parseFloat(Product.discountPercentage) > 0) { %>
-            <p class="discounted-price">₹<%= Product.discountedPrice %></p>
-            <p class="actual-price">₹<%= Product.price %></p>
-            <p>Discount: <span class="discount-percentage"><%= Product.discountPercentage %>%</span></p>
+          <p class="m-0 cake"><%= Product.category.categoryname %></p>
+          <p class="m-0 cake">Size: <%= Product.size %></p>
+          <% if (categoryDiscount > 0 || (Product.discountPercentage && parseFloat(Product.discountPercentage) > 0)) { %>
+            <% 
+                const productDiscountedPrice = Product.price - (Product.price * Product.discountPercentage / 100);
+                const categoryDiscountedPrice = Product.price - (Product.price * categoryDiscount / 100);
+                const finalDiscountedPrice = Math.min(productDiscountedPrice, categoryDiscountedPrice);
+            %>
+            <p class="discounted-price"><%= finalDiscountedPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) %></p>
+            <p class="actual-price"><%= Product.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) %></p>
         <% } else { %>
-            <p><strong class="text-primary h4">₹<%= Product.price %></strong></p>
+            <p><strong class="text-primary h4"><%= Product.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) %></strong></p>
         <% } %>
 
           <div class="mb-3">

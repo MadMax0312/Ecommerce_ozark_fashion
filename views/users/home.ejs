@@ -14,11 +14,12 @@
         <div class="container">
             <div class="row align-items-start align-items-md-center justify-content-end">
                 <div class="col-md-5 text-center text-md-left pt-5 pt-md-0">
-                    <h1 class="mb-2">Finding Your Perfect Shoes</h1>
+                    <h1 class="mb-2">Discover Your Perfect Style</h1>
                     <div class="intro-text text-center text-md-left">
                         <p class="mb-4">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at iaculis quam. Integer
-                            accumsan tincidunt fringilla.
+                            Elevate your wardrobe with our curated collection of fashionable clothing. Explore a world of
+            sophistication and comfort that reflects your unique style. Find the perfect pieces to express yourself
+            with confidence.
                         </p>
                         <p>
                             <a href="/shop" class="btn btn-sm btn-primary">Shop Now</a>
@@ -39,8 +40,8 @@
                     <div class="text">
                         <h2 class="text-uppercase">Free Shipping</h2>
                         <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at iaculis quam. Integer
-                            accumsan tincidunt fringilla.
+                            Enjoy swift and reliable delivery with our fast shipping services. We ensure your orders reach you
+            promptly, making your shopping experience hassle-free.
                         </p>
                     </div>
                 </div>
@@ -51,8 +52,8 @@
                     <div class="text">
                         <h2 class="text-uppercase">Free Returns</h2>
                         <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at iaculis quam. Integer
-                            accumsan tincidunt fringilla.
+                            Shop with confidence knowing that returns are a breeze. Our hassle-free return policy ensures that if
+            you're not satisfied with your purchase, sending it back is simple and stress-free.
                         </p>
                     </div>
                 </div>
@@ -63,54 +64,47 @@
                     <div class="text">
                         <h2 class="text-uppercase">Customer Support</h2>
                         <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus at iaculis quam. Integer
-                            accumsan tincidunt fringilla.
+                            Our customer support team is here to assist you around the clock. Whether you have questions about
+                            products, orders, or anything else, we're here to provide friendly and helpful support at every step.
                         </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="site-section site-blocks-2">
         <div class="container">
             <div class="row">
-                <div class="col-sm-6 col-md-6 col-lg-4 mb-4 mb-lg-0" data-aos="fade" data-aos-delay="">
-                    <a class="block-2-item" href="/shop">
-                        <figure class="image">
-                            <img src="/static/user/images/women.jpg" alt="" class="img-fluid" />
-                        </figure>
-                        <div class="text">
-                            <span class="text-uppercase">Collections</span>
-                            <h3>Women</h3>
+                <% if (categoryProductCounts && Array.isArray(categoryProductCounts)) { %>
+                    <% for (const category of categoryProductCounts) { %>
+                        <div class="col-sm-6 col-md-6 col-lg-4 mb-4 mb-lg-0" data-aos="fade" data-aos-delay="">
+                            <a class="block-2-item" href="/shop/category/<%= category.categoryName %>">
+                                <figure class="image" style="position: relative;">
+                                    <img src="/static/user/images/<%= category.categoryName.toLowerCase() %>.jpg" alt="" class="img-fluid" />
+                                    <% if (category.categoryName.toLowerCase() === 'kids') { %>
+                                        <div class="offer-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 70%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                            <img src="/static/user/images/offfer.png" alt="Discount Icon" class="offer-icon" style="width: 100px; height: 100px; margin-bottom: 140px; margin-right: 220px; margin-top: 40px;">
+                                            <img src="/static/user/images/30.png" alt="Discount text" class="offer-text" style="width: 130px; height: 100px;">
+                                        </div>
+                                    <% } %>
+                                </figure>
+                                <div class="text">
+                                    <span class="text-uppercase">Collections</span>
+                                    <h3><%= category.categoryName %></h3>
+                                </div>
+                            </a>
                         </div>
-                    </a>
-                </div>
-                <div class="col-sm-6 col-md-6 col-lg-4 mb-5 mb-lg-0" data-aos="fade" data-aos-delay="100">
-                    <a class="block-2-item" href="/shop">
-                        <figure class="image">
-                            <img src="/static/user/images/children.jpg" alt="" class="img-fluid" />
-                        </figure>
-                        <div class="text">
-                            <span class="text-uppercase">Collections</span>
-                            <h3>Children</h3>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-sm-6 col-md-6 col-lg-4 mb-5 mb-lg-0" data-aos="fade" data-aos-delay="200">
-                    <a class="block-2-item" href="/shop">
-                        <figure class="image">
-                            <img src="/static/user/images/men.jpg" alt="" class="img-fluid" />
-                        </figure>
-                        <div class="text">
-                            <span class="text-uppercase">Collections</span>
-                            <h3>Men</h3>
-                        </div>
-                    </a>
-                </div>
+                    <% } %>
+                <% } else { %>
+                    <!-- Handle the case when categoryProductCounts is not an array -->
+                    <p>No categories available.</p>
+                <% } %>
             </div>
+            
+            
         </div>
     </div>
+    
 
     <div class="site-section block-3 site-blocks-2 bg-light">
         <div class="container">

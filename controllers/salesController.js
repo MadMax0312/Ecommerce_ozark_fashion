@@ -67,7 +67,7 @@ const exportReport = async (req, res) => {
 
     // Transform the data to the format needed for CSV
     const csvData = orders.map(order => ({
-      'Order Id': order._id,
+      'Order Id': order.orderTrackId,
       'Order Date': order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-'),
       'Amount': order.totalAmount,
       'Payment': order.paymentMethod,

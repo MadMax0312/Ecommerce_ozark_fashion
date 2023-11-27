@@ -225,7 +225,7 @@ const updateStatus = async (req, res) => {
                 user.wallet += refundAmount;
                 user.walletHistory.push({
                     transactionDetails: `Refund for order ${order.orderTrackId}`,
-                    transactionType: 'refund',
+                    transactionType: 'Refund',
                     transactionAmount: refundAmount,
                     currentBalance: user.wallet,
                 });
@@ -342,8 +342,6 @@ const invoiceDownload = async (req, res, next) => {
       const filepathName = path.resolve(__dirname, "../views/users/invoice.ejs");
       const html = fs.readFileSync(filepathName).toString();
       const ejsData = ejs.render(html, data);
-  
-      console.log('ejsData:', ejsData);
   
       const browser = await puppeteer.launch({ headless: true });
       const page = await browser.newPage();

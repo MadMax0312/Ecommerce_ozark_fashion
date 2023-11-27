@@ -309,7 +309,9 @@ include('../adminLayouts/navbar.ejs') %>
                 </div>
             </div>
         </div>
-
+  
+        <canvas id="salesChart1" width="500" height="200"></canvas>
+ 
         <div class="row">
             <div class="col-sm-4 grid-margin">
                 <div class="card">
@@ -428,6 +430,13 @@ include('../adminLayouts/navbar.ejs') %>
                     </div>
                 </div>
             </div>
+           
+            <div class="col-md-6 col-xl-8 grid-margin stretch-card">
+                <canvas id="categoryPieChart" width="300" height="400"></canvas>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-md-6 col-xl-4 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
@@ -482,6 +491,12 @@ include('../adminLayouts/navbar.ejs') %>
                     </div>
                 </div>
             </div>
+            <div class="col-md-6 col-xl-8 grid-margin stretch-card">
+                <canvas id="paymentMethodDonutChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-md-6 col-xl-4 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
@@ -534,45 +549,200 @@ include('../adminLayouts/navbar.ejs') %>
                     </div>
                 </div>
             </div>
+            <div class="col-md-6 col-xl-8 grid-margin stretch-card">
+                <canvas id="revenuePieChart" width="400" height="400"></canvas>
+            </div>
         </div>
 
-        <div style="width: 80%; margin: auto">
-            <canvas id="ordersChart"></canvas>
-        </div>
 
-       
-      
     </div>
-    <!-- content-wrapper ends -->
-    <!-- partial:partials/_footer.html -->
-
-    <!-- partial -->
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Sample data (replace this with your actual data)
-        const data = {
-            labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"],
-            datasets: [
-                {
-                    label: "Orders",
-                    borderColor: "rgb(75, 192, 192)",
-                    data: [1, 8, 15, 7, 12],
-                    fill: true,
-                },
-            ],
-        };
-
-        // Get the canvas element
-        const ctx = document.getElementById("ordersChart").getContext("2d");
-
-        // Create the chart
-        const ordersChart = new Chart(ctx, {
-            type: "line",
-            data: data,
-        });
+    document.addEventListener('DOMContentLoaded', function () {
+        const count1 = parseInt(`<%= order.razorRevenue || 0 %>`)
+        const count2 = parseInt(`<%= order.razorRevenue || 0 %>`)
+        const count3 = parseInt(`<%= order.razorRevenue || 0 %>`)
+      const revenueData = [
+        {
+          label: 'Razor Revenue',
+          amount: count1,
+          color: '#007bff',
+        },
+        {
+          label: 'Wallet Revenue',
+          amount: count2,
+          color: '#28a745',
+        },
+        {
+          label: 'Cash on Delivery Revenue',
+          amount: count3,
+          color: '#ffc107',
+        },
+      ];
+  
+      var ctx = document.getElementById('revenuePieChart').getContext('2d');
+      var revenuePieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: revenueData.map(revenue => revenue.label),
+          datasets: [
+            {
+              data: revenueData.map(revenue => revenue.amount),
+              backgroundColor: revenueData.map(revenue => revenue.color),
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false, // Set to false to make the chart fit its container
+        },
+      });
     });
-</script>
+  </script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const count1 = parseInt(`<%= order.paymentMethod.find(payment => payment._id === 'Razor Payment')?.count || 0 %>`)
+      const count2 = parseInt(`<%= order.paymentMethod.find(payment => payment._id === 'Wallet Transfer')?.count || 0 %>`)
+      const count3 = parseInt(`<%= order.paymentMethod.find(payment => payment._id === 'Cash on Delivery')?.count || 0 %>`)
+    
+      const paymentMethodData = [
+        {
+          label: 'Razor Payment',
+          count: count1,
+          color: '#007bff',
+        },
+        {
+          label: 'Wallet Transfer',
+          count: count2,
+          color: '#28a745',
+        },
+        {
+          label: 'Cash on Delivery',
+          count: count3,
+          color: '#ffc107',
+        },
+      ];
+  
+      var ctx = document.getElementById('paymentMethodDonutChart').getContext('2d');
+      var paymentMethodDonutChart = new Chart(ctx, {
+        type: 'doughnut', // Set chart type to doughnut
+        data: {
+          labels: paymentMethodData.map(paymentMethod => paymentMethod.label),
+          datasets: [
+            {
+              data: paymentMethodData.map(paymentMethod => paymentMethod.count),
+              backgroundColor: paymentMethodData.map(paymentMethod => paymentMethod.color),
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutoutPercentage: 60, // Adjust the cutoutPercentage to control the size of the center hole
+        },
+      });
+    });
+  </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const count1 = parseInt(`<%= order.categoryCount.find(category => category._id === 'Men')?.count || 0 %>`)
+        const count2 = parseInt(`<%= order.categoryCount.find(category => category._id === 'Women')?.count || 0 %>`)
+        const count3 = parseInt(`<%= order.categoryCount.find(category => category._id === 'Kids')?.count || 0 %>`)
+      
+      const categoryData = [
+        {
+          label: 'Men',
+          count: count1,
+          color: '#007bff', // You can set a custom color for each category
+        },
+        {
+          label: 'Women',
+          count: count2,
+          color: '#28a745',
+        },
+        {
+          label: 'Kids',
+          count: count3,
+          color: '#ffc107',
+        },
+      ];
+  
+      var ctx = document.getElementById('categoryPieChart').getContext('2d');
+      var categoryPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: categoryData.map(category => category.label),
+          datasets: [
+            {
+              data: categoryData.map(category => category.count),
+              backgroundColor: categoryData.map(category => category.color),
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false, // Set to false to make the chart fit its container
+        },
+      });
+    });
+  </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+  const dailySales = parseFloat(`<%= order.dailySales %>`);
+  const monthlySales = parseFloat(`<%= order.monthlyRevenue %>`);
+  const yearlySales = parseFloat(`<%= order.yearlySales %>`);
+
+  var ctx = document.getElementById('salesChart1').getContext('2d');
+  var salesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Daily Sales', 'Monthly Sales', 'Yearly Sales'],
+      datasets: [
+        {
+          label: 'Sales',
+          backgroundColor: ['#007bff', '#28a745', '#ffc107'],
+          data: [dailySales, monthlySales, yearlySales],
+        },
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value, index, values) {
+              // Format y-axis ticks as currency (INR)
+              return '₹' + value.toLocaleString('en-IN');
+            },
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          display: false, // Hide legend for simplicity
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              // Format tooltip label as currency (INR)
+              return '₹' + context.parsed.y.toLocaleString('en-IN');
+            },
+          },
+        },
+      },
+    },
+  });
+});
+
+  </script>
+  
 
 <%- include('../adminLayouts/footer.ejs') %>

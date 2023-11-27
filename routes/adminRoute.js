@@ -101,7 +101,7 @@ admin_route.get("/addCategories", auth.isLogin, categoryController.loadAddCatego
 
 admin_route.post("/addCategories", categoryController.addCategory);
 
-admin_route.get("/unlist-category", auth.isLogin, categoryController.unlistCategory);
+admin_route.post("/unlist-category", auth.isLogin, categoryController.unlistCategory);
 
 //=====================================================================================================================================//
 

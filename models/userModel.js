@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 // Define the transactionTypes enum
-const transactionTypes = ["deposit", "withdrawal", "purchase", "refund"]; // Add other types as needed
+const transactionTypes = ["Deposit", "Withdrawal", "Purchase", "Refund"]; // Add other types as needed
 
 const userSchema = new mongoose.Schema(
     {
@@ -11,7 +11,6 @@ const userSchema = new mongoose.Schema(
         },
         last_name: {
             type: String,
-            required: true,
         },
         email: {
             type: String,
@@ -30,6 +29,10 @@ const userSchema = new mongoose.Schema(
             required: true,
             default: 0,
         },
+        referralCode: {
+            type: String,
+            unique: true,
+          },
         isBlock: {
             type: Boolean,
             required: true,

@@ -101,7 +101,7 @@ if (!nameRegex.test(productname)) {
   }
 
   if (!isValidSize(size)) {
-    sizeError.textContent = "Size field should be a positive number";
+    sizeError.textContent = "Size field should be a positive number btw 10 and 45";
     setTimeout(function () {
       sizeError.textContent = "";
   }, 3000);

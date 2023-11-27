@@ -31,7 +31,7 @@
                                     <th>Category</th>
                                     <th>Size</th>
                                     <th>Price</th>
-                                    <th>Discount</th>
+                                    <th>Offer</th>
                                     <th>Quantity</th>
                                     <th>Image</th>
                                     <th>Edit</th>
@@ -42,7 +42,7 @@
                             <% if (Product.length > 0) { 
                                 for (let i = 0; i < Product.length; i++) { %>
                                 <tr>
-                                    <td><%= Product[i].productname %></td>
+                                    <td><%= (currentPage - 1) * 5 + i + 1 %>.<%= Product[i].productname %></td>
                                     <td><%= Product[i].category.categoryname %></td>
                                     <td><%= Product[i].size %></td>
                                     <td><%= Product[i].price %></td>

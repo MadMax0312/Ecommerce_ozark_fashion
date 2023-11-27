@@ -6,6 +6,7 @@ function validForm() {
     const categoryname = document.getElementById('exampleInputName1').value.trim();
     const categorydes = document.getElementById('exampleTextarea1').value.trim();
     const offerPercentage = document.getElementById('Offer').value.trim();
+    const discountPrice = document.getElementById("Offer").value.trim();
 
     const namePattern = /^[a-zA-Z]+$/;
     const descPattern = /^[a-zA-Z]+$/;
@@ -15,6 +16,21 @@ function validForm() {
         document.getElementById('categorydes-error').textContent = 'Category description and name fields should not be empty';
         return false;
     }
+
+    if (
+        discountPrice !== "" &&
+        (!isValidPrice(discountPrice) ||
+            parseFloat(discountPrice) < 0 ||
+            parseFloat(discountPrice) > 50) // Updated condition to check if discount is greater than 70%
+      ) {
+        document.getElementById("discount-error").textContent =
+            "Discount percentage should be a non-negative number and should not exceed 50%.";
+        setTimeout(function () {
+            document.getElementById("discount-error").textContent = "";
+        }, 3000);
+        return false;
+      }
+      
 
     if (categoryname.length > 10) {
         document.getElementById('categoryname-error').textContent = 'Category name should not exceed 10 characters';

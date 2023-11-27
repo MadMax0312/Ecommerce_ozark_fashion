@@ -48,7 +48,7 @@ const addCategory = async (req, res) => {
       const newCategory = new Category({
         categoryname: categoryname,
         description: categorydes,
-        discount: discount,
+        discountPercentage: discount,
         status: true,
       });
   
@@ -78,12 +78,13 @@ const unlistCategory = async (req, res) => {
       if (category) {
           category.status = !category.status;
           await category.save();
-      }
-
-      const categories = await Category.find();
-      res.render("categories", { Category: categories });
+          return res.status(200).json({ message: "Category Status Updated" });
+      } else {
+        res.status(404).send("Category not found"); // Send a 404 error if product is not found
+    }
   } catch (error) {
       console.log(error.message);
+      res.status(500).send("Internal Server Error"); // Send a 500 error for internal server errors
   }
 };
 
@@ -112,12 +113,29 @@ const loadEditCatogories = async (req, res) => {
 
 const editCategory = async (req, res) => {
   try {
-      const editData = await Category.findByIdAndUpdate(
-          { _id: req.body.id },
-          { $set: { categoryname: req.body.categoryname, description: req.body.categorydes, discount: req.body.Offer } }
-      );
 
+    const id = req.body.id;
+    let category = await Category.findById(id)
+
+    if(category){
+
+       // Update product fields
+       category.categoryname = req.body.categoryname;
+       category.description = req.body.categorydes;
+       category.discountPercentage = req.body.Offer;
+
+        // Save the updated product
+        const updatedCategory = await category.save();
+
+        if (updatedCategory) {
+            res.redirect("/admin/categories");
+        } else {
+            res.render("editCategories", { data: category, message: "Failed to update the category" });
+        }
+    }else {
       res.redirect("/admin/categories");
+  }
+  
   } catch (error) {
       console.log(error.message);
   }
