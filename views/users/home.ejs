@@ -140,27 +140,32 @@
                                     <% } else { %>
                                         <p class="card-text text-primary font-weight-bold">₹ <%= product.price %></p>
                                     <% } %>
-                
-                                    <div class="d-inline-block">
+
+                                    <div class="row">
+                                        
+                                    <div class="col-md-6 d-inline-block">
                                         <button
                                             type="button"
                                             class="btn btn-primary p-1 m-1 addToCartBtn"
                                             data-product-id="<%= product._id %>"
+                                            style="font-size: 14px;"
                                         >
                                             Add to Cart
                                         </button>
                                     </div>
-                                    <div class="d-inline-block">
+                                    <div class="col-md-6 d-inline-block">
                                         <button
                                             type="button"
                                             class="btn p-1 m-1 addToWishlistBtn"
                                             data-product-id="<%= product._id %>"
-                                            style="background-color: orange"
+                                            style="background-color: orange; font-size: 14px;"
                                         >
                                             Add to Wishlist
                                         </button>
                                     </div>
-                                    <div class="d-inline-block">
+                                    </div>
+                
+                                    <!-- <div class="d-inline-block">
                                         <button
                                             type="button"
                                             class="btn p-1 m-1 buyNowBtn"
@@ -169,7 +174,7 @@
                                         >
                                             Buy now
                                         </button>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>

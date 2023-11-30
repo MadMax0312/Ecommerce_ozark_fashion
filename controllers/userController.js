@@ -207,7 +207,7 @@ const insertUser = async (req, res) => {
                     transactionDate: new Date(),
                     transactionAmount: bonusAmount,
                     transactionDetails: `Referral bonus for user ${userData.username}`,
-                    transactionType: 'Deposit',
+                    transactionType: 'deposit',
                   });
                   await referringUser.save();
         
@@ -216,13 +216,12 @@ const insertUser = async (req, res) => {
                     transactionDate: new Date(),
                     transactionAmount: bonusAmount,
                     transactionDetails: 'Referral bonus',
-                    transactionType: 'Deposit',
+                    transactionType: 'deposit',
                   });
                   await userData.save();
                 }
               }
 
-            console.log(userData);
             res.render("login");
         } else {
             res.render("otp", { message: "Invalid OTP" });
@@ -260,7 +259,6 @@ const verifyLogin = async (req, res) => {
         console.log("password:", password);
 
         var userData = await User.findOne({ email: email });
-        console.log("userData:", userData);
 
         if (userData) {
             if (userData.isBlock === false) {
@@ -667,7 +665,6 @@ const getProductsByCategory = async (req, res) => {
 };
 
 
-
 ///===========Rendering product info page -=-----------//
 
 const loadProductInfo = async (req, res) => {
@@ -718,8 +715,6 @@ const loadProductInfo = async (req, res) => {
         const productDiscountedPrice = product.price - (product.price * product.discountPercentage / 100);
         const categoryDiscountedPrice = product.price - (product.price * categoryDiscount / 100);
         const finalDiscountedPrice = Math.min(productDiscountedPrice, categoryDiscountedPrice);
-
-        console.log("Most Selling Products:", mostSellingProductsWithImages);
 
         res.render("productDetails", { 
             Product: product, 

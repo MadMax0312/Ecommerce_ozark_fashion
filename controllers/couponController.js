@@ -68,9 +68,7 @@ const editCoupon = async (req, res) => {
     try {
 
       const id = req.body.id;
-      console.log();
       let coupon = await Coupon.findById(id);
-      console.log(coupon);
 
       if(coupon){
         coupon.couponName = req.body.couponName;
@@ -81,7 +79,6 @@ const editCoupon = async (req, res) => {
         coupon.users = req.body.users || [];
 
         const data = await coupon.save();
-        console.log(data)
 
         if (data) {
             res.redirect("/admin/coupons");

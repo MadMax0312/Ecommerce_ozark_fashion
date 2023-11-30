@@ -63,28 +63,24 @@ const loadDashboard = async (req, res) => {
             }
         }
     ])
-   
-       // Total Sales Amount
+
        const totalSales = await Order.aggregate([
-        { $match: { paymentStatus: 'Paid' } }, // You may adjust the match criteria as needed
+        { $match: { paymentStatus: 'Paid' } }, 
         { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
     ]);
 
-    // Total Purchase Amount
     const totalPurchase = await Order.aggregate([
-        { $match: { paymentStatus: 'Paid' } }, // You may adjust the match criteria as needed
+        { $match: { paymentStatus: 'Paid' } },
         { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
     ]);
 
-    // Total Products Sold
     const totalProductsSold = await Order.aggregate([
-        { $match: { paymentStatus: 'Paid' } }, // You may adjust the match criteria as needed
+        { $match: { paymentStatus: 'Paid' } }, 
         { $group: { _id: null, totalQuantity: { $sum: { $sum: '$products.quantity' } } } },
     ]);
 
-    // Most Sold Product (assuming you have a field tracking product sales)
     const mostSoldProduct = await Order.aggregate([
-        { $match: { paymentStatus: 'Paid' } }, // You may adjust the match criteria as needed
+        { $match: { paymentStatus: 'Paid' } }, 
         { $unwind: '$products' },
         { $group: { _id: '$products.productId', totalQuantity: { $sum: '$products.quantity' } } },
         { $sort: { totalQuantity: -1 } },
@@ -101,23 +97,20 @@ const loadDashboard = async (req, res) => {
               description: productDetails ? productDetails.description : null,
               image: productDetails ? productDetails.image : null,
               price: productDetails ? productDetails.price : null,
-              // Add other product details as needed
           };
       })
   );
 
-    // Monthly Revenue
     const monthlyRevenue = await Order.aggregate([
-        { $match: { createdAt: { $gte: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) } } }, // Last 30 days
+        { $match: { createdAt: { $gte: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) } } },
         { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
     ]);
 
-    // Daily Revenue
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set the time to the beginning of the day
+    today.setHours(0, 0, 0, 0);
     
     const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1); // Set the time to the beginning of the next day
+    tomorrow.setDate(tomorrow.getDate() + 1);
     
     const dailyRevenue = await Order.aggregate([
         {
@@ -137,13 +130,11 @@ const loadDashboard = async (req, res) => {
     ]);
     
 
-    // Yearly Revenue
     const yearlyRevenue = await Order.aggregate([
         { $match: { createdAt: { $gte: new Date(new Date().getFullYear(), 0, 1) } } }, // Current year
         { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
     ]);
 
-    // Total Revenue
     const totalRevenue = await Order.aggregate([
         { $group: { _id: null, totalAmount: { $sum: '$totalAmount' } } },
     ]);

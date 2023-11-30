@@ -25,7 +25,6 @@ user_route.use(express.urlencoded({ extended: true }));
 const userController = require("../controllers/userController");
 const wishlistController = require("../controllers/wishlistController");
 const cartController = require("../controllers/cartController");
-const addressController = require("../controllers/addressController");
 const checkoutController = require("../controllers/checkoutController");
 const profileController = require("../controllers/profileController");
 const orderContoller = require("../controllers/orderContoller");

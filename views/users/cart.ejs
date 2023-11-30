@@ -48,7 +48,7 @@
                                         ₹<%= item.product.price %>
                                     </td>
                                     <td class="product-price" data-product-price="<%= item.product.price %>">
-                                        ₹<%= item.product.discountedPrice %>
+                                        ₹<%= item.product.finalDiscountedPrice %>
                                     </td>
                                     <td style="text-align: center"> 
                                         <div class="input-group mb-3" style="max-width: 130px; margin: 0 auto">
@@ -75,7 +75,7 @@
                                     </td>
                                     <td>
                                         <span class="total-price"
-                                            >₹ <%= (item.quantity * item.product.discountedPrice).toFixed(2) %></span
+                                            >₹ <%= (item.quantity * item.product.finalDiscountedPrice).toFixed(2) %></span
                                         >
                                     </td>
                                     <td>

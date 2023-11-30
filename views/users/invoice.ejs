@@ -4,92 +4,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+    crossorigin="anonymous">
     <title>Order Invoice</title>
     <style>
-        /* Global styles */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f8f9fa;
         }
 
-        /* Header styles */
         h2 {
             text-align: center;
             margin-top: 20px;
+            color: #007bff;
         }
 
-        /* Content container styles */
         .container {
             margin-top: 50px;
             margin-bottom: 50px;
+            max-width: 100%;
         }
 
-        /* Card styles */
         .card {
             border: 1px solid #ccc;
             border-radius: 10px;
-            overflow: hidden;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Invoice styles */
         .invoice {
-            color: black;
-            padding: 20px;
+            color: #343a40;
+            padding: 15px;
         }
 
-        /* User info styles */
         .user-info {
-            margin-top: 20px;
+            margin-top: 15px;
+            color: #6c757d;
         }
 
-        /* Order details styles */
-        .order-details {
-            margin-top: 20px;
-            border-top: 1px solid #ccc;
-            border-bottom: 1px solid #ccc;
-            padding: 20px;
-        }
-
-        /* Product details styles */
-        .product-details {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-collapse: collapse;
+        .details-table {
+            margin-top: 15px;
             width: 100%;
         }
 
-        .product-details table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        .details-table th,
+        .details-table td {
+            border: none;
+            padding: 4px;
+            text-align: left;
         }
 
-        .product-details th,
-        .product-details td {
-            border: 1px solid #ddd;
+        .product-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .product-details-table th,
+        .product-details-table td {
+            border: 1px solid #3e3c3c;
             padding: 10px;
             text-align: left;
         }
 
-        .product-details img {
-            max-width: 100px;
-            max-height: 100px;
-            object-fit: cover;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .address-details {
+            margin-top: 15px;
+            padding: 7px;
         }
 
-        /* Totals styles */
-        .totals {
-            margin-top: 20px;
+        .billing-table {
+            margin-top: 15px;
+            width: 100%;
         }
 
-        /* Closing message styles */
-        .closing-message {
-            margin-top: 20px;
+        .billing-table td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        .totals p,
+        .totals h4 {
+            margin: 0;
         }
     </style>
 </head>
@@ -97,8 +94,8 @@
 <body>
 
     <div class="container">
-        <div class="row d-flex justify-content-center">
-            <div class="col-md-8 p-3" id="invoice">
+        <div class="row justify-content-center">
+            <div class="col-md-10 p-3">
                 <div class="card">
                     <div class="invoice">
                         <h2>Your Order Confirmed!</h2>
@@ -107,10 +104,9 @@
                             <span>Your order has been confirmed and will be shipped in the next two days!</span>
                         </div>
 
-                        <!-- Order details -->
-                        <div class="order-details">
+                        <div class="details-table">
                             <h3>Order Details</h3>
-                            <table>
+                            <table class="table">
                                 <tr>
                                     <td>Order Date:</td>
                                     <td><%= orderData.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></td>
@@ -131,10 +127,9 @@
                             </table>
                         </div>
 
-                        <!-- Product details -->
-                        <div class="product-details">
+                        <div class="details-table">
                             <h3>Product Details</h3>
-                            <table>
+                            <table class="table product-details-table">
                                 <thead>
                                     <tr>
                                         <th>Product Name</th>
@@ -149,34 +144,12 @@
                                     <% if (orderData && orderData.products.length > 0) { %>
                                         <% orderData.products.forEach(item => { %>
                                             <tr>
-                                                <td>
-                                                    <span><%= item.productId.productname %></span>
-                                                </td>
-                                                <td>
-                                                    <div class="text-left">
-                                                        <span>Price: ₹ <%= item.productId.price %></span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="text-left">
-                                                        <span>Quantity: <%= item.quantity %></span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="text-left">
-                                                        <span><%= orderData.paymentMethod %></span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="text-left">
-                                                        <span><%= orderData.paymentStatus %></span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="text-left">
-                                                        <span>₹ <%= (item.quantity * item.productId.price).toFixed(2) %></span>
-                                                    </div>
-                                                </td>
+                                                <td><%= item.productId.productname %></td>
+                                                <td>₹ <%= item.productId.price %></td>
+                                                <td><%= item.quantity %></td>
+                                                <td><%= orderData.paymentMethod %></td>
+                                                <td><%= orderData.paymentStatus %></td>
+                                                <td>₹ <%= (item.quantity * item.productId.price).toFixed(2) %></td>
                                             </tr>
                                         <% }); %>
                                     <% } else { %>
@@ -190,41 +163,22 @@
                             </table>
                         </div>
 
-                        <!-- Shipping Address -->
-                        <div class="row d-flex">
+                        <div class="row">
                             <div class="col-md-6">
                                 <h3>Shipping Address</h3>
-                                <table>
-                                    <tr>
-                                        <td><%= orderData.address.fullName %></td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= orderData.address.city %></td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= orderData.address.district %></td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= orderData.address.state %></td>
-                                    </tr>
-                                    <tr>
-                                        <td><%= orderData.address.country %></td>
-                                    </tr>
-                                    <tr>
-                                        <td>PIN: <%= orderData.address.pincode %></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Mobile Number: <%= orderData.address.mobile %></td>
-                                    </tr>
-                                </table>
+                                <div class="address-details">
+                                    <p><%= orderData.address.fullName %>, <%= orderData.address.city %></p>
+                                    <p><%= orderData.address.district %>, <%= orderData.address.state %></p>
+                                    <p><%= orderData.address.country %> - <%= orderData.address.pincode %></p>
+                                    <p>Mobile Number: <%= orderData.address.mobile %></p>
+                                </div>
                             </div>
 
-                            <!-- Billing Details -->
                             <div class="col-md-6">
                                 <h3>Billing Details</h3>
-                                <table>
+                                <table class="table billing-table">
                                     <tr>
-                                        <td>Subtotal : </td>
+                                        <td>Subtotal :</td>
                                         <td>₹ <%= orderData.totalAmount.toFixed(2) %></td>
                                     </tr>
                                     <tr>
@@ -236,23 +190,25 @@
                                         <td>₹ <%= orderData.couponDiscount.toFixed(2) || 0 %></td>
                                     </tr>
                                     <tr class="border-top border-bottom">
-                                        <td class="font-weight-bold">Total : </td>
+                                        <td class="font-weight-bold">Total:</td>
                                         <td class="font-weight-bold">₹ <%= orderData.totalAmount.toFixed(2) %></td>
                                     </tr>
                                 </table>
                             </div>
                         </div>
 
-                        <!-- Closing message -->
-                        <div class="closing-message">
-                            <p class="font-weight-bold mb-0">Thanks for shopping with us!</p>
-                            <span>Ozark Team</span>
+                        <div class="totals">
+                            <p class="font-weight-bold mb-0" style="text-align: left; display: inline-block;">Thanks for shopping with us!</p>
+                            <h4 class="font-weight-bold mb-0" style="text-align: right;">O Z A R K</h4>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
 </body>
 

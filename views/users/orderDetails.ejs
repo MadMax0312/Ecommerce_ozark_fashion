@@ -1,248 +1,270 @@
 <%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
 <style>
-
-  .hot{
-    color: black;
-  }
-  .disabled-link{
-    color: gray;
-  }
-
+    .hot {
+        color: black;
+    }
+    .disabled-link {
+        color: gray;
+    }
 </style>
 
 <section class="gradient-custom-2">
-  <div class="container py-2 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-md-10 col-lg-8 col-xl-6">
-        <div class="card card-stepper" style="border-radius: 16px;">
-          <div class="card-header p-4">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <p class="text-muted mb-2"> Order ID: &nbsp; <span class="fw-bold text-body"><%= order.orderTrackId %></span></p>
-                <p class="text-muted mb-0"> Placed On:  &nbsp;<span class="fw-bold text-body"> <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
-                  'short', day: '2-digit' }).replace(/\//g, '-') %></span> </p>
-              </div>
-              <div>
-                <h6 class="mb-0"> <a href="#">View Details</a> </h6>
-              </div>
-            </div>
-          </div>
-          <div class="card-body p-4">
-       
-                <div class="d-flex flex-row mb-4 pb-2">
-                  <div class="flex-fill">
-                    <h3 class="hot"><%= product.productId.productname %></h3>
-                    <h6 class="hot"><%= product.productId.description %></h5>
-                    <p class="hot">Qty: <%= product.quantity %></p>
-                    <h5 class="hot" style="font-weight: 600;">Total: <%= product.subtotal %></h5>
-                    <h6 class="hot"><span class="hot"><%= order.paymentMethod %> </span></h6>
-                    <h5 class="hot">Payment: <span class="hot"><%= order.paymentStatus %> </span></h5>
-                    <p class="text-muted">Tracking Status on: <span class="text-body">11:30pm, Today</span></p>
-                  </div>
-                  <div>
-                    <img class="align-self-center img-fluid"
-                      src="/static/admin/Assets/images/products/<%= product.productId.image[0] %>" width="150">
-                  </div>
-                </div>
-                <% if (product.status !== "Cancelled" && product.status !== "Return") { %>
-                  <div class="progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Order Placed' ? 1 : (product.status === 'Shipped' ? 2 : (product.status === 'Out for Delivery' ? 3 : (product.status === 'Delivered' ? 4 : 0))) %>">
-                    <ul id="progressbar">
-                      <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>" id="step1">Order Placed</li>
-                      <li class="step <%= product.status === 'Shipped' ? 'active' : '' %>" id="step2">Shipped</li>
-                      <li class="step <%= product.status === 'Out for Delivery' ? 'active' : '' %>" id="step3">Out for Delivery</li>
-                      <li class="step <%= product.status === 'Delivered' ? 'active' : '' %>" id="step4">Delivered</li>
-                    </ul>
-                  </div>
-                
-                  <% if (product.status === 'Delivered') { %>
-                    <!-- Show message when product is delivered -->
-                    <div class="alert alert-success" role="alert">
-                      Product delivered!!
+    <div class="container py-2 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-10 col-lg-8 col-xl-6">
+                <div class="card card-stepper" style="border-radius: 16px">
+                    <div class="card-header p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-2">
+                                    Order ID: &nbsp; <span class="fw-bold text-body"><%= order.orderTrackId %></span>
+                                </p>
+                                <p class="text-muted mb-0">
+                                    Placed On: &nbsp;<span class="fw-bold text-body">
+                                        <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short',
+                                        day: '2-digit' }).replace(/\//g, '-') %></span
+                                    >
+                                </p>
+                            </div>
+                            <div>
+                                <h6 class="mb-0"><a href="#">View Details</a></h6>
+                            </div>
+                        </div>
                     </div>
-                  <% } %>
-                
-                <% } else if (product.status === "Cancelled") { %>
-                  <!-- Separate progress bar for cancelled orders -->
-                  <div class="cancelled-progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Cancelled' ? 2 : 0 %>">
-                    <ul class="cancelled-progressbar">
-                      <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>">Order Placed</li>
-                      <li class="step <%= product.status === 'Cancelled' ? 'active text-danger' : '' %>">Cancelled</li>
-                    </ul>
-                  </div>
-                  <!-- Show message when order is cancelled -->
-                  <div class="alert alert-danger text-center" role="alert">
-                    Your Order has been Cancelled. Refund is processed.
-                  </div>
-                
-                <% } else if (product.status === "Return") { %>
-                  <!-- Separate progress bar for returned orders -->
-                  <div class="return-progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Return' ? 5 : 0 %>">
-                    <ul class="return-progressbar">
-                      <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>">Order Placed</li>
-                      <li class="step <%= product.status === 'Return' ? 'active text-danger' : '' %>">Returned</li>
-                    </ul>
-                  </div>
-                  <!-- Show message when product is returned -->
-                  <div class="alert alert-info text-center" role="alert">
-                    Your product has been returned. Refund in process.
-                  </div>
-                
-                <% } %>
-                
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-row mb-4 pb-2">
+                            <div class="flex-fill">
+                                <h3 class="hot"><%= product.productId.productname %></h3>
+                                <h6 class="hot"><%= product.productId.description %></h6>
+                                <p class="hot">Qty: <%= product.quantity %></p>
+                                <h5 class="hot" style="font-weight: 600">Total: <%= product.subtotal %></h5>
+                                <h6 class="hot"><span class="hot"><%= order.paymentMethod %> </span></h6>
+                                <h5 class="hot">Payment: <span class="hot"><%= order.paymentStatus %> </span></h5>
+                                <p class="text-muted">Tracking Status on: <span class="text-body">11:30pm, Today</span></p>
+                            </div>
+                            <div>
+                                <img
+                                    class="align-self-center img-fluid"
+                                    src="/static/admin/Assets/images/products/<%= product.productId.image[0] %>"
+                                    width="150"
+                                />
+                            </div>
+                        </div>
+                        <% if (product.status !== "Cancelled" && product.status !== "Return") { %>
+                        <div
+                            class="progress-track"
+                            data-order-id="<%= order._id %>"
+                            data-product-id="<%= product._id %>"
+                            data-product-status="<%= product.status === 'Order Placed' ? 1 : (product.status === 'Shipped' ? 2 : (product.status === 'Out for Delivery' ? 3 : (product.status === 'Delivered' ? 4 : 0))) %>"
+                        >
+                            <ul id="progressbar">
+                                <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>" id="step1">
+                                    Order Placed
+                                </li>
+                                <li class="step <%= product.status === 'Shipped' ? 'active' : '' %>" id="step2">Shipped</li>
+                                <li class="step <%= product.status === 'Out for Delivery' ? 'active' : '' %>" id="step3">
+                                    Out for Delivery
+                                </li>
+                                <li class="step <%= product.status === 'Delivered' ? 'active' : '' %>" id="step4">
+                                    Delivered
+                                </li>
+                            </ul>
+                        </div>
+
+                        <% if (product.status === 'Delivered') { %>
+                        <!-- Show message when product is delivered -->
+                        <div class="alert alert-success" role="alert">Product delivered!!</div>
+                        <% } %> <% } else if (product.status === "Cancelled") { %>
+                        <!-- Separate progress bar for cancelled orders -->
+                        <div
+                            class="cancelled-progress-track"
+                            data-order-id="<%= order._id %>"
+                            data-product-id="<%= product._id %>"
+                            data-product-status="<%= product.status === 'Cancelled' ? 2 : 0 %>"
+                        >
+                            <ul class="cancelled-progressbar">
+                                <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>">Order Placed</li>
+                                <li class="step <%= product.status === 'Cancelled' ? 'active text-danger' : '' %>">
+                                    Cancelled
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Show message when order is cancelled -->
+                        <div class="alert alert-danger text-center" role="alert">
+                            Your Order has been Cancelled. Refund is processed.
+                        </div>
+
+                        <% } else if (product.status === "Return") { %>
+                        <!-- Separate progress bar for returned orders -->
+                        <div
+                            class="return-progress-track"
+                            data-order-id="<%= order._id %>"
+                            data-product-id="<%= product._id %>"
+                            data-product-status="<%= product.status === 'Return' ? 5 : 0 %>"
+                        >
+                            <ul class="return-progressbar">
+                                <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>">Order Placed</li>
+                                <li class="step <%= product.status === 'Return' ? 'active text-danger' : '' %>">
+                                    Returned
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Show message when product is returned -->
+                        <div class="alert alert-info text-center" role="alert">
+                            Your product has been returned. Refund in process.
+                        </div>
+
+                        <% } %>
+                    </div>
+
+                    <div class="card-footer p-4">
+                        <div class="d-flex justify-content-between">
+                            <div class="border-start h-100"></div>
+                            <div class="border-start h-100"></div>
+                            <% if (product.status !== "Cancelled" && product.status !== "Out for Delivery" && product.status
+                            !== "Delivered") { %>
+                            <h5 class="fw-normal mb-0"><a href="#!" id="cancelLink">Cancel</a></h5>
+                            <% } else { %>
+                            <h5 class="fw-normal mb-0 disabled-link">Cancel</h5>
+                            <% } %> <% if (product.status === "Delivered") { %>
+                            <h5 class="fw-normal mb-0"><a href="#!" id="returnLink">Return</a></h5>
+                            <% } else { %>
+                            <h5 class="fw-normal mb-0 disabled-link">Return</h5>
+                            <% } %>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="card-footer p-4">
-                  <div class="d-flex justify-content-between">
-                    <div class="border-start h-100"></div>
-                    <div class="border-start h-100"></div>
-                    <% if (product.status !== "Cancelled" && product.status !== "Out for Delivery" && product.status !== "Delivered") { %>
-                      <h5 class="fw-normal mb-0"><a href="#!" id="cancelLink">Cancel</a></h5>
-                    <% } else { %>
-                      <h5 class="fw-normal mb-0 disabled-link">Cancel</h5>
-                    <% } %>
-                
-                    <% if (product.status === "Delivered") { %>
-                      <h5 class="fw-normal mb-0"><a href="#!" id="returnLink">Return</a></h5>
-                    <% } else { %>
-                      <h5 class="fw-normal mb-0 disabled-link">Return</h5>
-                    <% } %>
-            
-              
-        
-              
             </div>
         </div>
-
-
-        </div>
-      </div>
     </div>
-  </div>
 </section>
-
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    let initialProductStatus;
+    document.addEventListener("DOMContentLoaded", function () {
+        let initialProductStatus;
 
-    function updateProductStatus(orderId, productId, productStatus, link) {
-      fetch('/updateProductStatus', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          orderId: orderId,
-          productId: productId,
-          productStatus: productStatus,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            const updatedProduct = data.product;
-            updateProgressBar(updatedProduct.status);
-            if (updatedProduct.status === 'Cancelled') {
-              // Show SweetAlert for cancelled order
-              Swal.fire({
-                icon: 'error',
-                title: 'Order Cancelled!',
-                text: 'Your order has been cancelled.',
-              }).then(() => {
-              location.reload();
+        function updateProductStatus(orderId, productId, productStatus, link) {
+            fetch("/updateProductStatus", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    productId: productId,
+                    productStatus: productStatus,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        const updatedProduct = data.product;
+                        updateProgressBar(updatedProduct.status);
+                        if (updatedProduct.status === "Cancelled") {
+                            // Show SweetAlert for cancelled order
+                            Swal.fire({
+                                icon: "error",
+                                title: "Order Cancelled!",
+                                text: "Your order has been cancelled.",
+                            }).then(() => {
+                                location.reload();
+                            });
+                            // Update the UI without reloading the page
+                            link.classList.add("disabled-link");
+                            link.removeAttribute("href");
+                        }
+                    } else {
+                        console.error("Error updating product status:", data.error);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error updating product status:", error);
+                });
+        }
+
+        function updateProgressBar(productStatus) {
+            const progressBarSteps = document.querySelectorAll(".progress-track .step");
+            progressBarSteps.forEach((step) => {
+                step.classList.remove("active");
             });
-              // Update the UI without reloading the page
-              link.classList.add('disabled-link');
-              link.removeAttribute('href');
+
+            for (let i = 0; i < productStatus; i++) {
+                progressBarSteps[i].classList.add("active");
             }
-          } else {
-            console.error('Error updating product status:', data.error);
-          }
-        })
-        .catch((error) => {
-          console.error('Error updating product status:', error);
-        });
-    }
-
-    function updateProgressBar(productStatus) {
-      const progressBarSteps = document.querySelectorAll('.progress-track .step');
-      progressBarSteps.forEach((step) => {
-        step.classList.remove('active');
-      });
-
-      for (let i = 0; i < productStatus; i++) {
-        progressBarSteps[i].classList.add('active');
-      }
-    }
-
-    function updateProductStatusWithConfirmation(orderId, productId, productStatus, link) {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: 'You won\'t be able to revert this!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, ' + productStatus.toLowerCase() + ' it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          updateProductStatus(orderId, productId, productStatus, link);
-          location.reload()
         }
-      });
-    }
 
-    const cancelLink = document.getElementById('cancelLink');
-    if (cancelLink) {
-      cancelLink.addEventListener('click', function (event) {
-        event.preventDefault();
-
-        const progressBar = document.querySelector('.progress-track');
-        const orderId = progressBar ? progressBar.dataset.orderId : null;
-        const productId = progressBar ? progressBar.dataset.productId : null;
-        const productStatus = progressBar ? progressBar.dataset.productStatus : null;
-
-        // Check if Cancel button should be enabled based on the product status
-        if (productStatus !== 'Delivered' && productStatus !== 'Cancelled' && productStatus !== 'Out for Delivery') {
-          updateProductStatusWithConfirmation(orderId, productId, 'Cancelled', cancelLink);
-        } else {
-          // Show SweetAlert for invalid action
-          Swal.fire({
-            icon: 'error',
-            title: 'Invalid Action!',
-            text: 'You cannot cancel an order with the current status.',
-          });
+        function updateProductStatusWithConfirmation(orderId, productId, productStatus, link) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, " + productStatus.toLowerCase() + " it!",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    updateProductStatus(orderId, productId, productStatus, link);
+                    location.reload();
+                }
+            });
         }
-      });
-    }
 
-    const returnLink = document.getElementById('returnLink');
-    if (returnLink) {
-      returnLink.addEventListener('click', function (event) {
-        event.preventDefault();
+        const cancelLink = document.getElementById("cancelLink");
+        if (cancelLink) {
+            cancelLink.addEventListener("click", function (event) {
+                event.preventDefault();
 
-        const progressBar = document.querySelector('.progress-track');
-        const orderId = progressBar ? progressBar.dataset.orderId : null;
-        const productId = progressBar ? progressBar.dataset.productId : null;
-        const productStatus = progressBar ? progressBar.dataset.productStatus : null;
+                const progressBar = document.querySelector(".progress-track");
+                const orderId = progressBar ? progressBar.dataset.orderId : null;
+                const productId = progressBar ? progressBar.dataset.productId : null;
+                const productStatus = progressBar ? progressBar.dataset.productStatus : null;
 
-        // Check if Return button should be enabled based on the product status
-        if (productStatus === 'Delivered') {
-          updateProductStatusWithConfirmation(orderId, productId, 'Return', returnLink);
-        } else {
-          // Show SweetAlert for invalid action
-          Swal.fire({
-            icon: 'error',
-            title: 'Invalid Action!',
-            text: 'You cannot return an order with the current status.',
-          });
+                // Check if Cancel button should be enabled based on the product status
+                if (
+                    productStatus !== "Delivered" &&
+                    productStatus !== "Cancelled" &&
+                    productStatus !== "Out for Delivery"
+                ) {
+                    updateProductStatusWithConfirmation(orderId, productId, "Cancelled", cancelLink);
+                } else {
+                    // Show SweetAlert for invalid action
+                    Swal.fire({
+                        icon: "error",
+                        title: "Invalid Action!",
+                        text: "You cannot cancel an order with the current status.",
+                    });
+                }
+            });
         }
-      });
-    }
-  });
+
+        const returnLink = document.getElementById("returnLink");
+        if (returnLink) {
+            returnLink.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                const progressBar = document.querySelector(".progress-track");
+                const orderId = progressBar ? progressBar.dataset.orderId : null;
+                const productId = progressBar ? progressBar.dataset.productId : null;
+                const productStatus = progressBar ? progressBar.dataset.productStatus : null;
+
+                // Check if Return button should be enabled based on the product status
+                if (productStatus === "Delivered") {
+                    updateProductStatusWithConfirmation(orderId, productId, "Return", returnLink);
+                } else {
+                    // Show SweetAlert for invalid action
+                    Swal.fire({
+                        icon: "error",
+                        title: "Invalid Action!",
+                        text: "You cannot return an order with the current status.",
+                    });
+                }
+            });
+        }
+    });
 </script>
 
 <%- include('../userLayouts/footer.ejs') %>

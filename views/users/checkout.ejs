@@ -355,8 +355,9 @@
                                                 />
                                             </td>
                                             <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= item.quantity %></td>
-                                            <td>₹ <%= item.product.discountedPrice %></td>
-                                            <td class="font-weight-bold">₹ <%= (item.product.discountedPrice * item.quantity).toFixed(2) %></td>
+                                            <td>₹ <%= item.product.finalDiscountedPrice.toFixed(2) %></td>
+                                            <td class="font-weight-bold">₹ <%= (item.product.finalDiscountedPrice * item.quantity).toFixed(2) %></td>
+
                                         </tr>
                                         <% }); %> <% } else { %>
                                         <tr>
@@ -589,12 +590,10 @@
                 try {
                     const userWalletBalance = await checkWalletBalance();
     
-                    // Extract and parse the purchase amount using the element ID
                     const purchaseAmountElement = document.getElementById('purchaseAmountElement');
                     const purchaseAmount = parseFloat(purchaseAmountElement.textContent.replace('₹', ''));
 
                     if (userWalletBalance >= purchaseAmount) {
-                        // Make a request to the server to handle the wallet transaction
                         const response = await fetch('/walletTransaction', {
                             method: 'POST',
                             headers: {
@@ -602,17 +601,14 @@
                             },
                             body: JSON.stringify({
                                
-                                transactionType: 'Purchase',
+                                transactionType: 'purchase',
                                 transactionAmount: purchaseAmount,
-                                transactionDetails: 'Shopping', // Provide additional details if needed
+                                transactionDetails: 'Shopping',
                             }),
                         });
 
                         const responseData = await response.json();
 
-                        console.log("wlltransaction", responseData)
-
-                        // Check if the transaction was successful
                         if (response.ok) {
                             Swal.fire({
                                 title: "Yeahh!!!!",
@@ -626,7 +622,6 @@
                                 }
                             });
                         } else {
-                            // Handle error from the server
                             Swal.fire({
                                 title: "Oops!",
                                 text: responseData.error || "Error processing the order. Please try again.",
@@ -676,7 +671,6 @@
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("razorPayment").addEventListener("change", async function () {
             if (this.checked) {
-                console.log("coolllllllllll");
                 try {
                     const selectedAddress = document.querySelector('input[name="defaultAddress"]:checked');
                     const selectedAddressId = selectedAddress.id.split("_")[1];
@@ -691,8 +685,6 @@
                     const discountElement = document.getElementById("discountElement");
                     const discountText = discountElement.textContent.trim().replace("₹", "");
                     const couponDiscount = parseFloat(discountText);
-
-                    console.log("discount", couponDiscount)
 
                     const paymentMethod = "Razor Payment"; // Set the payment method to Razor Payment
 
@@ -715,8 +707,6 @@
                     
                         });
                     });
-
-                    console.log(products);
 
                     const address = {
                         fullName: fullName,
@@ -745,28 +735,21 @@
                         body: JSON.stringify(orderData),
                     });
 
-                    console.log("dfsadds", response);
 
                     if (response.ok) {
                         const responseData = await response.json();
-                        console.log("enterererere", responseData.message);
 
                         const rzp = new Razorpay({
                             key: "<%= process.env.RAZORPAY_ID_KEY %>",
                             order_id: responseData.razorpayOrderID,
                             handler: async function (response) {
                                 try {
-                                    // Send the Razorpay response to your server
                                     const razorpayResponse = {
                                         razorpayOrderID: responseData.razorpayOrderID,
-
                                         paymentID: response.razorpay_payment_id,
                                         signature: response.razorpay_signature,
-                                        // Add other relevant data
+
                                     };
-                                    console.log(razorpayResponse.razorpayOrderID);
-                                    console.log(razorpayResponse.paymentID);
-                                    console.log(razorpayResponse.signature);
 
                                     const paymentResponse = await fetch("/razorpay-payment", {
                                         method: "POST",
@@ -776,11 +759,8 @@
                                         body: JSON.stringify(razorpayResponse),
                                     });
 
-                                    console.log("hot", paymentResponse);
-
                                     if (paymentResponse.ok) {
                                         const paymentData = await paymentResponse.json();
-                                        console.log("Payment server response:", paymentData);
 
                                         Swal.fire({
                                             title: "Yeahh!!!!",
@@ -803,7 +783,6 @@
                    
                         });
 
-                        // Open Razorpay payment form
                         rzp.open();
                     } else {
                         console.error("Failed to place order");
@@ -833,7 +812,6 @@
                     const discountElement = document.getElementById("discountElement");
                     const discountText = discountElement.textContent.trim().replace("₹", "");
                     const couponDiscount = parseFloat(discountText);
-                    console.log("discount", couponDiscount)
 
             const paymentMethod = document.querySelector('input[name="paymentOption"]:checked').value;
 
@@ -875,8 +853,6 @@
                 couponDiscount:couponDiscount,
             };
 
-            console.log(orderData);
-
             const response = await fetch("/place-order", {
                 method: "POST",
                 headers: {
@@ -885,11 +861,8 @@
                 body: JSON.stringify(orderData),
             });
 
-            console.log("dfsadds", response);
-
             if (response.ok) {
                 const responseData = await response.json();
-                console.log("enterererere", responseData.message);
             } else {
                 console.error("Failed to place order");
             }
@@ -901,7 +874,6 @@
 
 <script>
     function removeAddress(addressId) {
-        // Remove the address card from the DOM
         const addressCard = document.getElementById(`address-card-${addressId}`);
         if (addressCard) {
             addressCard.remove();
@@ -922,12 +894,9 @@
             const pincode = document.getElementById("c_diff_pincode").value;
             const country = document.getElementById("c_diff_country").value;
 
-            // Validating the data
-
             const isValid = validateAddressForm(fullName, mobile, district, state, city, pincode);
 
             if (isValid) {
-                // Prepare the request body
                 const requestBody = {
                     c_diff_fname: fullName,
                     c_diff_mobile: mobile,
@@ -937,9 +906,7 @@
                     c_diff_country: country,
                     c_diff_pincode: pincode,
                 };
-                console.log(requestBody);
 
-                // Send a POST request to the server using Fetch API
                 fetch("/addNewAddress", {
                     method: "POST",
                     headers: {
@@ -957,16 +924,13 @@
                                 showConfirmButton: false,
                             })
                             location.reload()
-                            return response.json(); // or return response.text() based on the server response
+                            return response.json();
                         }
                         throw new Error("Network response was not ok.");
                     })
                     .then((data) => {
-                        
-                        console.log(data); // Log the response data from the server
                     })
                     .catch((error) => {
-                        // Handle errors
                         console.error("There has been a problem with your fetch operation:", error);
                     });
             }
@@ -1055,16 +1019,11 @@
         editButtons.forEach((button) => {
             button.addEventListener("click", async function (event) {
                 addressId = event.target.getAttribute("data-address-id");
-                console.log(addressId);
 
                 try {
-                    // Fetch address details based on addressId from your backend API
                     const response = await fetch(`/address/${addressId}`);
-                    console.log(response);
                     const selectedAddress = await response.json();
-                    console.log(selectedAddress);
 
-                    // Populate modal fields with address details
                     document.getElementById("fullName").value = selectedAddress.fullName;
                     document.getElementById("mobile").value = selectedAddress.mobile;
                     document.getElementById("district").value = selectedAddress.district;
@@ -1077,10 +1036,8 @@
             });
         });
 
-        // Save Changes Button Click Event
         const saveChangesBtn = document.getElementById("saveChangesBtn");
         saveChangesBtn.addEventListener("click", async function () {
-            console.log(addressId);
 
             async function handleFormSubmission(event) {
                 event.preventDefault();
@@ -1088,7 +1045,6 @@
                     return;
                 }
 
-                // Get the updated address details from the form fields
                 const updatedAddress = {
                     fullName: document.getElementById("fullName").value,
                     mobile: document.getElementById("mobile").value,
@@ -1099,7 +1055,6 @@
                 };
 
                 try {
-                    // Call your backend API endpoint to update the address
                     const response = await fetch(`/updateAddress/${addressId}`, {
                         method: "POST",
                         headers: {
@@ -1108,12 +1063,8 @@
                         body: JSON.stringify(updatedAddress),
                     });
 
-                    console.log(response);
-
                     if (response.ok) {
-                        // Parse the response JSON data
                         const updatedAddressData = await response.json();
-            
 
                         Swal.fire({
                             icon: "success",
@@ -1122,21 +1073,14 @@
                             timer: 1000,
                             showConfirmButton: false,
                         }).then(() => {
-                            // Reload the page after showing the notification
                             location.reload();
                         });
-
-                        console.log("Address updated successfully on both client and server sides!");
                     } else {
-                        // Handle errors here, such as network issues or server errors
                         console.error("Error updating address:", response.statusText);
                     }
                 } catch (error) {
-                    // Handle other types of errors, such as network issues
                     console.error("Error updating address:", error);
                 }
-
-                // Close the modal after initiating the save operation
                 const editAddressModal = new bootstrap.Modal(document.getElementById("editAddressModal"));
                 editAddressModal.hide();
             }

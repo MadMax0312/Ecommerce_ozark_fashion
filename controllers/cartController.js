@@ -2,29 +2,68 @@ const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 const { getTotalProductsInCart } = require("../number/cartNumber");
 
+const calculateDiscountedPrice = (product, quantity) => {
+    const productPrice = product.price;
+
+    // Calculate product-level discount
+    const productDiscountPercentage = parseFloat(product.discountPercentage) || 0;
+    const productDiscountedPrice = productPrice - (productPrice * productDiscountPercentage) / 100;
+
+    // Calculate category-level discount
+    const category = product.category || {}; // Ensure category is defined
+    const categoryDiscountPercentage = parseFloat(category.discountPercentage) || 0;
+    const categoryDiscountedPrice = productPrice - (productPrice * categoryDiscountPercentage) / 100;
+
+    const finalDiscountedPrice = Math.min(productDiscountedPrice, categoryDiscountedPrice);
+
+    return {
+        productDiscountedPrice: productDiscountedPrice,
+        categoryDiscountedPrice: categoryDiscountedPrice,
+        finalDiscountedPrice: finalDiscountedPrice,
+    };
+};
+
 const loadCart = async (req, res) => {
     try {
-        const user = req.session.user_id;
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
 
-        const cartItems = await Cart.find({ user_id: user }).populate("items.product");
+        const cartItems = await Cart.find({ user_id: userId }).populate({
+            path: "items.product",
+            model: "Product",
+            select: "productname image price discountPercentage category",
+            populate: "category", // populate the 'category' field
+        });
 
-        console.log(cartItems);
+        // Calculate discounted prices for each product in the cart
+        cartItems.forEach((cartItem) => {
+            cartItem.items.forEach((item) => {
+                console.log("item0", item);
+                const { finalDiscountedPrice } = calculateDiscountedPrice(item.product, item.quantity);
+                console.log("finalDiscount", finalDiscountedPrice);
+                item.product.finalDiscountedPrice = finalDiscountedPrice;
+            });
+        });
 
         let subtotal = 0;
         if (cartItems.length > 0) {
             subtotal = cartItems.reduce((total, cartItem) => {
                 const productTotalPrice = cartItem.items.reduce((itemTotal, item) => {
-                    const productPrice = item.product.price;
+                    const { finalDiscountedPrice } = item.product;
                     const quantity = item.quantity;
-                    return itemTotal + productPrice * quantity;
+                    return itemTotal + finalDiscountedPrice * quantity;
                 }, 0);
 
                 return total + productTotalPrice;
             }, 0);
         }
-        res.render("cart", { data: cartItems, subtotal: subtotal, user: user, count: totalProductsInCart });
+
+        res.render("cart", {
+            data: cartItems,
+            subtotal: subtotal,
+            user: userId,
+            count: totalProductsInCart,
+        });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
@@ -79,10 +118,9 @@ const addToCart = async (req, res) => {
         const product = await Product.findById(productId);
         const maxStock = product.quantity;
 
-        
         if (maxStock <= 0) {
             return res.status(402).json({ message: "Sorry, Product not available" });
-        }else if (quantity > maxStock) {
+        } else if (quantity > maxStock) {
             return res.status(400).json({ message: "Exceeded maximum stock limit" });
         }
 
@@ -111,7 +149,6 @@ const addToCart = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
-
 
 const removeProduct = async (req, res) => {
     try {

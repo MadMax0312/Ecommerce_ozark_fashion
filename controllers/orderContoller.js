@@ -225,7 +225,7 @@ const updateStatus = async (req, res) => {
                 user.wallet += refundAmount;
                 user.walletHistory.push({
                     transactionDetails: `Refund for order ${order.orderTrackId}`,
-                    transactionType: 'Refund',
+                    transactionType: 'refund',
                     transactionAmount: refundAmount,
                     currentBalance: user.wallet,
                 });
@@ -265,14 +265,12 @@ const walletTransaction = async(req, res) => {
 
          const userId = req.session.user_id;
 
-        // Retrieve the user from the database
         const user = await User.findById(userId);
 
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Update the user's wallet amount based on the transaction type
         switch (transactionType) {
             case 'purchase':
                 if (user.wallet >= transactionAmount) {
@@ -281,13 +279,11 @@ const walletTransaction = async(req, res) => {
                     return res.status(400).json({ error: 'Insufficient funds in the wallet' });
                 }
                 break;
-            // Add other transaction types as needed
 
             default:
                 return res.status(400).json({ error: 'Invalid transaction type' });
         }
 
-        // Add the transaction to walletHistory
         const newTransaction = {
             transactionDate: new Date(),
             transactionDetails,
@@ -298,7 +294,6 @@ const walletTransaction = async(req, res) => {
 
         user.walletHistory.push(newTransaction);
 
-        // Save the updated user
         await user.save();
 
         return res.status(200).json({ message: 'Wallet transaction successful' });
@@ -311,26 +306,16 @@ const walletTransaction = async(req, res) => {
 const invoiceDownload = async (req, res, next) => {
     try {
       const { orderId } = req.query;
-      console.log('orderId:', orderId);
-  
-      // const orderData = await Order.findById(orderId).populate('cart.products.productId');
       const orderData = await Order.findById(orderId).populate('products.productId').populate('user');
   
-      console.log('orderData:', orderData);
-  
       if (!orderData) {
-        // Handle the case where the order with the specified orderId doesn't exist
-        console.log('Order not found');
         return res.status(404).send('Order not found');
       }
   
       const userId = req.session.user_id;
-
       const userData = await User.findById(userId);
-      console.log('userData:', userData);
   
       const date = new Date();
-      console.log('date:', date);
   
       const data = {
         orderData: orderData,

@@ -50,26 +50,21 @@ const addMoneyToWallet = async (req, res) => {
 
 const updateWallet = async (req, res) => {
   try {
-    console.log("dfhsafkldsf")
     const { transactionType, transactionAmount, transactionDetails, razorpay_payment_id } = req.body;
-    console.log(transactionAmount)
 
-    // Assuming your User model has a wallet field
     const user = await User.findById(req.session.user_id);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Update the wallet based on your business logic
-    // You may want to add additional checks or validations
     user.wallet += parseFloat(transactionAmount);
     user.walletHistory.push({
       transactionType,
       transactionAmount: parseFloat(transactionAmount),
       transactionDetails,
       currentBalance: user.wallet,
-      razorpay_payment_id, // Include razorpay_payment_id
+      razorpay_payment_id,
     });
 
     await user.save();
@@ -83,10 +78,8 @@ const updateWallet = async (req, res) => {
 
 const verifyTransaction = async (req, res) => {
   try {
-    console.log("dfhsafkldsf")
     const { order_id, razorpay_payment_id, signature } = req.body;
 
-    // Calculate HMAC-SHA256 signature
     const generatedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_SECRET_KEY)
       .update(`${order_id}|${razorpay_payment_id}`)
@@ -94,12 +87,10 @@ const verifyTransaction = async (req, res) => {
 
       console.log(generatedSignature)
 
-    // Compare generated signature with the received signature
     if (generatedSignature === signature) {
-      // Implement any additional logic needed for successful verification
+
       res.json({ success: true });
     } else {
-      // Payment verification failed
       res.status(400).json({ error: 'Payment verification failed' });
     }
   } catch (error) {
