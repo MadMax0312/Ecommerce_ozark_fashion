@@ -99,6 +99,20 @@ const verifyTransaction = async (req, res) => {
   }
 };
 
+const loadReferral = async (req, res) => {
+  try {
+      const userId = req.session.user_id; 
+      const user = await User.findById({ _id:userId })
+      const totalProductsInCart = await getTotalProductsInCart(userId);
+      if (user && user.referralCode) {
+          res.render('referral', { userReferralCode: user.referralCode, user:user, count:totalProductsInCart });
+      } else {
+          res.render('referral', { user:user, count:totalProductsInCart });
+      }
+  } catch (error) {
+      console.log(error.message);
+  }
+};
 
 
 
@@ -107,4 +121,5 @@ module.exports = {
   updateWallet,
   verifyTransaction,
   loadWallet,
+  loadReferral
 }

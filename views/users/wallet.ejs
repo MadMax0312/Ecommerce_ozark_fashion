@@ -5,7 +5,7 @@
         <h3 class="text-center my-3">My Account</h3>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Profile</a>
+                <a class="nav-link" href="/userProfile"><i class="fa fa-ticket"></i>Profile</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Address</a>
@@ -14,10 +14,10 @@
                 <a class="nav-link" href="/viewOrder"><i class="fa fa-shopping-cart"></i>Orders</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Coupons</a>
+                <a class="nav-link" href="/wallet"><i class="fa fa-ticket"></i>Wallet</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/wallet"><i class="fa fa-ticket"></i>Wallet</a>
+                <a class="nav-link" href="/referral"><i class="fa fa-ticket"></i>My Referral</a>
             </li>
         </ul>
     </div>
@@ -241,7 +241,7 @@
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            transactionType: "deposit",
+                            transactionType: "Deposit",
                             transactionAmount: addMoneyAmount,
                             transactionDetails: "Added money to the wallet",
                             razorpay_payment_id: response.razorpay_payment_id,

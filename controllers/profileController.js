@@ -165,11 +165,8 @@ const resetPassword = async (req, res) => {
                 const newSecurePassword = await bcrypt.hash(req.body.newPassword, 10);
 
                 const change = await User.updateOne({ _id: userDetails._id }, { $set: { password: newSecurePassword } });
-                console.log(change);
                 res.redirect("/userProfile");
-                console.log("password changed...");
             } else {
-                console.log("wrong old password");
                 res.redirect("/userProfile");
             }
         });
@@ -251,10 +248,6 @@ const viewDetails = async (req, res) => {
                   message: "No orders found for the user.",
                 });
               }
-
-          
-
-              console.log("data", latestOrder)
 
         res.render("order", {
             user: userId,

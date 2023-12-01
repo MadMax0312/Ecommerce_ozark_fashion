@@ -550,8 +550,6 @@
 
             if (data.success) {
 
-                console.log("Coupon applied successfully:", data);
-
                 document.getElementById("totalElement").innerHTML = `<p style="color: black">₹ ${data.totalAmount.toFixed(2)}</p>`;
                 document.getElementById("discountElement").innerHTML = `<p style="color: black">₹ ${data.discount.toFixed(2)}</p>`;
                 document.getElementById("invalid-msg").innerText = ""; // Clear any previous error message
@@ -581,15 +579,15 @@
             throw error;
         }
     }
-    
+
     async function confirmOrder() {
         const selectedPaymentOption = document.querySelector('input[name="paymentOption"]:checked');
-    
+
         if (selectedPaymentOption) {
             if (selectedPaymentOption.value === 'Wallet Transfer') {
                 try {
                     const userWalletBalance = await checkWalletBalance();
-    
+
                     const purchaseAmountElement = document.getElementById('purchaseAmountElement');
                     const purchaseAmount = parseFloat(purchaseAmountElement.textContent.replace('₹', ''));
 
@@ -600,8 +598,7 @@
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                               
-                                transactionType: 'purchase',
+                                transactionType: 'Purchase',
                                 transactionAmount: purchaseAmount,
                                 transactionDetails: 'Shopping',
                             }),
@@ -642,35 +639,7 @@
                 } catch (error) {
                     console.error('Error checking wallet balance:', error);
                 }
-            } else {
-                Swal.fire({
-                    title: "Yeahh!!!!",
-                    text: "Your Order is Successful",
-                    icon: "success",
-                    confirmButtonColor: "#28a745",
-                    confirmButtonText: "View Details",
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "/order";
-                    }
-                });
-            }
-        } else {
-            Swal.fire({
-                title: "Oops!",
-                text: "Please select a payment option.",
-                icon: "error",
-                confirmButtonColor: "#dc3545",
-                confirmButtonText: "OK",
-            });
-        }
-    }
-    </script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("razorPayment").addEventListener("change", async function () {
-            if (this.checked) {
+            } else if (selectedPaymentOption.value === 'Razor Payment') {
                 try {
                     const selectedAddress = document.querySelector('input[name="defaultAddress"]:checked');
                     const selectedAddressId = selectedAddress.id.split("_")[1];
@@ -704,7 +673,6 @@
                             quantity: quantity,
                             price: price,
                             subtotal: subtotal,
-                    
                         });
                     });
 
@@ -724,7 +692,7 @@
                         notes: notes,
                         productsData: products,
                         totalAmount: products.reduce((total, product) => total + product.subtotal, 0),
-                        couponDiscount:couponDiscount
+                        couponDiscount: couponDiscount,
                     };
 
                     const response = await fetch("/place-order", {
@@ -734,7 +702,6 @@
                         },
                         body: JSON.stringify(orderData),
                     });
-
 
                     if (response.ok) {
                         const responseData = await response.json();
@@ -748,7 +715,6 @@
                                         razorpayOrderID: responseData.razorpayOrderID,
                                         paymentID: response.razorpay_payment_id,
                                         signature: response.razorpay_signature,
-
                                     };
 
                                     const paymentResponse = await fetch("/razorpay-payment", {
@@ -764,7 +730,7 @@
 
                                         Swal.fire({
                                             title: "Yeahh!!!!",
-                                            text: "Your Order is Succesfull",
+                                            text: "Your Order is Successful",
                                             icon: "success",
                                             confirmButtonColor: "#28a745",
                                             confirmButtonText: "View Details",
@@ -780,7 +746,6 @@
                                     console.error("Error handling Razorpay response:", error);
                                 }
                             },
-                   
                         });
 
                         rzp.open();
@@ -791,14 +756,34 @@
                     console.error("Error occurred while placing the order", error);
                 }
             }
-        });
-    });
+        } else {
+            Swal.fire({
+                title: "Oops!",
+                text: "Please select a payment option.",
+                icon: "error",
+                confirmButtonColor: "#dc3545",
+                confirmButtonText: "OK",
+            });
+        }
+    }
 </script>
 
 <script>
     document.getElementById("placeOrderBtn").addEventListener("click", async function () {
         try {
             const selectedAddress = document.querySelector('input[name="defaultAddress"]:checked');
+
+            if (!selectedAddress) {
+                // Show an error message if the user didn't select an address
+                Swal.fire({
+                    title: "Oops!",
+                    text: "Please add or select an address before placing the order.",
+                    icon: "error",
+                    confirmButtonColor: "#dc3545",
+                    confirmButtonText: "OK",
+                });
+                return; // Stop further execution
+            }
 
             const selectedAddressId = selectedAddress.id.split("_")[1];
 

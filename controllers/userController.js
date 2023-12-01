@@ -57,7 +57,6 @@ const loadOtpPage = async (req, res) => {
 //ottp sending and otp storing in session
 const verifyOtp = async (req, res) => {
     try {
-        console.log("fbhjgdahfj");
 
         const otpCode = otpGenerator.generate(6, {
             digits: true,
@@ -126,7 +125,8 @@ const verifyOtp = async (req, res) => {
 
 const loadRegister = async (req, res) => {
     try {
-        res.render("registration");
+        const referralCode = req.query.referralCode;
+        res.render("registration" , { referralCode });
     } catch (error) {
         console.log(error.message);
     }
@@ -142,10 +142,8 @@ const generateOTP = () => {
 const resendOtp = async (req, res) => {
     try {
         const currentTime = Date.now() / 1000;
-        console.log("current", currentTime);
         if (req.session.otp.expiry != null) {
             if (currentTime > req.session.otp.expiry) {
-                console.log("expire", req.session.otp.expiry);
                 const newDigit = otpGenerator.generate(6, {
                     digits: true,
                     alphabets: false,
@@ -172,7 +170,6 @@ const resendOtp = async (req, res) => {
 ///-----Inserting user details in sign up page============
 
 const insertUser = async (req, res) => {
-    console.log("Request Body:", req.body);
     try {
 
         const referralCode = req.session.referralCode;
@@ -207,7 +204,7 @@ const insertUser = async (req, res) => {
                     transactionDate: new Date(),
                     transactionAmount: bonusAmount,
                     transactionDetails: `Referral bonus for user ${userData.username}`,
-                    transactionType: 'deposit',
+                    transactionType: 'Deposit',
                   });
                   await referringUser.save();
         
@@ -216,7 +213,7 @@ const insertUser = async (req, res) => {
                     transactionDate: new Date(),
                     transactionAmount: bonusAmount,
                     transactionDetails: 'Referral bonus',
-                    transactionType: 'deposit',
+                    transactionType: 'Deposit',
                   });
                   await userData.save();
                 }
@@ -254,23 +251,19 @@ const loadLogout = async (req, res) => {
 const verifyLogin = async (req, res) => {
     try {
         const email = req.body.email;
-        // console.log('email:', email);
         const password = req.body.password;
-        console.log("password:", password);
 
         var userData = await User.findOne({ email: email });
 
         if (userData) {
             if (userData.isBlock === false) {
                 const passwordMatch = await bcrypt.compare(password, userData.password);
-                console.log("passwordMatch:", passwordMatch);
 
                 if (passwordMatch) {
                     if (userData.is_verified == 0) {
                         res.render("login", { message: "Please verify your email" });
                     } else {
                         req.session.user_id = userData._id;
-                        console.log(req.session.user_id);
 
                         res.redirect("/");
                     }
@@ -341,17 +334,14 @@ const forgotVerify = async (req, res) => {
     try {
         const email = req.body.email;
         const userData = await User.findOne({ email: email });
-        console.log(userData);
 
         if (userData) {
             if (userData.is_verified === 0) {
                 res.render("forgotPassword", { message: "Please verify your mail" });
             } else {
                 const randomString = randomstring.generate();
-                console.log(randomString);
 
                 const updatedData = await User.updateOne({ email: email }, { $set: { token: randomString } });
-                console.log(updatedData);
 
                 resetPasswordMail(userData.first_name, userData.last_name, userData.email, randomString);
 
@@ -644,8 +634,6 @@ const getProductsByCategory = async (req, res) => {
 
         const categoryProductCounts = await getCategoryProductCounts();
         categoryProductCounts.sort((a, b) => a.categoryName.localeCompare(b.categoryName));
-
-        console.log("categoryDiscount", categoryDiscount)
 
         res.render('categoryMen', {
             user: req.session.user_id,

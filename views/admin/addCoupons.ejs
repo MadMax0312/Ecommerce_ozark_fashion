@@ -1,6 +1,5 @@
-<%- include('../adminLayouts/header.ejs') %>
-<%- include('../adminLayouts/sidebar.ejs') %>
-<%- include('../adminLayouts/navbar.ejs') %>
+<%- include('../adminLayouts/header.ejs') %> <%- include('../adminLayouts/sidebar.ejs') %> <%-
+include('../adminLayouts/navbar.ejs') %>
 
 <div class="main-panel">
     <div class="content-wrapper">
@@ -10,33 +9,52 @@
                     <h2 class="card-title text-center">COUPONS</h2>
 
                     <% if(typeof message !== 'undefined'){ %>
-                        <h6 id="invalid-msg" class="text-success text-center"><%- message %></h6>
+                    <h6 id="invalid-msg" class="text-success text-center"><%- message %></h6>
                     <% } %>
 
                     <form action="" method="post" class="forms-sample" onsubmit="return couponValid()">
                         <div class="form-group">
                             <label for="exampleInputName1">Coupon Name</label>
-                            <input type="text" class="form-control" id="couponName" name="couponName" placeholder="Name" onkeyup="this.value = this.value.toUpperCase();"   />
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="couponName"
+                                name="couponName"
+                                placeholder="Name"
+                                onkeyup="this.value = this.value.toUpperCase();"
+                            />
                             <span id="couponNameError" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label for="exampleInputEmail3">Coupon Discount(in %)</label>
-                            <input type="number" class="form-control" name="discount" id="couponDiscount" placeholder="Discount"  />
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="discount"
+                                id="couponDiscount"
+                                placeholder="Discount"
+                            />
                             <span id="couponDiscountError" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label for="exampleInputPassword4">Minimum Purchase</label>
-                            <input type="number" class="form-control" name="minPurchase" id="minPurchase" placeholder="Purchase"  />
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="minPurchase"
+                                id="minPurchase"
+                                placeholder="Purchase"
+                            />
                             <span id="minPurchaseError" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label for="exampleInputCity1">Starting Date</label>
-                            <input type="date" class="form-control" name="startDate" id="startDate"  />
+                            <input type="date" class="form-control" name="startDate" id="startDate" />
                             <span id="startDateError" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label for="exampleInputCity1">Expiry Date</label>
-                            <input type="date" class="form-control" name="expiryDate" id="expiryDate"  />
+                            <input type="date" class="form-control" name="expiryDate" id="expiryDate" />
                             <span id="expiryDateError" class="text-danger"></span>
                         </div>
                         <button type="submit" class="btn btn-primary mr-2">Submit</button>
@@ -47,11 +65,12 @@
         </div>
     </div>
 </div>
-
 <script>
-    // Add a script to hide the message after 3 seconds
     setTimeout(function () {
-        document.getElementById("invalid-msg").style.display = "none";
+        var invalidMsgElement = document.getElementById("invalid-msg");
+        if (invalidMsgElement) {
+            invalidMsgElement.style.display = "none";
+        }
     }, 3000);
 </script>
 

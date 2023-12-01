@@ -38,7 +38,7 @@ function productValiddForm() {
 
     if (
         discountPrice !== "" &&
-        (!isValidPrice(discountPrice) ||
+        (!isValidPrices(discountPrice) ||
             parseFloat(discountPrice) < 0 ||
             parseFloat(discountPrice) > 50) // Updated condition to check if discount is greater than 70%
     ) {
@@ -130,6 +130,11 @@ function isValidPrice(price) {
     // This function checks if the input is a positive number with up to two decimal places
     const regex = /^\d+(\.\d{1,2})?$/;
     return regex.test(price) && parseFloat(price) > 0;
+}
+
+function isValidPrices(price) {
+    const regex = /^\d+(\.\d{1,2})?$/;
+    return regex.test(price) && parseFloat(price) >= 0;
 }
 
 function isValidQuantity(quantity) {

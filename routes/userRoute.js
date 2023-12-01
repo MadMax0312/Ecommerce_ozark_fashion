@@ -75,7 +75,7 @@ user_route.post('/creditMoney', walletController.addMoneyToWallet);
 user_route.post('/updateWallet', walletController.updateWallet);
 user_route.post('/verifypayment', walletController.verifyTransaction);
 
-
+user_route.get('/referral', auth.isLogin, walletController.loadReferral);
 
 
 //======================================================================

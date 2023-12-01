@@ -22,14 +22,6 @@
                         </div>
                         <div class="card-body">
                             <p><strong>Order ID:</strong> <%= order.orderTrackId %></p>
-                            <!-- <p><strong>Order Status:</strong>
-                                <select id="orderStatus" onchange="updateOrderStatus('<%= order._id %>')"
-                                    class="form-select">
-                                    <option value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                    <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                    <option value="Out for Delivery" <%= order.orderStatus === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
-                                </select>
-                            </p> -->
                             <p><strong>Order Date:</strong> <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></p>
                             <p><strong>Payment Method: </strong> <%= order.paymentMethod %></p>
                             <p><strong>Payment Status: </strong> <%= order.paymentStatus %></p>
@@ -66,33 +58,47 @@
                                     <div class="col-md-2">
                                         <img src="/static/admin/Assets/images/products/<%= product.productId.image[0] %>" alt="Product Image" style="width: 75px;">
                                     </div>
-                                    <div class="col-md-6">
-                                        <h5><%= product.productId.productname %></h5>
-                                        <p><strong>Quantity:</strong> <%= product.quantity %></p>
-                                        <p><strong>Price:</strong> <%= product.price %></p>
-                                    </div>
                                     <div class="col-md-4">
-                                        <p><strong>Subtotal:</strong> <%= product.subtotal %></p>
-                                        <p><strong>Status:</strong>
-                                            <select class="form-select productStatus <%= product.status === 'Cancelled' ? 'cancelled' : '' %>"
-                                                data-product-id="<%= product._id %>"
-                                                id="productStatus_<%= product._id %>"
-                                                onchange="updateProductStatus('<%= order._id %>', '<%= product._id %>')"
-                                                <%= product.status === 'Cancelled' ? 'disabled' : '' %>
-                                                <%= product.status === 'Return' ? 'disabled' : '' %>
-                                                >
-                                                <option value="Pending" <%= product.status === 'Order Placed' ? 'selected' : '' %>>Order Placed</option>
-                                                <option value="Shipped" <%= product.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                                <option value="Out for Delivery" <%= product.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
-                                                <option value="Delivered" <%= product.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                <option value="Cancelled" <%= product.status === 'Cancelled' ? 'selected' : '' %>>Cancel</option>
-                                                <option value="Return" <%= product.status === 'Return' ? 'selected' : '' %>>Return</option>
-                                       
-                                            </select>
-                                        </p>
-                                     <!-- Add a button for refund -->
-                                     <button class="btn btn-md btn-warning refund-btn" style="color: black;" disabled>Refund</button>
-                           
+                                        <h5><%= product.productId.productname %></h5>
+                                        <p class="mb-1">Quantity: <%= product.quantity %></p>
+                                        <p class="mb-2">Price: <%= product.price %></p>
+                                        <p>Subtotal: <%= product.subtotal %></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="mb-0"><strong>Status:</strong></p>
+                                                <select class="form-select productStatus <%= product.status === 'Cancelled' ? 'cancelled' : '' %>"
+                                                    data-product-id="<%= product._id %>"
+                                                    id="productStatus_<%= product._id %>"
+                                                    onchange="updateProductStatus('<%= order._id %>', '<%= product._id %>', '<%= product.status %>')"
+                                                    <%= product.status === 'Cancelled' ? 'disabled' : '' %>
+                                                    <%= product.status === 'Return' ? 'disabled' : '' %>
+                                                    >
+                                                    <option value="Order Placed" <%= product.status === 'Order Placed' ? 'selected' : '' %>>Order Placed</option>
+                                                    <option value="Shipped" <%= product.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                    <option value="Out for Delivery" <%= product.status === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                                                    <option value="Delivered" <%= product.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                    <option value="Cancelled" <%= product.status === 'Cancelled' ? 'selected' : '' %>>Cancel</option>
+                                                    <option value="Return" <%= product.status === 'Return' ? 'selected' : '' %> disabled>Return</option>
+                                                </select>
+                                                
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p>
+                                                    <strong>Return Status:</strong>
+                                                    <select class="form-select returnStatus" data-product-id="<%= product._id %>">
+                                                        <option value="Select">Select Status</option>
+                                                        <option value="Return Placed" <%= product.returnStatus === 'Return Placed' ? 'selected' : '' %>>Return Placed</option>
+                                                        <option value="Out for Pickup" <%= product.returnStatus === 'Out for Pickup' ? 'selected' : '' %>>Out for Pickup</option>
+                                                        <option value="Returned" <%= product.returnStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                                    </select>
+                                                </p>
+                                                <button class="btn btn-md btn-warning refund-btn" style="color: black;" data-product-id="<%= product._id %>" disabled>Refund</button>
+
+                                            </div>
+                                        </div>                                      
+                                     
                                    
                                     </div>
                                 </div>
@@ -109,79 +115,89 @@
 
 
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const orderId = '<%= order._id %>';
 
-async function updateProductStatus(orderId, productId) {
-    try {
-
-        const productStatusElement = document.querySelector(`.productStatus[data-product-id="${productId}"]`);
-        const productStatus = productStatusElement.value;
-
-        console.log(productStatus)
-
-        if (productStatus === 'Cancelled') {
-            // Do not proceed with the update if the status is 'Cancelled'
-            console.log('Cannot update status for cancelled product.');
-            return;
-        }
-        const response = await fetch('/admin/updateProductStatus', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                orderId: orderId,
-                productId: productId,
-                productStatus: productStatus,
-            }),
+        const productStatusSelects = document.querySelectorAll('.productStatus');
+        productStatusSelects.forEach((select) => {
+            select.addEventListener('change', handleProductStatusChange);
         });
 
-        console.log(response)
+        // Function to handle product status change
+        async function handleProductStatusChange(event) {
+            const productId = event.target.getAttribute('data-product-id');
 
-        const data = await response.json();
-        console.log('Product status updated successfully:', data);
-        if (response.ok) {
-            // Reload the page
-            window.location.reload();
-        } else {
-            console.error('Failed to update product status');
+            // Check if the selected status is "Return"
+            if (event.target.value === 'Return') {
+                // Disable the "Return" option
+                event.target.value = ''; // Reset the selected value
+                return;
+            }
+
+            // Fetch to update product status on the server
+            const response = await fetch('/admin/updateProductStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    productId: productId,
+                    productStatus: event.target.value,
+                }),
+            });
+
+            if (!response.ok) {
+                console.error('Failed to update product status on the server');
+            } else {
+                console.log('Product status updated successfully');
+                // Optionally, you can handle success here
+            }
         }
-
-    } catch (error) {
-        console.error('Error updating product status:', error);
-    }
-}
-
-
-function updateProgressBar(orderId, productId) {
-    const orderElement = document.getElementById(`order-${orderId}`);
-    const productElement = document.getElementById(`product-${productId}`);
-
-    fetch(`/admin/getProductStatus?orderId=${orderId}&productId=${productId}`)
-        .then(response => response.json())
-        .then(data => {
-            const productStatus = data.productStatus; // Assuming the response contains productStatus
-            // Update the progress bar classes based on the product status
-            if (productStatus >= 2) {
-                productElement.classList.add('active');
-            } else {
-                productElement.classList.remove('active');
-            }
-
-            // Check if all products in the order have been delivered (assuming status 4 indicates delivered)
-            const allProductsDelivered = data.order.products.every(product => product.status >= 4);
-
-            // Update the order progress bar based on all products' status
-            if (allProductsDelivered) {
-                orderElement.classList.add('completed');
-            } else {
-                orderElement.classList.remove('completed');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching product status:', error);
-        });
-}
-
+    });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const orderId = '<%= order._id %>';
+
+        const returnStatusSelects = document.querySelectorAll('.returnStatus');
+        returnStatusSelects.forEach((select) => {
+            select.addEventListener('change', handleReturnStatusChange);
+            // Initial check to enable/disable refund button based on initial return status
+            handleReturnStatusChange({ target: select });
+        });
+
+        // Function to handle return status change
+        async function handleReturnStatusChange(event) {
+            const productId = event.target.getAttribute('data-product-id');
+            const refundButton = document.querySelector(`.refund-btn[data-product-id="${productId}"]`);
+
+            if (event.target.value === 'Returned') {
+                refundButton.removeAttribute('disabled');
+            } else {
+                refundButton.setAttribute('disabled', true);
+            }
+
+            // Fetch to update return status on the server
+            const response = await fetch('/admin/updateReturnStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    productId: productId,
+                    returnStatus: event.target.value,
+                }),
+            });
+
+            if (!response.ok) {
+                console.error('Failed to update return status on the server');
+            }
+        }
+    });
+</script>
+    
 
 <%- include('../adminLayouts/footer.ejs') %>

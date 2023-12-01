@@ -55,8 +55,8 @@ const addCoupon = async (req, res) => {
 
 const loadEditCoupon = async (req, res) => {
     try {
-      const couponId = req.query.id
-        const couponData = await Coupon.findById({ _id:couponId });
+        const couponId = req.query.id;
+        const couponData = await Coupon.findById({ _id: couponId });
 
         res.render("editCoupons", { data: couponData });
     } catch (error) {
@@ -66,50 +66,43 @@ const loadEditCoupon = async (req, res) => {
 
 const editCoupon = async (req, res) => {
     try {
+        const id = req.body.id;
+        let coupon = await Coupon.findById(id);
 
-      const id = req.body.id;
-      let coupon = await Coupon.findById(id);
+        if (coupon) {
+            coupon.couponName = req.body.couponName;
+            coupon.discountPercentage = req.body.discount;
+            coupon.minimumPurchase = req.body.minPurchase;
+            coupon.startingDate = req.body.startDate;
+            coupon.expiryDate = req.body.expiryDate;
+            coupon.users = req.body.users || [];
 
-      if(coupon){
-        coupon.couponName = req.body.couponName;
-        coupon.discountPercentage = req.body.discount;
-        coupon.minimumPurchase = req.body.minPurchase;
-        coupon.startingDate = req.body.startDate;
-        coupon.expiryDate = req.body.expiryDate;
-        coupon.users = req.body.users || [];
+            const data = await coupon.save();
 
-        const data = await coupon.save();
-
-        if (data) {
-            res.redirect("/admin/coupons");
+            if (data) {
+                res.redirect("/admin/coupons");
+            } else {
+                res.render("editCoupons", { message: "Something went Wrong" });
+            }
         } else {
-            res.render("editCoupons", { message: "Something went Wrong" });
+            res.redirect("/admin/coupons");
         }
-      }else{
-        res.redirect("/admin/coupons");
-      }
     } catch (error) {
         console.log(error.message);
     }
 };
 
-const deleteCoupon = async(req, res) => {
-  try{
+const deleteCoupon = async (req, res) => {
+    try {
+        const couponId = req.query.id;
 
-   const couponId = req.query.id
+        const coupon = await Coupon.deleteOne({ _id: couponId });
 
-   console.log(couponId)
-
-   const coupon = await Coupon.deleteOne({_id:couponId});
-
-   console.log(coupon)
-
-   res.redirect("/admin/coupons");
-
-  }catch(error){
-    console.log(error.message)
-  }
-}
+        res.redirect("/admin/coupons");
+    } catch (error) {
+        console.log(error.message);
+    }
+};
 
 module.exports = {
     loadCoupons,
@@ -117,5 +110,5 @@ module.exports = {
     addCoupon,
     loadEditCoupon,
     editCoupon,
-    deleteCoupon
+    deleteCoupon,
 };

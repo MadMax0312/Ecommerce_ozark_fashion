@@ -72,7 +72,6 @@ const loadCart = async (req, res) => {
 
 const updateCart = async (req, res) => {
     try {
-        console.log("sdfjdkjflsdj");
         const user = req.session.user_id;
         const productID = req.body.productID;
         const quantity = req.body.quantity;
@@ -94,7 +93,6 @@ const updateCart = async (req, res) => {
 const getMaxStock = async (req, res) => {
     try {
         const productID = req.params.id;
-
         const product = await Product.findById(productID);
         const maxStock = product.quantity;
         res.json({ maxStock });

@@ -87,8 +87,6 @@ admin_route.post("/delete-image", productController.deleteImage);
 
 admin_route.post('/add-images', upload.array('images', 4), productController.addImages);
 
-admin_route.post("/update-image", upload.single('newImage'), productController.updateImage);
-
 //================================== C A T E G O R Y == S E C T I ON ================================================================================//
 
 admin_route.get("/categories", auth.isLogin, categoryController.loadCatogories);
@@ -113,6 +111,8 @@ admin_route.get('/orderDetailss', adminOrderController.viewDetails);
 
 admin_route.post('/updateProductStatus', adminOrderController.updateProductStatus);
 
+admin_route.post('/updateReturnStatus', adminOrderController.updateReturnStatus)
+
 admin_route.post('/refund', auth.isLogin, adminOrderController.proceedRefund);
 
 admin_route.post('/returnProduct', auth.isLogin, adminOrderController.returnProduct);
@@ -136,6 +136,8 @@ admin_route.get('/delete-coupons', couponController.deleteCoupon);
 admin_route.get("/sales", auth.isLogin, salesController.loadSales);
 
 admin_route.get("/export-sales", auth.isLogin, salesController.exportReport);
+
+admin_route.get('/get-sales-data', auth.isLogin, dashboardController.getSalesDataByDate)
 
 
 admin_route.get("*", function (req, res) {

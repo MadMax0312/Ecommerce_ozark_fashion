@@ -1,0 +1,77 @@
+<%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
+
+<div id="content" class="row">
+    <div id="sidebar" class="col-md-3 col-lg-2">
+        <h3 class="text-center my-3">My Account</h3>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="/userProfile"><i class="fa fa-ticket"></i>Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Address</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/viewOrder"><i class="fa fa-shopping-cart"></i>Orders</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/wallet"><i class="fa fa-ticket"></i>Wallet</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/referral"><i class="fa fa-ticket"></i>My Referral</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="main-content" class="col">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="mb-4">My Referral</h3>
+                </div>
+            </div>
+            <div class="wallet-container balance-section">
+              <h5>My Referral Code</h5>
+              <p class="text-primary lead" id="referralCode"><%= userReferralCode %></p>
+          </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                  <h3 class="mb-4">Referral Link</h3>
+              </div>
+          </div>
+
+          <div class="wallet-container balance-section">
+            <h5>My Referral Link</h5>
+            <p class="text-primary lead" id="referralLink"></p>
+            <button id="shareButton" class="btn btn-primary">Share</button>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  const referralCode = '<%= userReferralCode %>';
+  const referralLink = window.location.origin + '/signup?referralCode=' + referralCode;
+  document.getElementById('referralLink').innerText = referralLink;
+
+  // Share button event handler
+  const shareButton = document.getElementById('shareButton');
+  if (navigator.share) {
+      shareButton.addEventListener('click', async () => {
+          try {
+              await navigator.share({
+                  title: 'Check out this referral link!',
+                  text: `Join now and use my referral code: ${referralCode}`,
+                  url: referralLink,
+              });
+          } catch (error) {
+              console.error('Error sharing:', error.message);
+          }
+      });
+  } else {
+      // If the Web Share API is not supported, hide the button
+      shareButton.style.display = 'none';
+  }
+</script>
+
+<%- include('../userLayouts/footer.ejs') %>

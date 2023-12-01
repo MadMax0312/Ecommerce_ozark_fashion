@@ -82,7 +82,7 @@ const loadOrder = async (req, res) => {
     } catch (error) {
         console.log(error.message);
     }
-};
+}; 
 
 const viewDetails = async (req, res) => {
     try {
@@ -170,7 +170,7 @@ const proceedRefund = async (req, res) => {
 
         user.walletHistory.push({
             transactionDetails,
-            transactionType: 'refund',
+            transactionType: 'Refund',
             transactionAmount,
             currentBalance,
         });
@@ -212,6 +212,36 @@ const returnProduct = async (req, res) => {
     }
 };
 
+const updateReturnStatus = async (req, res) => {
+    try {
+        const { orderId, productId, returnStatus } = req.body;
+
+        const order = await Order.findById(orderId);
+        const product = order.products.find((product) => product._id.toString() === productId); 
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found in the order.' });
+        }
+
+        product.returnStatus = returnStatus;
+
+        if (returnStatus === 'Returned') {
+            product.paymentStatus = 'Refunded';
+
+            const originalProduct = await Product.findById(product.productId);
+            originalProduct.quantity += product.quantity;
+            await originalProduct.save();
+        }
+
+        await order.save();
+
+        res.json({ success: true, data: product });
+    } catch (error) {
+        console.error('Error updating return status:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
+
 
 module.exports = {
     loadOrder,
@@ -219,4 +249,5 @@ module.exports = {
     updateProductStatus,
     proceedRefund,
     returnProduct,
+    updateReturnStatus,
 };

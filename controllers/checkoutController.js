@@ -31,7 +31,8 @@ const calculateDiscountedPrice = (product, quantity) => {
 const loadCheckout = async (req, res) => {
     try {
         const userId = req.session.user_id;
-
+        const userData = await User.findById({ _id: userId });
+        const userAddress = await Address.findOne({ userId });
         const totalProductsInCart = await getTotalProductsInCart(userId);
 
         if (!userId) {
@@ -42,8 +43,6 @@ const loadCheckout = async (req, res) => {
             return res.status(402).json({ message: "Please add items to the cart." });
         }
 
-        const userData = await User.findById({ _id: userId });
-        const userAddress = await Address.findOne({ userId });
         const cartData = await Cart.findOne({ user_id: userId }).populate({
             path: 'items.product',
             model: 'Product',

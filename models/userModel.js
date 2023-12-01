@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 // Define the transactionTypes enum
-const transactionTypes = ["deposit", "withdrawal", "purchase", "refund"]; // Add other types as needed
+const transactionTypes = ["Deposit", "Withdrawal", "Purchase", "Refund"]; // Add other types as needed
 
 const userSchema = new mongoose.Schema(
     {

@@ -1,6 +1,5 @@
-<%- include('../adminLayouts/header.ejs') %> 
-<%- include('../adminLayouts/sidebar.ejs') %> 
-<%- include('../adminLayouts/navbar.ejs') %>
+<%- include('../adminLayouts/header.ejs') %> <%- include('../adminLayouts/sidebar.ejs') %> <%-
+include('../adminLayouts/navbar.ejs') %>
 
 <div class="main-panel">
     <div class="content-wrapper">
@@ -10,15 +9,8 @@
                     <h2 class="card-title" style="text-align: center">PRODUCTS</h2>
 
                     <form class="search-form">
-                        <input
-                            type="text"
-                            name="search"
-                            placeholder="Product name or Size"
-                            class="search-input"
-                        />
-                        <button type="submit" class="search-button">
-                            Search <i class="mdi mdi-magnify"></i>
-                        </button>
+                        <input type="text" name="search" placeholder="Product name or Size" class="search-input" />
+                        <button type="submit" class="search-button">Search <i class="mdi mdi-magnify"></i></button>
                     </form>
 
                     <br />
@@ -31,7 +23,7 @@
                                     <th>Category</th>
                                     <th>Size</th>
                                     <th>Price</th>
-                                    <th>Offer</th>
+                                    <th>Offer(%)</th>
                                     <th>Quantity</th>
                                     <th>Image</th>
                                     <th>Edit</th>
@@ -39,82 +31,86 @@
                                 </tr>
                             </thead>
 
-                            <% if (Product.length > 0) { 
-                                for (let i = 0; i < Product.length; i++) { %>
-                                <tr>
-                                    <td><%= (currentPage - 1) * 5 + i + 1 %>.<%= Product[i].productname %></td>
-                                    <td><%= Product[i].category.categoryname %></td>
-                                    <td><%= Product[i].size %></td>
-                                    <td><%= Product[i].price %></td>
-                                    <td><%= Product[i].discount %></td>
-                                    <td><%= Product[i].quantity %></td>
-                                    <td>
-                                        <% if (Product[i].image && Product[i].image.length > 0) { 
-                                            Product[i].image.forEach((image, index) => { %>
-                                            <img src="/static/admin/Assets/images/products/<%= image %>" alt="img" />
-                                        <% });
-                                        } %>
-                                    </td>
-                                    
-                                    <td>
-                                        <a href="/admin/edit-product?id=<%= Product[i]._id %>" class="btn btn-outline-secondary btn-icon-text">
-                                            Edit <i class="mdi mdi-file-check btn-icon-append"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <% if (Product[i].status === false) { %>
-                                        <a href="/admin/unlist-product?id=<%= Product[i]._id %>">
-                                            <button data-product-id="<%= Product[i]._id %>" type="button" class="btn btn-inverse-success yy">List</button>
-                                        </a>
-                                        <% } else { %>
-                                        <a href="/admin/unlist-product?id=<%= Product[i]._id %>">
-                                            <button data-product-id="<%= Product[i]._id %>" type="button" class="btn btn-inverse-danger yy">Unlist</button>
-                                        </a>
-                                        <% } %>
-                                    </td>
-                                </tr>
-                                <% } 
-                            } else { %>
-                                <tr>
-                                    <td colspan="5">Product not Found</td>
-                                </tr>
+                            <% if (Product.length > 0) { for (let i = 0; i < Product.length; i++) { %>
+                            <tr>
+                                <td><%= (currentPage - 1) * 5 + i + 1 %>.<%= Product[i].productname %></td>
+                                <td><%= Product[i].category.categoryname %></td>
+                                <td><%= Product[i].size %></td>
+                                <td><%= Product[i].price %></td>
+                                <td><%= Product[i].discountPercentage %></td>
+                                <td><%= Product[i].quantity %></td>
+                                <td>
+                                    <% if (Product[i].image && Product[i].image.length > 0) {
+                                    Product[i].image.forEach((image, index) => { %>
+                                    <img src="/static/admin/Assets/images/products/<%= image %>" alt="img" />
+                                    <% }); } %>
+                                </td>
+
+                                <td>
+                                    <a
+                                        href="/admin/edit-product?id=<%= Product[i]._id %>"
+                                        class="btn btn-sm btn-outline-secondary btn-icon-text"
+                                    >
+                                        Edit <i class="mdi mdi-file-check btn-icon-append"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <% if (Product[i].status === false) { %>
+                                    <a href="/admin/unlist-product?id=<%= Product[i]._id %>">
+                                        <button
+                                            data-product-id="<%= Product[i]._id %>"
+                                            type="button"
+                                            class="btn btn-inverse-success yy"
+                                        >
+                                            List
+                                        </button>
+                                    </a>
+                                    <% } else { %>
+                                    <a href="/admin/unlist-product?id=<%= Product[i]._id %>">
+                                        <button
+                                            data-product-id="<%= Product[i]._id %>"
+                                            type="button"
+                                            class="btn btn-inverse-danger yy"
+                                        >
+                                            Unlist
+                                        </button>
+                                    </a>
+                                    <% } %>
+                                </td>
+                            </tr>
+                            <% } } else { %>
+                            <tr>
+                                <td colspan="5">Product not Found</td>
+                            </tr>
                             <% } %>
                         </table>
 
                         <!-- Pagination -->
                         <div class="pagination-container ty">
                             <% if (typeof totalPages !== 'undefined') { %>
-                              <nav aria-label="Page navigation">
+                            <nav aria-label="Page navigation">
                                 <ul class="pagination">
-                          
-                                  <% if (currentPage > 1) { %>
+                                    <% if (currentPage > 1) { %>
                                     <li class="page-item">
-                                      <a class="page-link" href="?page=1" aria-label="First">
-                                        <span aria-hidden="true">&laquo;&laquo;</span>
-                                      </a>
+                                        <a class="page-link" href="?page=1" aria-label="First">
+                                            <span aria-hidden="true">&laquo;&laquo;</span>
+                                        </a>
                                     </li>
-                                  <% } %>
-                          
-                                  <% for (let j = 1; j <= totalPages; j++) { %>
+                                    <% } %> <% for (let j = 1; j <= totalPages; j++) { %>
                                     <li class="page-item <%= j === currentPage ? 'active' : '' %>">
-                                      <a class="page-link" href="?page=<%= j %>"><%= j %></a>
+                                        <a class="page-link" href="?page=<%= j %>"><%= j %></a>
                                     </li>
-                                  <% } %>
-                          
-                                  <% if (currentPage < totalPages) { %>
+                                    <% } %> <% if (currentPage < totalPages) { %>
                                     <li class="page-item">
-                                      <a class="page-link" href="?page=<%= totalPages %>" aria-label="Last">
-                                        <span aria-hidden="true">&raquo;&raquo;</span>
-                                      </a>
+                                        <a class="page-link" href="?page=<%= totalPages %>" aria-label="Last">
+                                            <span aria-hidden="true">&raquo;&raquo;</span>
+                                        </a>
                                     </li>
-                                  <% } %>
-                          
+                                    <% } %>
                                 </ul>
-                              </nav>
+                            </nav>
                             <% } %>
-                          </div>
-                          
-                          
+                        </div>
                     </div>
                 </div>
             </div>
@@ -122,11 +118,9 @@
     </div>
 </div>
 
-
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const productTable = document.getElementById("product-table");
-        console.log("fggfg");
 
         productTable.addEventListener("click", async (event) => {
             if (event.target.classList.contains("yy")) {
@@ -143,7 +137,7 @@
                     });
 
                     const data = await response.json();
-                    console.log("dfldkf",data);
+                    console.log("dfldkf", data);
 
                     if (response.ok) {
                         const button = event.target;
@@ -151,7 +145,6 @@
                         button.classList.toggle("btn-inverse-danger");
                         button.classList.toggle("btn-inverse-success");
 
-                        // Show SweetAlert notification on successful action
                         Swal.fire({
                             title: data.message,
                             icon: "success",
@@ -162,10 +155,7 @@
                             },
                         });
                     } else {
-                        // Handle server error or unexpected response
                         console.error("Error updating product status:", response.statusText);
-
-                        // Show SweetAlert error notification
                         Swal.fire({
                             title: "Error",
                             text: "Failed to update product status.",
@@ -179,10 +169,7 @@
                         });
                     }
                 } catch (error) {
-                    // Handle network error or JSON parsing error
                     console.error("Error:", error);
-
-                    // Show SweetAlert network error notification
                     Swal.fire({
                         title: "Network Error",
                         text: "Failed to communicate with the server.",
@@ -200,7 +187,4 @@
     });
 </script>
 
-
 <%- include('../adminLayouts/footer.ejs') %>
-
-    

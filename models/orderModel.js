@@ -31,9 +31,13 @@ const orderSchema = new mongoose.Schema(
                     enum: ["Order Placed", "Shipped", "Out for Delivery", "Delivered", "Cancelled", "Return" , "Processing"],
                     default: "Order Placed",
                 },
+                returnStatus: {
+                    type: String,
+                    enum: ["Return Placed", "Out for Pickup", "Returned"],
+                },
                 paymentStatus: {
                     type: String,
-                    enum: ["Pending", "Paid", "Failed"],
+                    enum: ["Pending", "Paid", "Failed", "Refunded"],
                     default: "Pending",
                 },
             },

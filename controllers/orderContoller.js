@@ -54,6 +54,7 @@ const loadOrder = async (req, res) => {
 const placeOrder = async (req, res) => {
     try {
         const { productsData, totalAmount, address, paymentMethod, notes, couponDiscount } = req.body;
+        console.log("address", address)
         const user_id = req.session.user_id;
         var payment;
 
@@ -77,8 +78,6 @@ const placeOrder = async (req, res) => {
             couponDiscount:couponDiscount,
         });
 
-        console.log(order);
-
         await order.save();
 
         for (const productData of productsData) {
@@ -87,8 +86,6 @@ const placeOrder = async (req, res) => {
 
             await Product.findByIdAndUpdate(productId, { $inc: { quantity: -orderedQuantity } }, { new: true });
         }
-
-        await Cart.findOneAndDelete({ user_id: user_id });
 
         const razorpayOrder = await razorpayInstance.orders.create({
             amount: totalAmount * 100,
@@ -140,6 +137,8 @@ const handleRazorpayPayment = async (req, res) => {
                 console.error('Order not found or could not be updated');
                 return res.status(404).json({ error: 'Order not found or could not be updated' });
             }
+
+            await Cart.findOneAndDelete({ user_id: userId });
 
             res.status(200).json({ message: 'Razorpay Payment Success' });
         } else {
@@ -225,7 +224,7 @@ const updateStatus = async (req, res) => {
                 user.wallet += refundAmount;
                 user.walletHistory.push({
                     transactionDetails: `Refund for order ${order.orderTrackId}`,
-                    transactionType: 'refund',
+                    transactionType: 'Refund',
                     transactionAmount: refundAmount,
                     currentBalance: user.wallet,
                 });
@@ -272,7 +271,7 @@ const walletTransaction = async(req, res) => {
         }
 
         switch (transactionType) {
-            case 'purchase':
+            case 'Purchase':
                 if (user.wallet >= transactionAmount) {
                     user.wallet -= transactionAmount;
                 } else {
