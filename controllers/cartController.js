@@ -128,7 +128,7 @@ const addToCart = async (req, res) => {
             const existingProductIndex = cartItem.items.findIndex((item) => item.product.equals(productId));
 
             if (existingProductIndex !== -1) {
-                return res.status(400).json({ message: "Product already in cart" });
+                return res.status(400).json({ message: "Product is already in cart" });
             } else {
                 cartItem.items.push({ product: productId, quantity: parseInt(quantity, 10) });
                 await cartItem.save();

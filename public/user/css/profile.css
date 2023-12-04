@@ -667,7 +667,7 @@ blockquote.text-white cite span {
 }
 .header-dropdown > a::after,
 .header-dropdown > span::after {
-  font-family: "molla";
+
   content: "\f110";
   position: absolute;
   right: 0;
@@ -8628,7 +8628,6 @@ small.form-text {
   color: #fff;
   background-image: none;
   font-size: 1rem;
-  font-family: "molla";
   content: "\ec2d";
   line-height: 1;
   text-align: center;
@@ -9418,7 +9417,6 @@ small.form-text {
   height: 5rem;
   margin-top: -2.5rem;
   margin-left: -2.5rem;
-  font-family: "molla";
   position: absolute;
   left: 50%;
   top: 50%;
@@ -10295,7 +10293,6 @@ button:focus {
   color: #333;
   content: "\f110";
   display: block;
-  font-family: "molla";
   font-size: 1.4rem;
   line-height: 1;
   position: absolute;
@@ -10378,7 +10375,6 @@ button:focus {
 }
 .filter-colors a:after {
   color: #fff;
-  font-family: "molla";
   content: "\ec2d";
   font-size: 1rem;
   line-height: 1;
@@ -11389,7 +11385,6 @@ button:focus {
 }
 .entry-video a:after {
   content: "\ec2c";
-  font-family: "molla";
   display: -ms-inline-flexbox;
   display: inline-flex;
   align-items: center;
@@ -11483,7 +11478,6 @@ button:focus {
   transition: all 0.3s ease;
 }
 .read-more:after {
-  font-family: "molla";
   content: "\f274";
   font-size: 1.5rem;
   line-height: 1;
@@ -11624,7 +11618,6 @@ button:focus {
   color: #fff;
   position: absolute;
   content: "\f24d";
-  font-family: "molla";
   top: 2.6rem;
 }
 .entry-mask .entry-body {
@@ -11961,7 +11954,6 @@ button:focus {
   font-weight: normal;
   font-size: 3rem;
   line-height: 1;
-  font-family: "molla";
   position: absolute;
   left: 3rem;
   top: 4rem;
@@ -12100,7 +12092,6 @@ button:focus {
 .pager-link:after {
   color: #333;
   display: block;
-  font-family: "molla";
   font-size: 1.5rem;
   line-height: 1;
   position: absolute;
@@ -12238,7 +12229,6 @@ button:focus {
   transition: all 0.35s ease;
 }
 .comment-reply:after {
-  font-family: "molla";
   content: "\f279";
   font-size: 1.5rem;
   margin-left: 0.7rem;
@@ -13782,7 +13772,6 @@ button:focus {
   border-bottom: 0.1rem solid #ebebeb;
 }
 .nav-dashboard .nav-link:before {
-  font-family: "molla";
   content: "\f274";
   display: block;
   font-size: 1.5rem;
@@ -14763,7 +14752,7 @@ button:focus {
 }
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
-  font-family: "molla";
+
   font-style: normal;
   font-weight: normal;
   speak: none;
@@ -15252,9 +15241,6 @@ button:focus {
 }
 .icon-heart:before {
   content: "\f233";
-}
-.icon-heart-o:before {
-  content: "\f234";
 }
 .icon-viacoin:before {
   content: "\f237";

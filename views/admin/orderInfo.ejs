@@ -21,11 +21,13 @@
                             Order Information
                         </div>
                         <div class="card-body">
-                            <p><strong>Order ID:</strong> <%= order.orderTrackId %></p>
-                            <p><strong>Order Date:</strong> <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></p>
-                            <p><strong>Payment Method: </strong> <%= order.paymentMethod %></p>
-                            <p><strong>Payment Status: </strong> <%= order.paymentStatus %></p>
-                            <p><strong>Instructions: </strong> <%= order.notes %></p>
+                            <p><span class="text-warning">Order ID:</span> <%= order.orderTrackId %></p>
+                            <p><span class="text-warning">Order Date:</span> <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %></p>
+                            <p><span class="text-warning">Total Price: </span>₹ <%= (order.totalAmount + order.couponDiscount).toFixed(2) %></p>
+                            <p><span class="text-warning">Discount Amount: </span>₹ <%= order.couponDiscount.toFixed(2) %></p>
+                            <p><span class="text-warning">Discounted Price: </span>₹ <%= order.totalAmount.toFixed(2) %></p>
+                            <p><span class="text-warning">Payment Method: </span><%= order.paymentMethod %></p>
+                            <p><span class="text-warning">Payment Status: </span><%= order.paymentStatus %></p>
                         </div>
                     </div>
                 </div>
@@ -35,13 +37,14 @@
                             Address
                         </div>
                         <div class="card-body">
-                            <p><strong>Full Name:</strong> <%= order.address.fullName %></p>
-                            <p><strong>City:</strong> <%= order.address.city %></p>
-                            <p><strong>District:</strong> <%= order.address.district %></p>
-                            <p><strong>State:</strong> <%= order.address.state %></p>
-                            <p><strong>Pincode:</strong> <%= order.address.pincode %></p>
-                            <p><strong>Mobile:</strong> <%= order.address.mobile %></p>
-
+                            <p><span class="text-warning">Full Name:</span> <%= order.address.fullName %></p>
+                            <p><span class="text-warning">City:</span> <%= order.address.city %></p>
+                            <p><span class="text-warning">District:</span> <%= order.address.district %></p>
+                            <p><span class="text-warning">State:</span> <%= order.address.state %></p>
+                            <p><span class="text-warning">Pincode:</span> <%= order.address.pincode %></p>
+                            <p><span class="text-warning">Mobile:</span> <%= order.address.mobile %></p>
+                            <p><span class="text-warning">Instructions: </span> <%= order.notes %></p>
+                            
                         </div>
                     </div>
                 </div>
@@ -61,13 +64,13 @@
                                     <div class="col-md-4">
                                         <h5><%= product.productId.productname %></h5>
                                         <p class="mb-1">Quantity: <%= product.quantity %></p>
-                                        <p class="mb-2">Price: <%= product.price %></p>
-                                        <p>Subtotal: <%= product.subtotal %></p>
+                                        <p class="mb-2">Price: ₹ <%= product.price %></p>
+                                        <p>Subtotal: ₹ <%= product.subtotal %></p>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <p class="mb-0"><strong>Status:</strong></p>
+                                                <p class="mb-0"><strong>Order Status:</strong></p>
                                                 <select class="form-select productStatus <%= product.status === 'Cancelled' ? 'cancelled' : '' %>"
                                                     data-product-id="<%= product._id %>"
                                                     id="productStatus_<%= product._id %>"
@@ -84,11 +87,10 @@
                                                 </select>
                                                 
                                             </div>
-                                            <div class="col-md-6">
+                                           <div class="col-md-6 return-status-section <%= product.status === 'Return' ? '' : 'd-none' %>" id="returnStatusSection">
                                                 <p>
                                                     <strong>Return Status:</strong>
                                                     <select class="form-select returnStatus" data-product-id="<%= product._id %>">
-                                                        <option value="Select">Select Status</option>
                                                         <option value="Return Placed" <%= product.returnStatus === 'Return Placed' ? 'selected' : '' %>>Return Placed</option>
                                                         <option value="Out for Pickup" <%= product.returnStatus === 'Out for Pickup' ? 'selected' : '' %>>Out for Pickup</option>
                                                         <option value="Returned" <%= product.returnStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
@@ -123,18 +125,14 @@
             select.addEventListener('change', handleProductStatusChange);
         });
 
-        // Function to handle product status change
         async function handleProductStatusChange(event) {
             const productId = event.target.getAttribute('data-product-id');
 
-            // Check if the selected status is "Return"
             if (event.target.value === 'Return') {
-                // Disable the "Return" option
-                event.target.value = ''; // Reset the selected value
+                event.target.value = ''; 
                 return;
             }
 
-            // Fetch to update product status on the server
             const response = await fetch('/admin/updateProductStatus', {
                 method: 'POST',
                 headers: {
@@ -151,7 +149,6 @@
                 console.error('Failed to update product status on the server');
             } else {
                 console.log('Product status updated successfully');
-                // Optionally, you can handle success here
             }
         }
     });
@@ -164,11 +161,9 @@
         const returnStatusSelects = document.querySelectorAll('.returnStatus');
         returnStatusSelects.forEach((select) => {
             select.addEventListener('change', handleReturnStatusChange);
-            // Initial check to enable/disable refund button based on initial return status
             handleReturnStatusChange({ target: select });
         });
 
-        // Function to handle return status change
         async function handleReturnStatusChange(event) {
             const productId = event.target.getAttribute('data-product-id');
             const refundButton = document.querySelector(`.refund-btn[data-product-id="${productId}"]`);
@@ -179,7 +174,6 @@
                 refundButton.setAttribute('disabled', true);
             }
 
-            // Fetch to update return status on the server
             const response = await fetch('/admin/updateReturnStatus', {
                 method: 'POST',
                 headers: {

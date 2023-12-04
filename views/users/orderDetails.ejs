@@ -4,6 +4,7 @@
 
   .hot{
     color: black;
+    font-weight: 400;
   }
   .disabled-link{
     color: gray;
@@ -14,17 +15,14 @@
 <section class="gradient-custom-2">
   <div class="container py-2 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-md-10 col-lg-8 col-xl-6">
+      <div class="col-md-10 col-lg-8 col-xl-7">
         <div class="card card-stepper" style="border-radius: 16px;">
           <div class="card-header p-4">
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                <p class="text-muted mb-2"> Order ID: &nbsp; <span class="fw-bold text-body"><%= order.orderTrackId %></span></p>
-                <p class="text-muted mb-0"> Placed On:  &nbsp;<span class="fw-bold text-body"> <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
+                <p class="mb-2"> Order ID: &nbsp; <span class="fw-bold text-body"><%= order.orderTrackId %></span></p>
+                <p class="mb-0"> Placed On:  &nbsp;<span class="fw-bold text-body"> <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
                   'short', day: '2-digit' }).replace(/\//g, '-') %></span> </p>
-              </div>
-              <div>
-                <h6 class="mb-0"> <a href="#">View Details</a> </h6>
               </div>
             </div>
           </div>
@@ -33,62 +31,60 @@
                 <div class="d-flex flex-row mb-4 pb-2">
                   <div class="flex-fill">
                     <h3 class="hot"><%= product.productId.productname %></h3>
-                    <h6 class="hot"><%= product.productId.description %></h6>
                     <p class="hot">Qty: <%= product.quantity %></p>
-                    <h5 class="hot" style="font-weight: 600;">Total: <%= product.subtotal %></h5>
-                    <h6 class="hot"><span class="hot"><%= order.paymentMethod %> </span></h6>
+                    <h5 class="hot" >Total: <%= product.subtotal %></h5>
+                    <h6 class="hot"><%= order.paymentMethod %></h6>
                     <h5 class="hot">Payment: <span class="hot"><%= order.paymentStatus %> </span></h5>
-                    <p class="text-muted">Tracking Status on: <span class="text-body">11:30pm, Today</span></p>
                   </div>
                   <div>
-                    <img class="align-self-center img-fluid"
-                      src="/static/admin/Assets/images/products/<%= product.productId.image[0] %>" width="150">
+                    <img class="align-self-center"
+                      src="/static/admin/Assets/images/products/<%= product.productId.image[0] %>" width="150" height="200">
                   </div>
                 </div>
                 <% if (product.status !== "Cancelled" && product.status !== "Return") { %>
                   <div class="progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Order Placed' ? 1 : (product.status === 'Shipped' ? 2 : (product.status === 'Out for Delivery' ? 3 : (product.status === 'Delivered' ? 4 : 0))) %>">
-                    <ul id="progressbar">
+                    <ul class="progress-bars">
                       <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>" id="step1">Order Placed</li>
                       <li class="step <%= product.status === 'Shipped' ? 'active' : '' %>" id="step2">Shipped</li>
                       <li class="step <%= product.status === 'Out for Delivery' ? 'active' : '' %>" id="step3">Out for Delivery</li>
                       <li class="step <%= product.status === 'Delivered' ? 'active' : '' %>" id="step4">Delivered</li>
                     </ul>
+                    <% if (product.status === 'Delivered') { %>
+                      <div class="alert alert-success text-center" role="alert">
+                        Product delivered!!
+                      </div>
+                    <% } %>
                   </div>
-                
-                  <% if (product.status === 'Delivered') { %>
-                    <!-- Show message when product is delivered -->
-                    <div class="alert alert-success" role="alert">
-                      Product delivered!!
-                    </div>
-                  <% } %>
-                
                 <% } else if (product.status === "Cancelled") { %>
-                  <!-- Separate progress bar for cancelled orders -->
                   <div class="cancelled-progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Cancelled' ? 2 : 0 %>">
-                    <ul class="cancelled-progressbar">
+                    <ul class="cancelled-progress-bar">
                       <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>">Order Placed</li>
-                      <li class="step <%= product.status === 'Cancelled' ? 'active text-danger' : '' %>">Cancelled</li>
+                      <li class="step <%= product.status === 'Cancelled' ? 'active text-black' : '' %>">Order Cancelled</li>
                     </ul>
+                    <div class="alert alert-danger text-center" role="alert">
+                      Your Order has been Cancelled. Refund is processed.
+                    </div>
                   </div>
-                  <!-- Show message when order is cancelled -->
-                  <div class="alert alert-danger text-center" role="alert">
-                    Your Order has been Cancelled. Refund is processed.
-                  </div>
-                
                 <% } else if (product.status === "Return") { %>
-                  <!-- Separate progress bar for returned orders -->
                   <div class="return-progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Return' ? 5 : 0 %>">
-                    <ul class="return-progressbar">
-                      <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>">Order Placed</li>
-                      <li class="step <%= product.status === 'Return' ? 'active text-danger' : '' %>">Returned</li>
+                    <ul class="return-progress-bar">
+                      <li class="step return-placed <%= product.returnStatus === 'Return Placed' ? 'active' : '' %>">Return Placed</li>
+                      <li class="step out-for-pickup <%= product.returnStatus === 'Out for Pickup' ? 'active' : '' %>">Out for Pickup</li>
+                      <li class="step returned <%= product.returnStatus === 'Returned' ? 'active text-black' : '' %>">Returned</li>
                     </ul>
+                    <% if (product.returnStatus !== "Returned") { %> 
+                    <div class="alert alert-info text-center" role="alert">
+                      Your returned the Product. Refund in process.
+                    </div>
+                    <% } %> 
                   </div>
-                  <!-- Show message when product is returned -->
-                  <div class="alert alert-info text-center" role="alert">
-                    Your product has been returned. Refund in process.
-                  </div>
-                
                 <% } %>
+
+                <% if (product.returnStatus === "Returned") { %>           
+                  <div class="alert alert-info text-center" role="alert">
+                    Successfully refunded the amount to your Wallet.
+                  </div>
+                <% } %>  
                 
                 </div>
                 
@@ -96,20 +92,17 @@
                   <div class="d-flex justify-content-between">
                     <div class="border-start h-100"></div>
                     <div class="border-start h-100"></div>
-                    <% if (product.status !== "Cancelled" && product.status !== "Out for Delivery" && product.status !== "Delivered") { %>
-                      <h5 class="fw-normal mb-0"><a href="#!" id="cancelLink">Cancel</a></h5>
+                    <% if (product.status !== "Cancelled" && product.status !== "Out for Delivery" && product.status !== "Delivered" && product.status !== "Return") { %>
+                      <h5 class="fw-normal mb-0"><a class="text-primary" href="#!" id="cancelLink">Cancel</a></h5>
                     <% } else { %>
-                      <h5 class="fw-normal mb-0 disabled-link">Cancel</h5>
+                      <h5 class="fw-normal mb-0 disabled-link text-muted">Cancel</h5>
                     <% } %>
                 
                     <% if (product.status === "Delivered") { %>
-                      <h5 class="fw-normal mb-0"><a href="#!" id="returnLink">Return</a></h5>
+                      <h5 class="fw-normal mb-0"><a class="text-primary" href="#!" id="returnLink">Return</a></h5>
                     <% } else { %>
-                      <h5 class="fw-normal mb-0 disabled-link">Return</h5>
+                      <h5 class="fw-normal mb-0 disabled-link text-muted">Return</h5>
                     <% } %>
-            
-              
-        
               
             </div>
         </div>
@@ -145,6 +138,7 @@
           if (data.success) {
             const updatedProduct = data.product;
             updateProgressBar(updatedProduct.status);
+            location.reload();
             if (updatedProduct.status === 'Cancelled') {
               // Show SweetAlert for cancelled order
               Swal.fire({
@@ -152,7 +146,6 @@
                 title: 'Order Cancelled!',
                 text: 'Your order has been cancelled.',
               }).then(() => {
-                window.location.reload()
               location.reload();
             });
               // Update the UI without reloading the page
@@ -191,9 +184,8 @@
       }).then((result) => {
         if (result.isConfirmed) {
           updateProductStatus(orderId, productId, productStatus, link);
-          location.reload()
         }
-      });
+      })
     }
 
     const cancelLink = document.getElementById('cancelLink');
@@ -231,7 +223,7 @@
         const productStatus = progressBar ? progressBar.dataset.productStatus : null;
 
         // Check if Return button should be enabled based on the product status
-        if (productStatus === 'Delivered') {
+        if (productStatus === '4') {
           updateProductStatusWithConfirmation(orderId, productId, 'Return', returnLink);
         } else {
           // Show SweetAlert for invalid action

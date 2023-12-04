@@ -46,8 +46,9 @@ const loadCheckout = async (req, res) => {
         const cartData = await Cart.findOne({ user_id: userId }).populate({
             path: 'items.product',
             model: 'Product',
-            populate: 'category', // Ensure category is populated
+            populate: 'category', 
         });
+        
         const couponData = await Coupon.find().sort({ minimumPurchase: 1 });
 
         // Calculate discounted prices for each product in the cart
@@ -205,8 +206,6 @@ const applyCoupon = async (req, res) => {
             totalAmount: totalAmountAfterDiscount, 
         });
 
-        coupon.users.push(userId);
-        await coupon.save();
     } catch (error) {
         console.error("Error applying coupon:", error.message);
         res.json({ success: false, error: "Internal server error" });

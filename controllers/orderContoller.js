@@ -1,11 +1,9 @@
 const User = require("../models/userModel");
 const { getTotalProductsInCart } = require("../number/cartNumber");
-const Address = require("../models/addressModel");
 const Cart = require("../models/cartModel");
 const Product = require("../models/productModel");
 const Order = require("../models/orderModel");
-const mongoose = require("mongoose");
-const { ObjectId } = mongoose.Types;
+const Coupon = require("../models/couponModel");
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
 const puppeteer = require('puppeteer');
@@ -39,7 +37,7 @@ const loadOrder = async (req, res) => {
                 path: "products.productId",
             });
 
-        res.render("order", {
+        res.render("orderConfirmation", {
             user: userId,
             userData: userData,
             count: totalProductsInCart,
@@ -53,21 +51,26 @@ const loadOrder = async (req, res) => {
 
 const placeOrder = async (req, res) => {
     try {
-        const { productsData, totalAmount, address, paymentMethod, notes, couponDiscount } = req.body;
-        console.log("address", address)
+        const { productsData, totalAmount, address, paymentMethod, notes, couponDiscount, couponName } = req.body;
         const user_id = req.session.user_id;
         var payment;
 
         if (paymentMethod == "Cash on Delivery") {
             payment = "Pending";
-        }else{
+        } else {
             payment = "Paid"
         }
         const randomOrderId = Math.floor(Math.random() * 9000000) + 1000000;
 
         const order = new Order({
             user: user_id,
-            products: productsData,
+            products: productsData.map(product => ({
+                productId: product.productId,
+                quantity: product.quantity,
+                price: product.price,
+                subtotal: product.subtotal,
+                paymentStatus: payment,              
+            })),
             totalAmount: totalAmount,
             address: address,
             paymentMethod: paymentMethod,
@@ -75,7 +78,7 @@ const placeOrder = async (req, res) => {
             notes: notes,
             paymentStatus: payment,
             orderTrackId: randomOrderId,
-            couponDiscount:couponDiscount,
+            couponDiscount: couponDiscount,
         });
 
         await order.save();
@@ -97,11 +100,19 @@ const placeOrder = async (req, res) => {
         order.razorpayOrderID = razorpayOrder.id;
         await order.save();
 
+        if (couponName) {
+            const coupon = await Coupon.findOne({ couponName });
+            coupon.users.push(user_id);
+            await coupon.save();
+        }
+
+        await Cart.findOneAndDelete({ user_id: user_id });
+
         res.status(200).json({
             message: "Order placed successfully!",
             razorpayOrderID: razorpayOrder.id,
         });
-        
+
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: "Internal Server Error" });
@@ -214,7 +225,7 @@ const updateStatus = async (req, res) => {
 
         order.products[productIndex].status = productStatus;
 
-        if ((productStatus === 'Cancelled' || productStatus === 'Return') && (order.paymentMethod === 'Razor Payment' || order.paymentMethod === 'Wallet Transfer')) {
+        if ((productStatus === 'Cancelled') && (order.paymentMethod === 'Razor Payment' || order.paymentMethod === 'Wallet Transfer')) {
             // Refund the amount to the user's wallet
             const refundAmount = order.products[productIndex].subtotal;
 

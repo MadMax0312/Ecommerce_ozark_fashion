@@ -1,56 +1,59 @@
-<%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
+<%- include('../userLayouts/header.ejs') %>
+<%- include('../userLayouts/navbar.ejs') %>
 
 <style>
+  .fork {
+    color: black;
+    font-weight: 400;
+  }
 
-    .fork {
-        color: black;
-        font-weight: 400;
-    }
-    .d-block, .a-block{
-        color: black;
-        font-weight: 700;
-    }
-    .c-block{
-        color: black;
-        font-weight: 400;
-    }
-    
+  .d-block,
+  .a-block {
+    color: black;
+    font-weight: 700;
+  }
+
+  .c-block {
+    color: black;
+    font-weight: 400;
+  }
 </style>
+
 <div class="bg-light py-3">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12 mb-0">
-          <a href="/">Home</a> <span class="mx-2 mb-0">/</span>
-          <strong class="text-black">Order</strong>
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 mb-0">
+        <a href="/">Home</a> <span class="mx-2 mb-0">/</span>
+        <strong class="text-black">Order</strong>
       </div>
     </div>
   </div>
-  
-  <div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-      <div class="col-md-10 p-3" id="invoice">
-        <div class="card">
-          <div class="invoice p-1 text-center">
-            <h2>Your Order Confirmed!</h2>
-            <span class="d-block mt-4">
-              Hello, <%= userData.first_name %> <%= userData.last_name %>
-            </span>
-            <span>Your order has been confirmed and will be shipped shortly!</span>
-                    <div class="payment border-top mt-3 mb-3 border-bottom table-responsive">
-                        <table class="table table-borderless">
-                            <tbody>
-                                <% data.forEach(function(order) { %>
-                                <tr>
-                                    <td>
-                                        <div class="py-2">
-                                            <span class="d-block">Order Date</span>
-                                            <span class="c-block"
-                                                ><%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
-                                                'short', day: '2-digit' }).replace(/\//g, '-') %></span
-                                            >
-                                        </div>
-                                    </td>
+</div>
+
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10 p-3" id="invoice">
+      <div class="card">
+        <div class="invoice p-1 text-center">
+          <h2>Your Order Confirmed!</h2>
+          <span class="d-block mt-4">
+            Hello, <%= userData.first_name %> <%= userData.last_name %>
+          </span>
+          <span>Your order has been confirmed and will be shipped shortly!</span>
+
+          <div class="payment border-top mt-3 mb-3 border-bottom table-responsive">
+            <table class="table table-borderless">
+              <tbody>
+                <% data.forEach(function(order) { %>
+                <tr>
+                  <td>
+                    <div class="py-2">
+                      <span class="d-block">Order Date</span>
+                      <span class="c-block">
+                        <%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-') %>
+                      </span>
+                    </div>
+                  </td>
                                     <td>
                                         <div class="py-2">
                                             <span class="d-block">Order No</span>
@@ -75,12 +78,12 @@
                                         <span class="c-block"><%= formattedDeliveryDate %></span>
                                         </div>
                                     </td>
-                                </tr>
-                                                      
-                                <% }); %>
-                            </tbody>
-                        </table>
-                    </div>
+                                  </tr>
+                                  <% }); %>
+                                </tbody>
+                              </table>
+                            </div>
+
                     <div class="product border-bottom table-responsive">
                         <table class="table" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
                             <thead>
@@ -88,8 +91,7 @@
                                 <td class="a-block" style="border: 1px solid black;">Details</td>
                                 <td class="a-block" style="border: 1px solid black;">Payment Method</td>
                                 <td class="a-block" style="border: 1px solid black;">Payment Status</td>
-                                <td class="a-block" style="border: 1px solid black;">Subtotal</td>
-                                <td class="a-block" style="border: 1px solid black;">Action</td>
+                                <td class="a-block" style="border: 1px solid black;">Amount</td>
                             
                             </thead>
                             <tbody>
@@ -102,7 +104,6 @@
                                         <img
                                             src="/static/admin/Assets/images/products/<%= item.productId.image[0] %>"
                                             width="90"
-                                            height="90"
                                             alt="Product Image"
                                         />
                                         <br>
@@ -116,9 +117,7 @@
                                             <span class="c-block" style="text-decoration: line-through;">Price: ₹ <%= item.productId.price %></span>
                                             <span class="c-block">Price: ₹ <%= item.price %></span>
                                         </div>
-                                    </td>
-                                    
-                                    
+                                    </td>                                                                     
 
                                     <td width="20%">
                                         <div class="text-center align-center">
@@ -141,17 +140,7 @@
                                                 >₹ <%= (item.quantity * item.price).toFixed(2) %></span
                                             >
                                         </div>
-                                    </td>
-
-                                    <td width="20%">
-                                        <div>
-                                            <a href="/invoice?productId=<%= item.productId._id %>&orderId=<%= order._id %>&productIdss=<%= item._id %>">
-                                                <button class="btn-sm btn-primary">Track</button>
-                                            </a>
-                                            
-                                        </div>
-                                    </td>                                                                                                                      
-                                     
+                                    </td>                                                                                                                                                       
                                 </tr>                            
                              
                               
@@ -161,10 +150,8 @@
                                         <p class="text-center">No products available.</p>
                                     </td>
                                 </tr>
-                                <% } %>
-                           
+                                <% } %>                         
                             </tbody>
-                  
                         </table>
             
                     </div>
@@ -262,22 +249,23 @@
                         </div>
                     </div>
  
-                    <div class="row">
-                        <div class="col-md-6 pl-3">
-                            <button class="btn btn-md" style="background-color: darkgray;"><a href="/shop">Continue Shopping</a></button>
-                        </div>
-                        <div class="col-md-6">
-                            <button class="btn btn-md" style="background-color: darkgray;"><a href="/userProfile">Visit Profile</a></button>
-                        </div>
-                    </div>
-              
-                </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+              <button class="btn btn-md btn-dark">
+                <a href="/shop" class="text-white">Continue Shopping</a>
+              </button>
             </div>
+            <div class="col-md-6">
+              <button class="btn btn-md btn-dark">
+                <a href="/userProfile" class="text-white">Visit Profile</a>
+              </button>
+            </div>
+          </div>
         </div>
-       
+      </div>
     </div>
+  </div>
 </div>
-
 
 <script>
     document.getElementById('downloadButton').addEventListener('click', async () => {

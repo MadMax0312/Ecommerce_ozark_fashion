@@ -226,7 +226,6 @@ const updateReturnStatus = async (req, res) => {
         product.returnStatus = returnStatus;
 
         if (returnStatus === 'Returned') {
-            product.paymentStatus = 'Refunded';
 
             const originalProduct = await Product.findById(product.productId);
             originalProduct.quantity += product.quantity;

@@ -1,117 +1,69 @@
-body {
-    font-family: "Roboto Condensed";
-    height: 100vh;
-    width: 97vw;
-    padding: 0;
-    background-image: radial-gradient(bodyBG, shade(bodyBG, 25));
+/* Common styles for steps and progress bars */
+.progress-bars,
+.return-progress-bar,
+.cancelled-progress-bar {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  margin: 0; 
 }
 
-:-moz-any-link:focus {
-    outline: 0;
+.progress-bars .step,
+.return-progress-bar .step,
+.cancelled-progress-bar .step {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+  background-color: #f0f0f0;
+  border: 2px solid #ddd; 
+  border-radius: 5px;
+  padding: 12px; 
+  transition: background-color 0.3s ease;
 }
 
-/* Progress Bar Styles */
+.progress-bars .step.active,
+.return-progress-bar .step.active,
+.cancelled-progress-bar .step.active {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #0056b3; 
+}
 
-#progressbar, .cancelled-progressbar, .return-progressbar {
-    margin-bottom: 3vh;
-    overflow: hidden;
-    color: #000;
-    padding-left: 0;
-    margin-top: 3vh;
-  }
-  
-  #progressbar li, .cancelled-progressbar li, .return-progressbar li {
-    list-style-type: none;
-    font-size: 0.8rem;
-    width: 25%;
-    float: left;
-    position: relative;
-    font-weight: 400;
-    color: #000;
-  }
-  
-  #progressbar #step1:before, #progressbar #step2:before, #progressbar #step3:before, #progressbar #step4:before,
-  .cancelled-progressbar #step1:before, .cancelled-progressbar #step2:before,
-  .cancelled-progressbar #step3:before, .cancelled-progressbar #step4:before,
-  .return-progressbar #step1:before, .return-progressbar #step2:before,
-  .return-progressbar #step3:before, .return-progressbar #step4:before {
-    content: "";
-    color: #000;
-    width: 20px;
-    height: 20px;
-  }
-  
-  #progressbar #step1:before, .cancelled-progressbar #step1:before, .return-progressbar #step1:before {
-    margin-left: 0 !important;
-  }
-  
-  #progressbar #step2:before, .cancelled-progressbar #step2:before, .return-progressbar #step2:before {
-    margin-left: 32%;
-  }
-  
-  #progressbar #step3:before, .cancelled-progressbar #step3:before, .return-progressbar #step3:before {
-    margin-right: 32%;
-  }
-  
-  #progressbar #step4:before, .cancelled-progressbar #step4:before, .return-progressbar #step4:before {
-    margin-right: 0 !important;
-  }
-  
-  #progressbar li:before, .cancelled-progressbar li:before, .return-progressbar li:before {
-    line-height: 29px;
-    display: block;
-    font-size: 12px;
-    background: #d1d1d1;
-    border-radius: 50%;
-    margin: auto;
-    z-index: -1;
-    margin-bottom: 1vh;
-  }
-  
-  #progressbar li:after, .cancelled-progressbar li:after, .return-progressbar li:after {
-    content: "";
-    height: 3px;
-    background: #d1d1d1;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin-bottom: 2vh;
-    top: 8px;
-    z-index: 1;
-  }
-  
-  .progress-track {
-    padding: 0 8%;
-  }
-  
-  #progressbar li:nth-child(2):after, #progressbar li:nth-child(1):after, #progressbar li:nth-child(3):after,
-  #progressbar li:nth-child(4):after,
-  .cancelled-progressbar li:nth-child(2):after, .cancelled-progressbar li:nth-child(1):after,
-  .cancelled-progressbar li:nth-child(3):after, .cancelled-progressbar li:nth-child(4):after,
-  .return-progressbar li:nth-child(2):after, .return-progressbar li:nth-child(1):after,
-  .return-progressbar li:nth-child(3):after, .return-progressbar li:nth-child(4):after {
-    margin: auto;
-  }
-  
-  #progressbar li:nth-child(3):after, .cancelled-progressbar li:nth-child(3):after, .return-progressbar li:nth-child(3):after {
-    float: left;
-    width: 68%;
-  }
-  
-  #progressbar li:nth-child(4):after, .cancelled-progressbar li:nth-child(4):after, .return-progressbar li:nth-child(4):after {
-    margin-left: auto;
-    width: 132%;
-  }
-  
-  #progressbar li.active:after, #progressbar li.active:before,
-  .cancelled-progressbar li.active:after, .cancelled-progressbar li.active:before,
-  .return-progressbar li.active:after, .return-progressbar li.active:before {
-    background: #00ff0d;
-  }
-  
-  /* Alert Styles */
-  
-  .alert {
-    margin-top: 1rem;
-  }
-  
+/* Styles for cancelled steps */
+.return-progress-bar .step.text-black,
+.cancelled-progress-bar .step.text-black {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #0056b3; 
+}
+
+/* Alert styles */
+.alert {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease; 
+}
+
+/* Specific alert styles */
+.alert-success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+}
