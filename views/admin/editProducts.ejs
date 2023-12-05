@@ -166,11 +166,8 @@ include('../adminLayouts/navbar.ejs') %>
                 event.preventDefault();
 
                 const productId = event.target.getAttribute("data-product-id");
-                console.log(productId);
                 const imageName = event.target.getAttribute("data-image");
-                console.log(imageName);
                 const imageContainer = event.target.parentElement;
-                console.log(imageContainer);
 
                 try {
                     const response = await fetch(`/admin/delete-image?productId=${productId}&imageName=${imageName}`, {
@@ -181,7 +178,6 @@ include('../adminLayouts/navbar.ejs') %>
                     });
 
                     if (response.ok) {
-                        console.log("response", response);
                         imageContainer.remove();
                     } else {
                         console.error("Error removing image:", response.statusText);

@@ -16,11 +16,11 @@ const couponSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
-      
+
         maximumDiscount: {
             type: Number,
             required: true,
-            default: 10000, // Set a default value of 10,000
+            default: 10000,
         },
 
         discountPercentage: {

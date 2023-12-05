@@ -28,7 +28,7 @@ const orderSchema = new mongoose.Schema(
                 },
                 status: {
                     type: String,
-                    enum: ["Order Placed", "Shipped", "Out for Delivery", "Delivered", "Cancelled", "Return" , "Processing"],
+                    enum: ["Order Placed", "Shipped", "Out for Delivery", "Delivered", "Cancelled", "Return", "Processing"],
                     default: "Order Placed",
                 },
                 returnStatus: {
@@ -102,11 +102,9 @@ const orderSchema = new mongoose.Schema(
         },
         razorpayPaymentID: {
             type: String,
- 
         },
         razorpayOrderID: {
             type: String,
-     
         },
     },
     {

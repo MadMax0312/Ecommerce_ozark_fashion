@@ -8,7 +8,7 @@ const getTotalProductsInCart = async (userId) => {
           const totalProducts = uniqueProductIds.size;
           return totalProducts;
       } else {
-          return 0; // No items in the cart
+          return 0;
       }
   } catch (error) {
       throw error;
@@ -17,4 +17,4 @@ const getTotalProductsInCart = async (userId) => {
 
 module.exports = {
   getTotalProductsInCart,
-}
+} 

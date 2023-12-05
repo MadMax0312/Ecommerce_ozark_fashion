@@ -2,12 +2,11 @@ const Admin = require("../models/adminModel");
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const User = require("../models/userModel");
-const paginate = require("../middleware/paginate");
 const bcrypt = require("bcrypt");
 const path = require("path");
 
 const randomstring = require("randomstring");
-const fs = require('fs');
+const fs = require("fs");
 const Order = require("../models/orderModel");
 
 const securePassword = async (password) => {
@@ -36,7 +35,6 @@ const verifyLogin = async (req, res) => {
 
         const adminData = await Admin.findOne({ email: email });
         if (adminData) {
-
             const passwordMatch = await bcrypt.compare(password, adminData.password);
 
             if (passwordMatch) {
@@ -68,7 +66,6 @@ const loadLogout = async (req, res) => {
     }
 };
 
-
 ///----------Loading user page in admin dashboard===========
 
 const loadUsers = async (req, res) => {
@@ -97,7 +94,6 @@ const loadUsers = async (req, res) => {
             .skip((page - 1) * limit)
             .exec();
 
-
         const count = await User.find({
             $or: [
                 { first_name: { $regex: ".*" + search + ".*", $options: "i" } }, // Case-insensitive search
@@ -105,8 +101,6 @@ const loadUsers = async (req, res) => {
                 { email: { $regex: ".*" + search + ".*", $options: "i" } },
             ],
         }).countDocuments();
-
-    
 
         res.render("users", {
             users: userData,
@@ -123,7 +117,7 @@ const blockUsers = async (req, res) => {
         const id = req.query.id;
         const user = await User.findById(id);
 
-        if (user) { 
+        if (user) {
             user.isBlock = !user.isBlock;
             await user.save();
             return res.status(200).json({ message: "User Status Updated" });
@@ -146,8 +140,6 @@ const loadBanner = async (req, res) => {
     }
 };
 
-
-
 const loadOrder = async (req, res) => {
     try {
         res.render("orders");
@@ -155,7 +147,6 @@ const loadOrder = async (req, res) => {
         console.log(error.message);
     }
 };
-
 
 module.exports = {
     loadLogin,

@@ -4,22 +4,20 @@ const Cart = require("../models/cartModel");
 const Product = require("../models/productModel");
 const Order = require("../models/orderModel");
 const Coupon = require("../models/couponModel");
-const crypto = require('crypto');
-const Razorpay = require('razorpay');
-const puppeteer = require('puppeteer');
+const crypto = require("crypto");
+const Razorpay = require("razorpay");
+const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
-const ejs = require('ejs');
+const ejs = require("ejs");
 
-
-const randomString = require('randomstring');
+const randomString = require("randomstring");
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env;
 
 const razorpayInstance = new Razorpay({
-  key_id: RAZORPAY_ID_KEY,
-  key_secret: RAZORPAY_SECRET_KEY
+    key_id: RAZORPAY_ID_KEY,
+    key_secret: RAZORPAY_SECRET_KEY,
 });
-
 
 const loadOrder = async (req, res) => {
     try {
@@ -58,18 +56,18 @@ const placeOrder = async (req, res) => {
         if (paymentMethod == "Cash on Delivery") {
             payment = "Pending";
         } else {
-            payment = "Paid"
+            payment = "Paid";
         }
         const randomOrderId = Math.floor(Math.random() * 9000000) + 1000000;
 
         const order = new Order({
             user: user_id,
-            products: productsData.map(product => ({
+            products: productsData.map((product) => ({
                 productId: product.productId,
                 quantity: product.quantity,
                 price: product.price,
                 subtotal: product.subtotal,
-                paymentStatus: payment,              
+                paymentStatus: payment,
             })),
             totalAmount: totalAmount,
             address: address,
@@ -92,7 +90,7 @@ const placeOrder = async (req, res) => {
 
         const razorpayOrder = await razorpayInstance.orders.create({
             amount: totalAmount * 100,
-            currency: 'INR',
+            currency: "INR",
             receipt: order._id.toString(), // Unique order ID
         });
 
@@ -112,7 +110,6 @@ const placeOrder = async (req, res) => {
             message: "Order placed successfully!",
             razorpayOrderID: razorpayOrder.id,
         });
-
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ error: "Internal Server Error" });
@@ -130,38 +127,36 @@ const handleRazorpayPayment = async (req, res) => {
 
         // Create an HMAC SHA-256 hash using your secret key
         const generatedSignature = crypto
-            .createHmac('sha256', process.env.RAZORPAY_SECRET_KEY)
+            .createHmac("sha256", process.env.RAZORPAY_SECRET_KEY)
             .update(stringToSign)
-            .digest('hex');
-            
-        if (generatedSignature === signature) {
+            .digest("hex");
 
+        if (generatedSignature === signature) {
             const updatedOrder = await Order.findOneAndUpdate(
                 { razorpayOrderID },
-                { $set: { paymentStatus: 'Paid', razorpayPaymentID: paymentID } },
+                { $set: { paymentStatus: "Paid", razorpayPaymentID: paymentID } },
                 { new: true }
             );
 
             await Cart.findOneAndDelete({ user_id: userId });
 
             if (!updatedOrder) {
-                console.error('Order not found or could not be updated');
-                return res.status(404).json({ error: 'Order not found or could not be updated' });
+                console.error("Order not found or could not be updated");
+                return res.status(404).json({ error: "Order not found or could not be updated" });
             }
 
             await Cart.findOneAndDelete({ user_id: userId });
 
-            res.status(200).json({ message: 'Razorpay Payment Success' });
+            res.status(200).json({ message: "Razorpay Payment Success" });
         } else {
-            console.error('Razorpay signature mismatch');
-            res.status(403).json({ error: 'Razorpay signature mismatch' });
+            console.error("Razorpay signature mismatch");
+            res.status(403).json({ error: "Razorpay signature mismatch" });
         }
     } catch (error) {
-        console.error('Error handling Razorpay payment:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error("Error handling Razorpay payment:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };
-
 
 const orderDetails = async (req, res) => {
     try {
@@ -174,19 +169,19 @@ const orderDetails = async (req, res) => {
 
         const orderData = await Order.findOne({
             user: userId,
-            'products': {
+            products: {
                 $elemMatch: {
                     productId: productId,
-                    '_id': productsObjectId
-                }
-            }
+                    _id: productsObjectId,
+                },
+            },
         }).populate({
-            path: 'products.productId'
+            path: "products.productId",
         });
 
-        const product = orderData.products.find(item => item._id.toString() === productsObjectId.toString());
+        const product = orderData.products.find((item) => item._id.toString() === productsObjectId.toString());
 
-        res.render('orderDetails', {
+        res.render("orderDetails", {
             user: userId,
             userData: userData,
             count: totalProductsInCart,
@@ -194,8 +189,8 @@ const orderDetails = async (req, res) => {
             product: product,
         });
     } catch (error) {
-        console.error('Error fetching order details:', error.message);
-        res.status(500).send('Internal Server Error');
+        console.error("Error fetching order details:", error.message);
+        res.status(500).send("Internal Server Error");
     }
 };
 
@@ -206,10 +201,10 @@ const updateStatus = async (req, res) => {
         const orderData = await Order.findById(orderId);
 
         if (!order) {
-            return res.status(404).json({ success: false, error: 'Order or product not found' });
+            return res.status(404).json({ success: false, error: "Order or product not found" });
         }
 
-        const productIndex = order.products.findIndex(p => p._id.equals(productId));
+        const productIndex = order.products.findIndex((p) => p._id.equals(productId));
         const originalStatus = order.products[productIndex].status;
 
         if (productStatus === "Cancelled" && originalStatus !== "Cancelled") {
@@ -224,14 +219,16 @@ const updateStatus = async (req, res) => {
             await Product.findByIdAndUpdate(productIdValue, { $inc: { quantity: returnedQuantity } }, { new: true });
         }
 
-        if (productStatus === 'Cancelled') {
-            order.products[productIndex].paymentStatus = 'Refunded';
+        if (productStatus === "Cancelled") {
+            order.products[productIndex].paymentStatus = "Refunded";
         }
 
         order.products[productIndex].status = productStatus;
 
-        if ((productStatus === 'Cancelled') && (order.paymentMethod === 'Razor Payment' || order.paymentMethod === 'Wallet Transfer')) {
-
+        if (
+            productStatus === "Cancelled" &&
+            (order.paymentMethod === "Razor Payment" || order.paymentMethod === "Wallet Transfer")
+        ) {
             const refundAmount = order.products[productIndex].subtotal;
 
             const user = await User.findById(order.user);
@@ -244,7 +241,7 @@ const updateStatus = async (req, res) => {
                 user.wallet += refundAmount - discountPerProduct;
                 user.walletHistory.push({
                     transactionDetails: `Refund for order ${order.orderTrackId}`,
-                    transactionType: 'Refund',
+                    transactionType: "Refund",
                     transactionAmount: refundAmount - discountPerProduct,
                     currentBalance: user.wallet,
                 });
@@ -257,51 +254,46 @@ const updateStatus = async (req, res) => {
 
         res.json({ success: true, product: updatedOrder });
     } catch (error) {
-        console.error('Error updating product status:', error.message);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        console.error("Error updating product status:", error.message);
+        res.status(500).json({ success: false, error: "Internal Server Error" });
     }
 };
 
-
-
-const checkWalletBalance = async(req, res) => {
-    try{
-
+const checkWalletBalance = async (req, res) => {
+    try {
         const userId = req.session.user_id;
-        const userData = await User.findById({ _id:userId });
+        const userData = await User.findById({ _id: userId });
 
         const userWalletBalance = userData.wallet;
         res.json({ walletBalance: userWalletBalance });
-
-    }catch(error){
-        console.log(error.message)
+    } catch (error) {
+        console.log(error.message);
     }
-}
+};
 
-const walletTransaction = async(req, res) => {
-    try{
+const walletTransaction = async (req, res) => {
+    try {
+        const { transactionType, transactionAmount, transactionDetails } = req.body;
 
-         const { transactionType, transactionAmount, transactionDetails } = req.body;
-
-         const userId = req.session.user_id;
+        const userId = req.session.user_id;
 
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: "User not found" });
         }
 
         switch (transactionType) {
-            case 'Purchase':
+            case "Purchase":
                 if (user.wallet >= transactionAmount) {
                     user.wallet -= transactionAmount;
                 } else {
-                    return res.status(400).json({ error: 'Insufficient funds in the wallet' });
+                    return res.status(400).json({ error: "Insufficient funds in the wallet" });
                 }
                 break;
 
             default:
-                return res.status(400).json({ error: 'Invalid transaction type' });
+                return res.status(400).json({ error: "Invalid transaction type" });
         }
 
         const newTransaction = {
@@ -316,56 +308,95 @@ const walletTransaction = async(req, res) => {
 
         await user.save();
 
-        return res.status(200).json({ message: 'Wallet transaction successful' });
-
-    }catch(error){
-        console.log(error.message)
+        return res.status(200).json({ message: "Wallet transaction successful" });
+    } catch (error) {
+        console.log(error.message);
     }
-}
+};
 
 const invoiceDownload = async (req, res, next) => {
     try {
-      const { orderId } = req.query;
-      const orderData = await Order.findById(orderId).populate('products.productId').populate('user');
-  
-      if (!orderData) {
-        return res.status(404).send('Order not found');
-      }
-  
-      const userId = req.session.user_id;
-      const userData = await User.findById(userId);
-  
-      const date = new Date();
-  
-      const data = {
-        orderData: orderData,
-        userData: userData,
-        date,
+        const { orderId } = req.query;
+        const orderData = await Order.findById(orderId).populate("products.productId").populate("user");
 
-      };
-  
-      const filepathName = path.resolve(__dirname, "../views/users/invoice.ejs");
-      const html = fs.readFileSync(filepathName).toString();
-      const ejsData = ejs.render(html, data);
-  
-      const browser = await puppeteer.launch({ headless: true });
-      const page = await browser.newPage();
-      await page.setContent(ejsData, { waitUntil: "networkidle0" });
-      const pdfBytes = await page.pdf({ format: "Letter" });
-      await browser.close();
-  
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        "attachment; filename=order_invoice.pdf"
-      );
-      res.send(pdfBytes);
+        if (!orderData) {
+            return res.status(404).send("Order not found");
+        }
+
+        const userId = req.session.user_id;
+        const userData = await User.findById(userId);
+
+        const date = new Date();
+
+        const data = {
+            orderData: orderData,
+            userData: userData,
+            date,
+        };
+
+        const filepathName = path.resolve(__dirname, "../views/users/invoice.ejs");
+        const html = fs.readFileSync(filepathName).toString();
+        const ejsData = ejs.render(html, data);
+
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.setContent(ejsData, { waitUntil: "networkidle0" });
+        const pdfBytes = await page.pdf({ format: "Letter" });
+        await browser.close();
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", "attachment; filename=order_invoice.pdf");
+        res.send(pdfBytes);
     } catch (error) {
-      console.error('Error in invoiceDownload:', error);
-      next(error);
+        console.error("Error in invoiceDownload:", error);
+        next(error);
+    }
+};
+
+const rateProduct = async (req, res) => {
+    try {
+      const productId = req.body.productId;
+      const rating = req.body.rating;
+      const comment = req.body.comment;
+      const userId = req.session.user_id;
+  
+      // Find the product by ID
+      const product = await Product.findById(productId);
+  
+      if (product) {
+        // Check if the user has already submitted a review for the product
+        const existingReview = product.reviews.find((review) => review.user.toString() === userId);
+  
+        if (existingReview) {
+          // User has already submitted a review, update the existing one
+          existingReview.rating = rating;
+          existingReview.comment = comment;
+        } else {
+          // User has not submitted a review, add a new one
+          product.reviews.push({ user: userId, rating: rating, comment: comment });
+        }
+  
+        // Calculate the new average rating for the product
+        const totalRatings = product.reviews.length || 0;
+        const sumOfRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+        const averageRating = totalRatings > 0 ? sumOfRatings / totalRatings : 0;
+  
+        // Update the product document with the new average rating
+        product.averageRating = averageRating;
+  
+        // Save the updated product
+        await product.save();
+  
+        res.redirect(`/product-info?id=${productId}`);
+      } else {
+        console.error("Product not found");
+        res.status(404).send("Product not found");
+      }
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Internal Server Error");
     }
   };
-
 
 module.exports = {
     loadOrder,
@@ -375,5 +406,6 @@ module.exports = {
     handleRazorpayPayment,
     checkWalletBalance,
     walletTransaction,
-    invoiceDownload
+    invoiceDownload,
+    rateProduct
 };

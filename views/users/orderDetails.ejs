@@ -48,13 +48,10 @@
                       <li class="step <%= product.status === 'Shipped' ? 'active' : '' %>" id="step2">Shipped</li>
                       <li class="step <%= product.status === 'Out for Delivery' ? 'active' : '' %>" id="step3">Out for Delivery</li>
                       <li class="step <%= product.status === 'Delivered' ? 'active' : '' %>" id="step4">Delivered</li>
-                    </ul>
-                    <% if (product.status === 'Delivered') { %>
-                      <div class="alert alert-success text-center" role="alert">
-                        Product delivered!!
-                      </div>
-                    <% } %>
+                    </ul>              
                   </div>
+
+
                 <% } else if (product.status === "Cancelled") { %>
                   <div class="cancelled-progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Cancelled' ? 2 : 0 %>">
                     <ul class="cancelled-progress-bar">
@@ -72,21 +69,69 @@
                       <li class="step out-for-pickup <%= product.returnStatus === 'Out for Pickup' ? 'active' : '' %>">Out for Pickup</li>
                       <li class="step returned <%= product.returnStatus === 'Returned' ? 'active text-black' : '' %>">Returned</li>
                     </ul>
-                    <% if (product.returnStatus !== "Returned") { %> 
-                    <div class="alert alert-info text-center" role="alert">
-                      Your returned the Product. Refund in process.
-                    </div>
-                    <% } %> 
                   </div>
+
+                  <% if (product.returnStatus !== "Returned") { %>
+                    <div class="alert alert-warning text-center" role="alert">
+                      Return request Accepted. Refund in progress.
+                    </div>
+
+                    <% } else if(product.returnStatus === "Returned") %>
+                    <div class="alert alert-success text-center" role="alert">
+                      Amount refunded Successfully to your Wallet
+                    </div>
+
                 <% } %>
 
-                <% if (product.returnStatus === "Returned") { %>           
-                  <div class="alert alert-info text-center" role="alert">
-                    Successfully refunded the amount to your Wallet.
+                <!-- ----------------------------------------------------------------------- -->
+
+                <% if (product.status === "Delivered") { %>
+                  <div class="alert alert-success text-center" role="alert">
+                    Your order has been delivered. Please rate and review the product.
                   </div>
-                <% } %>  
+                
+                  <!-- Button to open the modal -->
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ratingReviewModal">
+                    Rate and Review
+                  </button>
+                
+                  <!-- Modal for rating and review -->
+                  <div class="modal fade" id="ratingReviewModal" tabindex="-1" role="dialog" aria-labelledby="ratingReviewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="ratingReviewModalLabel">Rate and Review Product</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <!-- Rating and review form -->
+                          <form action="/submit-rating-review" method="post">
+                            <!-- Rating input -->
+                            <label for="rating">Rating:</label>
+                            <input type="number" name="rating" id="rating" min="1" max="5" required>
+                
+                            <!-- Comment input -->
+                            <label for="comment">Review:</label>
+                            <textarea name="comment" id="comment" rows="4" required></textarea>
+                
+                            <!-- Hidden input to pass product ID to the server -->
+                            <input type="hidden" name="productId" value="<%= product.productId._id %>">
+                
+                            <!-- Submit button -->
+                            <button type="submit" class="btn btn-primary">Submit Rating and Review</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+   
+                <% } %>
                 
                 </div>
+
+                <!-- ------------------------------------------------- -->
                 
                 <div class="card-footer p-4">
                   <div class="d-flex justify-content-between">

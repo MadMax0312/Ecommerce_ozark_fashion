@@ -3,19 +3,18 @@
 <%- include('../adminLayouts/navbar.ejs') %>
 
 <style>
-    .form-select.cancelled {
+.form-select.cancelled {
     color: red;
     background-color: white;
-    }
-
+}
     
-    .swal2-popup {
-        background-color: white;
-        color: #007bff;
-    }
+.swal2-popup {
+    background-color: white;
+    color: #007bff;
+}
 
-    .your-custom-class .swal2-popup {
-    height: 100px; /* Set your desired height here */
+.your-custom-class .swal2-popup {
+    height: 100px; 
 }
 
 .swal2-modal .swal2-title {
@@ -26,10 +25,6 @@
     font-weight: initial;
     margin-bottom: 0;
 }
-
-
-
-
 </style>
 
 <div class="main-panel">
@@ -98,6 +93,7 @@
                                                     id="productStatus_<%= product._id %>"
                                                     onchange="updateProductStatus('<%= order._id %>', '<%= product._id %>', '<%= product.status %>')"
                                                     <%= product.status === 'Cancelled' ? 'disabled' : '' %>
+                                                    <%= product.status === 'Delivered' ? 'disabled' : '' %>
                                                     <%= product.status === 'Return' ? 'disabled' : '' %>
                                                     >
                                                     <option value="Order Placed" <%= product.status === 'Order Placed' ? 'selected' : '' %>>Order Placed</option>
@@ -113,6 +109,11 @@
                                                   Product Order Cancelled
                                                 </div>
                                               <% } %>  
+                                              <% if (product.status === "Delivered") { %>           
+                                                <div class="alert alert-info text-center" role="alert">
+                                                  Product successfully delivered!!!
+                                                </div>
+                                              <% } %>  
                                            <div class="col-md-6 return-status-section <%= product.status === 'Return' ? '' : 'd-none' %>" id="returnStatusSection">
                                                 <p>
                                                     <strong>Return Status:</strong>
@@ -125,9 +126,7 @@
                                                 <button class="btn btn-md btn-warning refund-btn" style="color: black;" data-product-id="<%= product._id %>" disabled>Refund</button>
 
                                             </div>
-                                        </div>                                      
-                                     
-                                   
+                                        </div>                                                                                                          
                                     </div>
                                 </div>
                             <% }); %>

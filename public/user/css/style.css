@@ -17,9 +17,11 @@ body {
 a {
   -webkit-transition: .3s all ease;
   -o-transition: .3s all ease;
-  transition: .3s all ease; }
+  transition: .3s all ease; 
+}
   a:hover {
-    text-decoration: none; }
+    text-decoration: none; 
+  }
 
 .text-black {
   color: #000; }

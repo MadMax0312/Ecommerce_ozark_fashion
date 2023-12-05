@@ -83,6 +83,36 @@
     .cake {
         font-size: 20px;
     }
+    .user-review-container {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .user-details {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .user-details h5 {
+            margin-bottom: 5px;
+        }
+
+        .user-rating-review {
+            padding: 20px;
+        }
+
+        .user-rating-review h5 {
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .no-reviews {
+            text-align: center;
+            font-style: italic;
+            color: #6c757d;
+        }
 </style>
 
 <div class="site-wrap">
@@ -110,7 +140,7 @@
                                 <img
                                     id="myImage"
                                     src="/static/admin/Assets/images/products/<%= data %>"
-                                    class="d-block img-drift-demo-trigger featured-product-image MagicZoom"
+                                    class="d-block img-drift-demo-trigger featured-product-image"
                                     alt="Image"
                                 />
                             </div>
@@ -119,7 +149,7 @@
                                 <img
                                     id="myImage"
                                     src="/static/admin/Assets/images/products/<%= data %>"
-                                    class="d-block img-drift-demo-trigger featured-product-image MagicZoom"
+                                    class="d-block img-drift-demo-trigger featured-product-image"
                                     alt="Placeholder Image"
                                 />
                             </div>
@@ -205,12 +235,16 @@
                             Add To Cart
                         </a>
                     </p>
-
                     <p>
-                        <a href="/cart" class="buy-now btn btn-sm btn-dark" style="color: white; border-radius: 20px"
-                            >Go To Cart</a
-                        >
-                    </p>
+                        Average Rating:
+                        <% for (let i = 1; i <= 5; i++) { %>
+                          <% if (i <= Math.round(Product.averageRating)) { %>
+                            ★ <!-- Filled star character -->
+                          <% } else { %>
+                            ☆ <!-- Empty star character -->
+                          <% } %>
+                        <% } %>
+                      </p>                                        
                 </div>
                 
                 <div class="col-md-3">
@@ -265,9 +299,7 @@
                           <!-- Add more rows for sizes 22 to 45 if needed -->
                       </tbody>
                   </table>
-              </div>
-              
-              
+              </div>   
             </div>
 
             <div class="col-md-12 mt-3">
@@ -279,7 +311,6 @@
                             src="/static/admin/Assets/images/products/<%= data %>"
                             alt="Thumbnail Image"
                             class="thumbnail-image"
-                            onclick="changeImage('<%= data %>')"
                         />
                     </a>
                     <% }); } %>
@@ -330,18 +361,49 @@
                     </div>
                 </div>
             </div>
+
+            <div class="site-section">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-md-7 site-section-heading text-center pt-4">
+                            <h2>User Ratings and Reviews</h2>
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                        <% if (userRatingsAndReviews.length > 0) { %>
+                            <% for (let i = 0; i < Math.min(userRatingsAndReviews.length, 5); i++) { %>
+                                <div class="col-md-12">
+                                    <div class="user-review-container">
+                                        <!-- Display user details (replace with actual user data) -->
+                                        <div class="user-details">
+                                            <h5>User: <%= userRatingsAndReviews[i].user.first_name %></h5>
+                                            <p>Email: <%= userRatingsAndReviews[i].user.email %></p>
+                                        </div>
+            
+                                        <!-- Display user's rating and review for a product -->
+                                        <div class="user-rating-review">
+                                            <h5>Rating: <%= userRatingsAndReviews[i].rating %> stars</h5>
+                                            <p>Review: <%= userRatingsAndReviews[i].comment %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% } else { %>
+                            <div class="col-md-12">
+                                <p class="no-reviews">No ratings and reviews yet.</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        MagicZoom.init();
-    });
-</script>
 
 <script>
-    // Initialize Fancybox
     $(document).ready(function () {
         $(".thumbnail-image").fancybox({
             baseClass: "fancybox-custom-layout",

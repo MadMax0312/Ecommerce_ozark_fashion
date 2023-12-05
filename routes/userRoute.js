@@ -9,8 +9,8 @@ const user_route = express();
 user_route.use(
     session({
         secret: config.sessionSecret,
-        resave: false, // Add this line
-        saveUninitialized: true, // Add this line
+        resave: false, 
+        saveUninitialized: true, 
     })
 );
 
@@ -117,23 +117,25 @@ user_route.post("/applyCoupon", auth.isLogin, checkoutController.applyCoupon);
 
 //===================== O R D E R ========================================
 
-user_route.get("/order", orderContoller.loadOrder);
+user_route.get("/order", auth.isLogin, orderContoller.loadOrder);
 
 user_route.post("/place-order", orderContoller.placeOrder);
 
-user_route.get("/about", userController.loadAbout);
+user_route.get("/about", auth.isLogin, userController.loadAbout);
 
-user_route.get('/invoice', orderContoller.orderDetails);
+user_route.get('/invoice', auth.isLogin,  orderContoller.orderDetails);
 
-user_route.get('/downloadInvoice', orderContoller.invoiceDownload)
+user_route.get('/downloadInvoice', auth.isLogin, orderContoller.invoiceDownload)
 
 user_route.post('/updateProductStatus', orderContoller.updateStatus);
 
 user_route.post('/razorpay-payment', orderContoller.handleRazorpayPayment);
 
-user_route.get('/checkBalance', orderContoller.checkWalletBalance);
+user_route.get('/checkBalance', auth.isLogin, orderContoller.checkWalletBalance);
 
 user_route.post('/walletTransaction', orderContoller.walletTransaction);
+
+user_route.post('/submit-rating-review', orderContoller.rateProduct);
 
 
 module.exports = user_route;

@@ -10,12 +10,12 @@ const calculateDiscountedPrice = (product, quantity) => {
 
     // Calculate product-level discount
     const productDiscountPercentage = parseFloat(product.discountPercentage) || 0;
-    const productDiscountedPrice = productPrice - (productPrice * productDiscountPercentage / 100);
+    const productDiscountedPrice = productPrice - (productPrice * productDiscountPercentage) / 100;
 
     // Calculate category-level discount
     const category = product.category || {};
     const categoryDiscountPercentage = parseFloat(category.discountPercentage) || 0;
-    const categoryDiscountedPrice = productPrice - (productPrice * categoryDiscountPercentage / 100);
+    const categoryDiscountedPrice = productPrice - (productPrice * categoryDiscountPercentage) / 100;
 
     // Use the minimum of product and category discounts
     const finalDiscountedPrice = Math.min(productDiscountedPrice, categoryDiscountedPrice);
@@ -26,7 +26,6 @@ const calculateDiscountedPrice = (product, quantity) => {
         finalDiscountedPrice: finalDiscountedPrice,
     };
 };
-
 
 const loadCheckout = async (req, res) => {
     try {
@@ -44,15 +43,15 @@ const loadCheckout = async (req, res) => {
         }
 
         const cartData = await Cart.findOne({ user_id: userId }).populate({
-            path: 'items.product',
-            model: 'Product',
-            populate: 'category', 
+            path: "items.product",
+            model: "Product",
+            populate: "category",
         });
-        
+
         const couponData = await Coupon.find().sort({ minimumPurchase: 1 });
 
         // Calculate discounted prices for each product in the cart
-        cartData.items.forEach(item => {
+        cartData.items.forEach((item) => {
             const { finalDiscountedPrice } = calculateDiscountedPrice(item.product, item.quantity);
             item.product.finalDiscountedPrice = finalDiscountedPrice;
         });
@@ -75,7 +74,6 @@ const loadCheckout = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
-
 
 const getAddressById = async (req, res) => {
     try {
@@ -198,25 +196,23 @@ const applyCoupon = async (req, res) => {
         }
 
         const discount = Math.min((coupon.discountPercentage / 100) * totalAmount, coupon.maximumDiscount);
-        const totalAmountAfterDiscount = totalAmount - discount; 
+        const totalAmountAfterDiscount = totalAmount - discount;
 
         res.json({
             success: true,
             discount: discount,
-            totalAmount: totalAmountAfterDiscount, 
+            totalAmount: totalAmountAfterDiscount,
         });
-
     } catch (error) {
         console.error("Error applying coupon:", error.message);
         res.json({ success: false, error: "Internal server error" });
     }
 };
 
-
 module.exports = {
     loadCheckout,
     getAddressById,
     updateAddress,
     addAddress,
-    applyCoupon
+    applyCoupon,
 };
