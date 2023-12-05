@@ -8,6 +8,28 @@
     background-color: white;
     }
 
+    
+    .swal2-popup {
+        background-color: white;
+        color: #007bff;
+    }
+
+    .your-custom-class .swal2-popup {
+    height: 100px; /* Set your desired height here */
+}
+
+.swal2-modal .swal2-title {
+    font-size: 25px;
+    line-height: 1;
+    font-weight: 500;
+    color: black;
+    font-weight: initial;
+    margin-bottom: 0;
+}
+
+
+
+
 </style>
 
 <div class="main-panel">
@@ -65,7 +87,7 @@
                                         <h5><%= product.productId.productname %></h5>
                                         <p class="mb-1">Quantity: <%= product.quantity %></p>
                                         <p class="mb-2">Price: ₹ <%= product.price %></p>
-                                        <p>Subtotal: ₹ <%= product.subtotal %></p>
+                                        <p>Subtotal: ₹ <span class="subtotal" data-refund-amount="<%= product.subtotal %>"><%= product.subtotal %></span></p>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="row">
@@ -84,9 +106,13 @@
                                                     <option value="Delivered" <%= product.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                                                     <option value="Cancelled" <%= product.status === 'Cancelled' ? 'selected' : '' %>>Cancel</option>
                                                     <option value="Return" <%= product.status === 'Return' ? 'selected' : '' %> disabled>Return</option>
-                                                </select>
-                                                
+                                                </select>                                               
                                             </div>
+                                            <% if (product.status === "Cancelled") { %>           
+                                                <div class="alert alert-info text-center" role="alert">
+                                                  Product Order Cancelled
+                                                </div>
+                                              <% } %>  
                                            <div class="col-md-6 return-status-section <%= product.status === 'Return' ? '' : 'd-none' %>" id="returnStatusSection">
                                                 <p>
                                                     <strong>Return Status:</strong>
@@ -128,11 +154,6 @@
         async function handleProductStatusChange(event) {
             const productId = event.target.getAttribute('data-product-id');
 
-            if (event.target.value === 'Return') {
-                event.target.value = ''; 
-                return;
-            }
-
             const response = await fetch('/admin/updateProductStatus', {
                 method: 'POST',
                 headers: {
@@ -148,6 +169,7 @@
             if (!response.ok) {
                 console.error('Failed to update product status on the server');
             } else {
+                location.reload()
                 console.log('Product status updated successfully');
             }
         }
@@ -190,8 +212,80 @@
                 console.error('Failed to update return status on the server');
             }
         }
+
     });
 </script>
-    
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const orderId = '<%= order._id %>';
+        const refundButtons = document.querySelectorAll('.refund-btn');
+
+        refundButtons.forEach((button) => {
+            button.addEventListener('click', handleRefund);
+        });
+
+        async function handleRefund(event) {
+            const productId = event.target.getAttribute('data-product-id');
+
+            // Show SweetAlert confirmation dialog
+            const confirmation = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to process a refund for this product?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, refund it!'
+            });
+
+            if (!confirmation.isConfirmed) {
+                return;
+            }
+
+            const refundButton = document.querySelector(`.refund-btn[data-product-id="${productId}"]`);
+            
+            try {
+                const response = await fetch('/admin/refund', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        productId: productId,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to process refund on the server');
+                }
+
+                const responseData = await response.json();
+
+                if (responseData.success) {
+                    refundButton.setAttribute('disabled', true);
+                    refundButton.innerHTML = 'Refunded'; // Change the button text or style
+                    Swal.fire({
+                        title: responseData.message,
+                        icon: "success",
+                        timer: 3000,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: "animate__animated animate__fadeInDown",
+                            content: "your-custom-class",
+                        },
+                    });
+                } else {
+                    throw new Error(`Error processing refund: ${responseData.message}`);
+                }
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+    });
+</script>
+
+
 
 <%- include('../adminLayouts/footer.ejs') %>

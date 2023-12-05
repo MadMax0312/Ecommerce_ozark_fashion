@@ -203,6 +203,7 @@ const updateStatus = async (req, res) => {
     try {
         const { orderId, productId, productStatus } = req.body;
         const order = await Order.findOne({ _id: orderId, "products._id": productId });
+        const orderData = await Order.findById(orderId);
 
         if (!order) {
             return res.status(404).json({ success: false, error: 'Order or product not found' });
@@ -223,20 +224,28 @@ const updateStatus = async (req, res) => {
             await Product.findByIdAndUpdate(productIdValue, { $inc: { quantity: returnedQuantity } }, { new: true });
         }
 
+        if (productStatus === 'Cancelled') {
+            order.products[productIndex].paymentStatus = 'Refunded';
+        }
+
         order.products[productIndex].status = productStatus;
 
         if ((productStatus === 'Cancelled') && (order.paymentMethod === 'Razor Payment' || order.paymentMethod === 'Wallet Transfer')) {
-            // Refund the amount to the user's wallet
+
             const refundAmount = order.products[productIndex].subtotal;
 
             const user = await User.findById(order.user);
 
             if (user) {
-                user.wallet += refundAmount;
+                const couponDiscount = orderData.couponDiscount || 0;
+
+                const discountPerProduct = couponDiscount / order.products.length;
+
+                user.wallet += refundAmount - discountPerProduct;
                 user.walletHistory.push({
                     transactionDetails: `Refund for order ${order.orderTrackId}`,
                     transactionType: 'Refund',
-                    transactionAmount: refundAmount,
+                    transactionAmount: refundAmount - discountPerProduct,
                     currentBalance: user.wallet,
                 });
 
@@ -252,6 +261,7 @@ const updateStatus = async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 };
+
 
 
 const checkWalletBalance = async(req, res) => {

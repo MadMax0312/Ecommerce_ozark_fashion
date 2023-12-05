@@ -34,7 +34,7 @@
                     <p class="hot">Qty: <%= product.quantity %></p>
                     <h5 class="hot" >Total: <%= product.subtotal %></h5>
                     <h6 class="hot"><%= order.paymentMethod %></h6>
-                    <h5 class="hot">Payment: <span class="hot"><%= order.paymentStatus %> </span></h5>
+                    <h5 class="hot">Payment Status: <span class="hot"><%= product.paymentStatus %> </span></h5>
                   </div>
                   <div>
                     <img class="align-self-center"
@@ -103,11 +103,8 @@
                     <% } else { %>
                       <h5 class="fw-normal mb-0 disabled-link text-muted">Return</h5>
                     <% } %>
-              
             </div>
-        </div>
-
-
+          </div>
         </div>
       </div>
     </div>
@@ -198,11 +195,9 @@
         const productId = progressBar ? progressBar.dataset.productId : null;
         const productStatus = progressBar ? progressBar.dataset.productStatus : null;
 
-        // Check if Cancel button should be enabled based on the product status
         if (productStatus !== 'Delivered' && productStatus !== 'Cancelled' && productStatus !== 'Out for Delivery') {
           updateProductStatusWithConfirmation(orderId, productId, 'Cancelled', cancelLink);
         } else {
-          // Show SweetAlert for invalid action
           Swal.fire({
             icon: 'error',
             title: 'Invalid Action!',
@@ -222,11 +217,9 @@
         const productId = progressBar ? progressBar.dataset.productId : null;
         const productStatus = progressBar ? progressBar.dataset.productStatus : null;
 
-        // Check if Return button should be enabled based on the product status
         if (productStatus === '4') {
           updateProductStatusWithConfirmation(orderId, productId, 'Return', returnLink);
         } else {
-          // Show SweetAlert for invalid action
           Swal.fire({
             icon: 'error',
             title: 'Invalid Action!',

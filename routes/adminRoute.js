@@ -39,10 +39,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-
 const productController = require("../controllers/productController");
 
-const categoryController = require("../controllers/categoryController")
+const categoryController = require("../controllers/categoryController");
 
 const adminController = require("../controllers/adminController");
 
@@ -53,7 +52,6 @@ const dashboardController = require("../controllers/dashboardController");
 const salesController = require("../controllers/salesController");
 
 const couponController = require("../controllers/couponController");
-
 
 admin_route.get("/", auth.isLogout, adminController.loadLogin);
 
@@ -85,7 +83,7 @@ admin_route.post("/edit-product", upload.array("images", 4), productController.e
 
 admin_route.post("/delete-image", productController.deleteImage);
 
-admin_route.post('/add-images', upload.array('images', 4), productController.addImages);
+admin_route.post("/add-images", upload.array("images", 4), productController.addImages);
 
 //================================== C A T E G O R Y == S E C T I ON ================================================================================//
 
@@ -107,29 +105,27 @@ admin_route.get("/banner", auth.isLogin, adminController.loadBanner);
 
 admin_route.get("/orders", auth.isLogin, adminOrderController.loadOrder);
 
-admin_route.get('/orderDetailss', adminOrderController.viewDetails);
+admin_route.get("/orderDetailss", adminOrderController.viewDetails);
 
-admin_route.post('/updateProductStatus', adminOrderController.updateProductStatus);
+admin_route.post("/updateProductStatus", adminOrderController.updateProductStatus);
 
-admin_route.post('/updateReturnStatus', adminOrderController.updateReturnStatus)
+admin_route.post("/updateReturnStatus", adminOrderController.updateReturnStatus);
 
-admin_route.post('/refund', auth.isLogin, adminOrderController.proceedRefund);
-
-admin_route.post('/returnProduct', auth.isLogin, adminOrderController.returnProduct);
+admin_route.post("/refund", auth.isLogin, adminOrderController.proceedRefund);
 
 //===================== C O U P O N - S E C T I O N  ======================================================================
 
 admin_route.get("/coupons", auth.isLogin, couponController.loadCoupons);
 
-admin_route.get('/addCoupons', auth.isLogin, couponController.loadAddCoupons);
+admin_route.get("/addCoupons", auth.isLogin, couponController.loadAddCoupons);
 
-admin_route.post('/addCoupons', couponController.addCoupon);
+admin_route.post("/addCoupons", couponController.addCoupon);
 
-admin_route.get('/editCoupons', auth.isLogin, couponController.loadEditCoupon);
+admin_route.get("/editCoupons", auth.isLogin, couponController.loadEditCoupon);
 
-admin_route.post('/editCoupons', couponController.editCoupon);
+admin_route.post("/editCoupons", couponController.editCoupon);
 
-admin_route.get('/delete-coupons', couponController.deleteCoupon);
+admin_route.get("/delete-coupons", couponController.deleteCoupon);
 
 //=====================================================================================================
 
@@ -137,8 +133,7 @@ admin_route.get("/sales", auth.isLogin, salesController.loadSales);
 
 admin_route.get("/export-sales", auth.isLogin, salesController.exportReport);
 
-admin_route.get('/get-sales-data', auth.isLogin, dashboardController.getSalesDataByDate)
-
+admin_route.get("/get-sales-data", auth.isLogin, dashboardController.getSalesDataByDate);
 
 admin_route.get("*", function (req, res) {
     res.redirect("/admin");
