@@ -10,7 +10,105 @@
     color: gray;
   }
 
+  .rating {
+  display: flex;
+  justify-content: center;
+  flex-direction: row-reverse;
+  gap: 0.3rem;
+  --stroke: #666;
+  --fill: #ffc73a;
+}
+
+.rating input {
+  appearance: unset;
+}
+
+.rating label {
+  cursor: pointer;
+}
+
+.rating svg {
+  width: 2rem;
+  height: 2rem;
+  overflow: visible;
+  fill: transparent;
+  stroke: var(--stroke);
+  stroke-linejoin: bevel;
+  stroke-dasharray: 12;
+  animation: idle 4s linear infinite;
+  transition: stroke 0.2s, fill 0.5s;
+}
+
+@keyframes idle {
+  from {
+    stroke-dashoffset: 24;
+  }
+}
+
+.rating label:hover svg {
+  stroke: var(--fill);
+}
+
+.rating input:checked ~ label svg {
+  transition: 0s;
+  animation: idle 4s linear infinite, yippee 0.75s backwards;
+  fill: var(--fill);
+  stroke: var(--fill);
+  stroke-opacity: 0;
+  stroke-dasharray: 0;
+  stroke-linejoin: miter;
+  stroke-width: 8px;
+}
+
+@keyframes yippee {
+  0% {
+    transform: scale(1);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30% {
+    transform: scale(0);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30.1% {
+    stroke: var(--fill);
+    stroke-dasharray: 0;
+    stroke-linejoin: miter;
+    stroke-width: 8px;
+  }
+
+  60% {
+    transform: scale(1.2);
+    fill: var(--fill);
+  }
+}
+
 </style>
+
+<div class="site-wrap">
+  <div class="bg-light py-3">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12 mb-0">
+                  <a href="/">Home</a> <span class="mx-2 mb-0">/</span>
+                  <strong class="text-black">Order Details</strong>
+              </div>
+          </div>
+      </div>
+  </div>
 
 <section class="gradient-custom-2">
   <div class="container py-2 h-100">
@@ -86,67 +184,81 @@
                 <!-- ----------------------------------------------------------------------- -->
 
                 <% if (product.status === "Delivered") { %>
-                  <div class="alert alert-success text-center" role="alert">
-                    Your order has been delivered. Please rate and review the product.
-                  </div>
+                  <div class="review-section" id="reviewSection">
+                    <div class="alert alert-success text-center" role="alert">
+                      Your order has been delivered. Please rate and review the product.
+                    </div>
                 
-                  <!-- Button to open the modal -->
-                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ratingReviewModal">
-                    Rate and Review
-                  </button>
-                
-                  <!-- Modal for rating and review -->
-                  <div class="modal fade" id="ratingReviewModal" tabindex="-1" role="dialog" aria-labelledby="ratingReviewModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="ratingReviewModalLabel">Rate and Review Product</h5>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <!-- Rating and review form -->
-                          <form action="/submit-rating-review" method="post">
-                            <!-- Rating input -->
-                            <label for="rating">Rating:</label>
-                            <input type="number" name="rating" id="rating" min="1" max="5" required>
-                
-                            <!-- Comment input -->
-                            <label for="comment">Review:</label>
-                            <textarea name="comment" id="comment" rows="4" required></textarea>
-                
-                            <!-- Hidden input to pass product ID to the server -->
-                            <input type="hidden" name="productId" value="<%= product.productId._id %>">
-                
-                            <!-- Submit button -->
-                            <button type="submit" class="btn btn-primary">Submit Rating and Review</button>
-                          </form>
-                        </div>
+                    <!-- Rating and review form -->
+                  <form id="ratingForm">
+                    <!-- Rating input -->
+                    <div class="form-group">
+                      <h5 class="text-center p-0">Rating</h5>
+                      <div class="rating">
+                        <input type="radio" id="star-1" name="star" value="5" <%= existingReview && existingReview.rating === 5 ? 'checked' : '' %>>
+                        <label for="star-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                        </label>
+                        <input type="radio" id="star-2" name="star" value="4" <%= existingReview && existingReview.rating === 4 ? 'checked' : '' %>>
+                        <label for="star-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                        </label>
+                        <input type="radio" id="star-3" name="star" value="3" <%= existingReview && existingReview.rating === 3 ? 'checked' : '' %>>
+                        <label for="star-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                        </label>
+                        <input type="radio" id="star-4" name="star" value="2" <%= existingReview && existingReview.rating === 2 ? 'checked' : '' %>>
+                        <label for="star-4">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                        </label>
+                        <input type="radio" id="star-5" name="star" value="1" <%= existingReview && existingReview.rating === 1 ? 'checked' : '' %>>
+                        <label for="star-5">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+                        </label>
                       </div>
                     </div>
-                  </div>
-   
-                <% } %>
+
+                      <div class="form-group">
+                        <label for="comment"><h5 class="m-0">Feedback</h5></label>
+                        <textarea class="form-control" name="comment" id="comment" rows="2"
+                          aria-label="Product Review"><%= existingReview && existingReview.comment ? existingReview.comment : '' %></textarea>
+                      </div>
+                      <!-- Hidden input to pass product ID to the server -->
+                      <input type="hidden" name="productId" value="<%= product.productId._id %>">
                 
+                      <!-- Submit button -->
+                      <div class="text-center">
+                        <button type="button" class="btn btn-md btn-warning" id="submitButton">Submit</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div id="reviewSections">
+
+                  </div>
+
+                  <% } %>
+                
+               
                 </div>
+
 
                 <!-- ------------------------------------------------- -->
                 
                 <div class="card-footer p-4">
-                  <div class="d-flex justify-content-between">
+                  <div class="d-flex justify-content-center">
                     <div class="border-start h-100"></div>
                     <div class="border-start h-100"></div>
                     <% if (product.status !== "Cancelled" && product.status !== "Out for Delivery" && product.status !== "Delivered" && product.status !== "Return") { %>
-                      <h5 class="fw-normal mb-0"><a class="text-primary" href="#!" id="cancelLink">Cancel</a></h5>
+                      <button class="btn btn-primary fw-normal mb-0 mr-2" id="cancelButton" style="font-size: 14px;">Cancel</button>
                     <% } else { %>
-                      <h5 class="fw-normal mb-0 disabled-link text-muted">Cancel</h5>
+                      <button class="btn btn-secondary fw-normal mb-0 disabled-link text-muted mr-2" style="font-size: 14px;" disabled>Cancel</button>
                     <% } %>
-                
+                  
                     <% if (product.status === "Delivered") { %>
-                      <h5 class="fw-normal mb-0"><a class="text-primary" href="#!" id="returnLink">Return</a></h5>
+                      <button class="btn btn-primary fw-normal mb-0 ml-2" id="returnButton" style="font-size: 14px;">Return</button>
                     <% } else { %>
-                      <h5 class="fw-normal mb-0 disabled-link text-muted">Return</h5>
+                      <button class="btn btn-secondary fw-normal mb-0 disabled-link text-muted ml-2" style="font-size: 14px;" disabled>Return</button>
                     <% } %>
             </div>
           </div>
@@ -155,9 +267,44 @@
     </div>
   </div>
 </section>
+</div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const submitButton = document.getElementById("submitButton");
+    const reviewSections = document.getElementById("reviewSections");
+
+    submitButton.addEventListener("click", async function () {
+      try {
+        const star = document.querySelector('input[name="star"]:checked').value;
+        const comment = document.getElementById('comment').value;
+        const productId = document.querySelector('input[name="productId"]').value;
+
+        const response = await fetch("/submit-rating-review", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ star, comment, productId }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Network response was not ok. Status: ${response.status}`);
+        }else{
+          reviewSections.innerHTML = '<div class="alert alert-success text-center" role="alert">Thank you for your rating and feedback!</div>';
+        }
+
+      } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+      }
+    });
+  });
+</script>
+
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {

@@ -113,6 +113,81 @@
             font-style: italic;
             color: #6c757d;
         }
+        .rating {
+  display: flex;
+  justify-content: left;
+  --fill: #ffc73a;
+}
+
+.rating svg {
+  width: 2rem;
+  height: 2rem;
+  overflow: visible;
+  fill: transparent;
+  stroke: var(--stroke);
+  stroke-linejoin: bevel;
+  stroke-dasharray: 12;
+  animation: idle 4s linear infinite;
+  transition: stroke 0.2s, fill 0.5s;
+}
+
+@keyframes idle {
+  from {
+    stroke-dashoffset: 24;
+  }
+}
+
+.rating label:hover svg {
+  stroke: var(--fill);
+}
+
+.rating input:checked ~ label svg {
+  transition: 0s;
+  animation: idle 4s linear infinite, yippee 0.75s backwards;
+  fill: var(--fill);
+  stroke: var(--fill);
+  stroke-opacity: 0;
+  stroke-dasharray: 0;
+  stroke-linejoin: miter;
+  stroke-width: 8px;
+}
+
+@keyframes yippee {
+  0% {
+    transform: scale(1);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30% {
+    transform: scale(0);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30.1% {
+    stroke: var(--fill);
+    stroke-dasharray: 0;
+    stroke-linejoin: miter;
+    stroke-width: 8px;
+  }
+
+  60% {
+    transform: scale(1.2);
+    fill: var(--fill);
+  }
+}
+
 </style>
 
 <div class="site-wrap">
@@ -170,6 +245,14 @@
 
                 <div class="col-md-3">
                     <h2 class="text-black"><%= Product.productname %></h2>
+                        <div class="rating p-0">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29">
+                                    <path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                                        fill="<%= i <= Math.round(Product.averageRating) ? 'gold' : 'gray' %>"></path>
+                                </svg>
+                            <% } %>
+                        </div>
                     <p class="m-0 cake"><%= Product.category.categoryname %></p>
                     <p class="m-0 cake">Size: <%= Product.size %></p>
                     <% if (categoryDiscount > 0 || (Product.discountPercentage && parseFloat(Product.discountPercentage) >
@@ -218,7 +301,7 @@
                             href="#"
                             class="addToWishlistBtn btn btn-sm"
                             id="cool"
-                            style="color: white; background-color: orange; border-radius: 20px"
+                            style="color: black; border-radius: 5px; border-color: #333;"
                             data-product-id="<%= Product._id %>"
                             >Add to Wishlist</a
                         >
@@ -229,22 +312,13 @@
                             href="#"
                             class="addToCartBtn btn btn-sm"
                             id="hot"
-                            style="background-color: rgb(52, 186, 47); color: black; border-radius: 20px"
+                            style="background-color: rgb(52, 186, 47); color: black; border-radius: 5px"
                             data-product-id="<%= Product._id %>"
                         >
                             Add To Cart
                         </a>
                     </p>
-                    <p>
-                        Average Rating:
-                        <% for (let i = 1; i <= 5; i++) { %>
-                          <% if (i <= Math.round(Product.averageRating)) { %>
-                            ★ <!-- Filled star character -->
-                          <% } else { %>
-                            ☆ <!-- Empty star character -->
-                          <% } %>
-                        <% } %>
-                      </p>                                        
+                                               
                 </div>
                 
                 <div class="col-md-3">
@@ -372,19 +446,23 @@
             
                     <div class="row">
                         <% if (userRatingsAndReviews.length > 0) { %>
-                            <% for (let i = 0; i < Math.min(userRatingsAndReviews.length, 5); i++) { %>
+                            <% for (let i = 0; i < userRatingsAndReviews.length; i++) { %>
                                 <div class="col-md-12">
                                     <div class="user-review-container">
                                         <!-- Display user details (replace with actual user data) -->
                                         <div class="user-details">
-                                            <h5>User: <%= userRatingsAndReviews[i].user.first_name %></h5>
-                                            <p>Email: <%= userRatingsAndReviews[i].user.email %></p>
-                                        </div>
-            
-                                        <!-- Display user's rating and review for a product -->
-                                        <div class="user-rating-review">
-                                            <h5>Rating: <%= userRatingsAndReviews[i].rating %> stars</h5>
-                                            <p>Review: <%= userRatingsAndReviews[i].comment %></p>
+                                            <h5><%= userRatingsAndReviews[i].user.first_name %></h5>
+                                            
+                                            <div class="rating">
+                                               
+                                                <% for (let j = 1; j <= 5; j++) { %>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29">
+                                                        <path pathLength="360" d="M12,17.27L18.18,21,L16.54,13.97,L22,9.24,L14.81,8.62,L12,2,L9.19,8.62,L2,9.24,L7.45,13.97,L5.82,21,L12,17.27Z"
+                                                            fill="<%= j <= parseInt(userRatingsAndReviews[i].rating) ? 'gold' : 'gray' %>"></path>
+                                                    </svg>
+                                                <% } %>
+                                            </div>
+                                            <p><%= userRatingsAndReviews[i].comment %></p>
                                         </div>
                                     </div>
                                 </div>
@@ -395,6 +473,7 @@
                             </div>
                         <% } %>
                     </div>
+                    
                 </div>
             </div>
 

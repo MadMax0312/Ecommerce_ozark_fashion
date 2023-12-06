@@ -655,6 +655,7 @@ const loadProductInfo = async (req, res) => {
         const totalProductsInCart = await getTotalProductsInCart(userId);
         const product = await Product.findById(id).populate("category");
         const userRatingsAndReviews = await Product.find({ _id: id }).select("reviews").populate("reviews.user");
+        console.log(userRatingsAndReviews[0].reviews)
 
         if (!product) {
             return res.status(404).send("Product not found");

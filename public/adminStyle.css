@@ -7381,6 +7381,11 @@ body {
   font-size: 1rem;
   line-height: 1.5;
   color: #ffffff;
+  user-select: none;
+}
+
+*:focus, *:active {
+  outline: none;
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {

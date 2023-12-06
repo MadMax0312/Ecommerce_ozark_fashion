@@ -4,6 +4,10 @@ body {
    /* color: black;  */
   font-weight: 400;
   font-size: 15px; 
+  user-select: none;
+}
+*:focus, *:active {
+  outline: none;
 }
 
 ::-moz-selection {
@@ -18,6 +22,7 @@ a {
   -webkit-transition: .3s all ease;
   -o-transition: .3s all ease;
   transition: .3s all ease; 
+  text-decoration: none;
 }
   a:hover {
     text-decoration: none; 
@@ -71,6 +76,7 @@ a {
 
 .btn {
   text-transform: uppercase;
+  text-decoration: none;
   position: relative;
   -webkit-transition: 0.2s all ease-in-out !important;
   -o-transition: 0.2s all ease-in-out !important;

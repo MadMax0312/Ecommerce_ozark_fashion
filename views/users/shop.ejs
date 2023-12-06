@@ -2,14 +2,11 @@
 <%- include('../userLayouts/navbar.ejs') %>
 
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-
-
 <style>
     .product-card {
         border: none;
         transition: box-shadow 0.3s ease;
-        height: 350px; 
+        height: 350px;
     }
 
     .product-card:hover {
@@ -18,8 +15,8 @@
 
     .product-image {
         height: 200px;
-        object-fit: cover; 
-        width: 100%; 
+        object-fit: cover;
+        width: 100%;
     }
 
     .category {
@@ -31,15 +28,15 @@
     }
 
     .offer-icon {
-        color: #e44d26; 
-        font-size: 18px; 
+        color: #e44d26;
+        font-size: 18px;
     }
 
     .center-line {
         position: absolute;
-        height: 2px;
+        height: 1px;
         width: 100%;
-        background-color: #333; 
+        background-color: #333;
         top: 50%;
         transform: translateY(-50%);
         z-index: 1;
@@ -51,26 +48,28 @@
         align-items: center;
         position: relative;
         margin-top: 10px;
-        font-weight: 700;
+        font-weight: 500;
     }
 
     .actual-price {
         position: relative;
         z-index: 2;
-        padding-right: 5px; 
     }
 
     .discounted-price {
         position: relative;
         z-index: 2;
-        padding-left: 5px; 
+        padding-left: 5px;
     }
-    .card-text{
+
+    .card-text {
         color: black;
     }
-    .card-title{
+
+    .card-title {
         font-size: 22px;
     }
+
     #filterForm {
         max-width: 100%;
     }
@@ -82,10 +81,87 @@
     #filterForm button {
         width: 100%;
     }
-    .d-block{
-      font-weight: 700;
-      color: #e44d26;
+
+    .d-block {
+        font-weight: 700;
+        color: #e44d26;
     }
+    .rating {
+  display: flex;
+  justify-content: center;
+  --fill: #ffc73a;
+}
+
+
+.rating svg {
+  width: 2rem;
+  height: 2rem;
+  overflow: visible;
+  fill: transparent;
+  stroke: var(--stroke);
+  stroke-linejoin: bevel;
+  stroke-dasharray: 12;
+  animation: idle 4s linear infinite;
+  transition: stroke 0.2s, fill 0.5s;
+}
+
+@keyframes idle {
+  from {
+    stroke-dashoffset: 24;
+  }
+}
+
+.rating label:hover svg {
+  stroke: var(--fill);
+}
+
+.rating input:checked ~ label svg {
+  transition: 0s;
+  animation: idle 4s linear infinite, yippee 0.75s backwards;
+  fill: var(--fill);
+  stroke: var(--fill);
+  stroke-opacity: 0;
+  stroke-dasharray: 0;
+  stroke-linejoin: miter;
+  stroke-width: 8px;
+}
+
+@keyframes yippee {
+  0% {
+    transform: scale(1);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30% {
+    transform: scale(0);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30.1% {
+    stroke: var(--fill);
+    stroke-dasharray: 0;
+    stroke-linejoin: miter;
+    stroke-width: 8px;
+  }
+
+  60% {
+    transform: scale(1.2);
+    fill: var(--fill);
+  }
+}
+
 </style>
 
 <div class="bg-light py-3">
@@ -120,28 +196,34 @@
                                 <div class="card product-card">
                                     <div class="product-image-wrapper">
                                         <a href="/product-info?id=<%= Product[i]._id %>">
-                                            <img src="/static/admin/Assets/images/products/<%= Product[i].image[0] %>" alt="Product Image" class="card-img-top product-image" />
+                                            <img src="/static/admin/Assets/images/products/<%= Product[i].image[0] %>" alt="Product Image" class="card-img-top product-image img-fluid" />
                                         </a>
                                     </div>
                                     <div class="card-body">
                                         <h5 class="card-title" style="margin-bottom: 0;">
                                             <a href="/product-info?id=<%= Product[i]._id %>" style="color: black"><%= Product[i].productname %></a>
                                         </h5>
-                                        <p class="card-text category" style="margin-bottom: 0;"><%= Product[i].category.categoryname %></p>
-                                        <p class="card-text size" style="margin-bottom: 0;">Size: <%= Product[i].size %></p>
-                                        
+
                                         <div class="prices">
                                             <span class="actual-price pl-4">
                                                 <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) { %>
                                                     <span class="center-line" style="width: 44px;"></span> ₹<%= Product[i].price %>
                                                 <% } else { %>
-                                                    <span class="font-weight-bold ml-5">Price: </span> ₹<%= Product[i].price %>
+                                                    <span class="ml-5">Price: </span> ₹<%= Product[i].price %>
                                                 <% } %>
                                             </span>
                                             <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) { %>
                                                 <span class="discounted-price offer-icon">
                                                     <i data-feather="tag"></i> ₹<%= Product[i].discountedPrice %>
                                                 </span>
+                                            <% } %>
+                                        </div>
+                                        <div class="rating p-0">
+                                            <% for (let i = 1; i <= 5; i++) { %>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                                    <path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                                                        fill="<%= i <= Math.round(Product[i].averageRating) ? 'gold' : 'gray' %>"></path>
+                                                </svg>
                                             <% } %>
                                         </div>
                                     </div>
@@ -196,7 +278,7 @@
                               </a>
                             </li>
                           <% }); %>
-                      </ul>                    
+                      </ul>
                 </div>
 
                 <div class="border p-4 rounded mb-4">
@@ -215,9 +297,8 @@
                             <input type="text" class="form-control" id="size" placeholder="Enter size" />
                         </div>
                         <button type="button" class="btn btn-primary btn-sm" onclick="applyFilters()">Apply Filters</button>
-                    </form>                    
+                    </form>
                 </div>
-                            
             </div>
         </div>
     </div>

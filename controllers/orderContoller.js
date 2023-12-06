@@ -180,6 +180,10 @@ const orderDetails = async (req, res) => {
         });
 
         const product = orderData.products.find((item) => item._id.toString() === productsObjectId.toString());
+        const productid = product.productId._id;
+        const reviewProduct = await Product.findById(productid);
+
+        const existingReview = reviewProduct.reviews.find((review) => review.user.toString() === userId);
 
         res.render("orderDetails", {
             user: userId,
@@ -187,6 +191,7 @@ const orderDetails = async (req, res) => {
             count: totalProductsInCart,
             order: orderData,
             product: product,
+            existingReview: existingReview,
         });
     } catch (error) {
         console.error("Error fetching order details:", error.message);
@@ -356,8 +361,10 @@ const invoiceDownload = async (req, res, next) => {
 const rateProduct = async (req, res) => {
     try {
       const productId = req.body.productId;
-      const rating = req.body.rating;
-      const comment = req.body.comment;
+      console.log(productId)
+      const rating = req.body.star;
+      console.log(rating)
+      const comment = req.body.comment; 
       const userId = req.session.user_id;
   
       // Find the product by ID
@@ -386,8 +393,9 @@ const rateProduct = async (req, res) => {
   
         // Save the updated product
         await product.save();
-  
-        res.redirect(`/product-info?id=${productId}`);
+
+        return res.status(200).json({ message: "Thank You for you Response" });
+
       } else {
         console.error("Product not found");
         res.status(404).send("Product not found");

@@ -32,55 +32,9 @@
       <div class="col-md-10 p-3" id="invoice">
         <div class="card">
           <div class="invoice p-1 text-center">
-            <h2>Your Order Confirmed!</h2>
-            <span class="d-block mt-4">
-              Hello, <%= userData.first_name %> <%= userData.last_name %>
-            </span>
-            <span>Your order has been confirmed and will be shipped shortly!</span>
-                    <div class="payment border-top mt-3 mb-3 border-bottom table-responsive">
-                        <table class="table table-borderless">
-                            <tbody>
-                                <% data.forEach(function(order) { %>
-                                <tr>
-                                    <td>
-                                        <div class="py-2">
-                                            <span class="d-block">Order Date</span>
-                                            <span class="c-block"
-                                                ><%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month:
-                                                'short', day: '2-digit' }).replace(/\//g, '-') %></span
-                                            >
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="py-2">
-                                            <span class="d-block">Order No</span>
-                                            <span class="c-block"><%= order.orderTrackId %></span>
-                                        </div>
-                                    </td>
-                                   
-                                    <td>
-                                        <div class="py-2">
-                                            <span class="d-block">Expected Delivery</span>
-                                            <% 
-                                            // Get the order date from the server response (assuming order.createdAt is a valid Date object)
-                                            const orderDate = new Date(order.createdAt);
-                                    
-                                            // Calculate the expected delivery date (7 days later)
-                                            const expectedDeliveryDate = new Date(orderDate);
-                                            expectedDeliveryDate.setDate(orderDate.getDate() + 7);
-                                    
-                                            // Format the expected delivery date and display it
-                                            const formattedDeliveryDate = expectedDeliveryDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).replace(/\//g, '-');
-                                        %>
-                                        <span class="c-block"><%= formattedDeliveryDate %></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                                      
-                                <% }); %>
-                            </tbody>
-                        </table>
-                    </div>
+            <h2 class="mb-3 mt-3">Your Orders</h2>
+
+                   
                     <div class="product border-bottom table-responsive">
                         <table class="table" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
                             <thead>
