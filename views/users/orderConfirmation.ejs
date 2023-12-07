@@ -114,8 +114,12 @@
                                     <td width="20%">
                                         <div class="text-center align-center">
                                             <span class="d-block">Quantity: <%= item.quantity %></span>
-                                            <span class="c-block" style="text-decoration: line-through;">Price: ₹ <%= item.productId.price %></span>
+                                            <% if (item.price > 0) { %> 
                                             <span class="c-block">Price: ₹ <%= item.price %></span>
+                                            <% } else {%>     
+                                                <span class="c-block" >Price: ₹ <%= item.productId.price %></span>
+                                            <% } %>     
+                                          
                                         </div>
                                     </td>                                                                     
 

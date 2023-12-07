@@ -1,34 +1,18 @@
 const Admin = require("../models/adminModel");
-const Category = require("../models/categoryModel");
-const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
-const path = require("path");
 
-const randomstring = require("randomstring");
-const fs = require("fs");
-const Order = require("../models/orderModel");
-
-const securePassword = async (password) => {
-    try {
-        const passwordHash = await bcrypt.hash(password, 10);
-        return passwordHash;
-    } catch (error) {
-        console.log(error.message);
-    }
-};
-
-const loadLogin = async (req, res) => {
+const loadLogin = async (req, res, next) => {
     try {
         res.render("login");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 ///////----------------------Verify Login-------------------'///////////
 
-const verifyLogin = async (req, res) => {
+const verifyLogin = async (req, res, next) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
@@ -51,27 +35,26 @@ const verifyLogin = async (req, res) => {
             res.render("login", { message: "Login details are incorrect" });
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 //////==============-----LOGOUT----===========
 
-const loadLogout = async (req, res) => {
+const loadLogout = async (req, res, next) => {
     try {
         req.session.destroy();
         res.redirect("/admin");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 ///----------Loading user page in admin dashboard===========
 
-const loadUsers = async (req, res) => {
+const loadUsers = async (req, res, next) => {
     try {
-        console.log("dfdfdfdd");
-        var search = ""; //<----this is where we search for the users in dashboard -----------------
+        var search = "";
         if (req.query.search) {
             search = req.query.search;
         }
@@ -108,11 +91,11 @@ const loadUsers = async (req, res) => {
             currentPage: page,
         });
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 };
 
-const blockUsers = async (req, res) => {
+const blockUsers = async (req, res, next) => {
     try {
         const id = req.query.id;
         const user = await User.findById(id);
@@ -122,29 +105,10 @@ const blockUsers = async (req, res) => {
             await user.save();
             return res.status(200).json({ message: "User Status Updated" });
         } else {
-            res.status(404).send("User not found"); // Send a 404 error if user is not found
+            res.status(404).send("User not found");
         }
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error"); // Send a 500 error for internal server errors
-    }
-};
-
-//////===========Banner Section ===================/////////////////
-
-const loadBanner = async (req, res) => {
-    try {
-        res.render("banner");
-    } catch (error) {
-        console.log(error.message);
-    }
-};
-
-const loadOrder = async (req, res) => {
-    try {
-        res.render("orders");
-    } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
@@ -154,6 +118,4 @@ module.exports = {
     loadLogout,
     loadUsers,
     blockUsers,
-    loadBanner,
-    loadOrder,
 };

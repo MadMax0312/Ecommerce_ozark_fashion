@@ -2,16 +2,17 @@ const mongoose = require("mongoose");
 const path = require("path");
 const session = require("express-session");
 const config = require("./config/config");
-require('dotenv').config();
-const cors = require('cors');
+require("dotenv").config();
+const cors = require("cors");
+const express = require("express");
+const adminRoute = require("./routes/adminRoute");
+const userRoute = require("./routes/userRoute");
 
-
-mongoose.connect("mongodb://127.0.0.1:27017/Ozark_Fashion", {
+mongoose.connect("mongodb+srv://thahirmuhammedap:rUAxPc9lbK8Rfsy4@clusterozark.x3veijw.mongodb.net/?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-});
+}).then(console.log("dfdf"));
 
-const express = require("express");
 const app = express();
 app.use(cors());
 
@@ -23,19 +24,26 @@ app.use(
     })
 );
 
+app.set("view engine", "ejs");
+app.set("views", "./views/users");
+
+const disable = (req, res, next) => {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "1");
+    next();
+};
+app.use(disable);
+
 app.use("/static", express.static(path.join(__dirname, "public")));
 
-const userRoute = require("./routes/userRoute");
-app.use("/", userRoute);
-
-//for admin routes-----------------------------///////////////////
-
-const adminRoute = require("./routes/adminRoute");
 app.use("/admin", adminRoute);
 
-app.use("*", (req, res) => {
-    res.send("Error 404. No pages available");
-});
+app.use("/", userRoute);
+
+app.use('*',(req,res)=>{
+    res.render('404')
+})
 
 app.listen(process.env.PORT || 8080, () => {
     console.log("Server is running....");

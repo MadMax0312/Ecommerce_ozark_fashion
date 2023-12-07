@@ -1,12 +1,7 @@
-const Admin = require("../models/adminModel");
-const Category = require("../models/categoryModel");
-const Product = require("../models/productModel");
-const User = require("../models/userModel");
 const Order = require("../models/orderModel");
 const { Parser } = require("json2csv");
-const fs = require("fs");
 
-const loadSales = async (req, res) => {
+const loadSales = async (req, res, next) => {
     try {
         const orders = await Order.find().sort({ createdAt: -1 });
 
@@ -43,11 +38,11 @@ const loadSales = async (req, res) => {
             orderSummary: orderSummary,
         });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const exportReport = async (req, res) => {
+const exportReport = async (req, res, next) => {
     try {
         const { filter } = req.query;
         let filterMatch = {};
@@ -93,8 +88,7 @@ const exportReport = async (req, res) => {
         // Pipe the CSV data to the response stream
         res.status(200).send(csv);
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 

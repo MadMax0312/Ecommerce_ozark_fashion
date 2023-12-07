@@ -3,11 +3,11 @@ const isLogin = async (req, res, next) => {
         if (req.session.user_id) {
             return next();
         } else {
-            res.redirect("/");
+            res.redirect("/login");
         }
     } catch (error) {
         console.log(error.message);
-        res.redirect("/");
+        res.redirect("/login");
     }
 };
 
@@ -16,7 +16,7 @@ const isLogout = async (req, res, next) => {
         if (req.session.user_id) {
             res.redirect("/");
         } else {
-            return next(); // Proceed to the next middleware or route
+            return next(); 
         }
     } catch (error) {
         console.log(error.message);

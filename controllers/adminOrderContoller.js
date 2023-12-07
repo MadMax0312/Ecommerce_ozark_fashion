@@ -1,13 +1,8 @@
-const Admin = require("../models/adminModel");
-const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const User = require("../models/userModel");
-const bcrypt = require("bcrypt");
-const path = require("path");
 const Order = require("../models/orderModel");
-const Cart = require("../models/cartModel");
 
-const loadOrder = async (req, res) => {
+const loadOrder = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 10; // Adjust the number of orders per page as needed
@@ -75,11 +70,11 @@ const loadOrder = async (req, res) => {
             orderSummary: orderSummary,
         });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const viewDetails = async (req, res) => {
+const viewDetails = async (req, res, next) => {
     try {
         const orderId = req.query.id;
         const latestOrder = await Order.findById({ _id: orderId })
@@ -94,11 +89,11 @@ const viewDetails = async (req, res) => {
             order: latestOrder,
         });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const updateProductStatus = async (req, res) => {
+const updateProductStatus = async (req, res, next) => {
     try {
         const orderId = req.body.orderId;
         const productId = req.body.productId;
@@ -166,12 +161,11 @@ const updateProductStatus = async (req, res) => {
 
         res.json({ order: updatedOrder });
     } catch (error) {
-        console.error("Error updating product status:", error.message);
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const updateReturnStatus = async (req, res) => {
+const updateReturnStatus = async (req, res, next) => {
     try {
         const { orderId, productId, returnStatus } = req.body;
         const order = await Order.findById(orderId);
@@ -193,12 +187,11 @@ const updateReturnStatus = async (req, res) => {
 
         res.json({ success: true, data: product });
     } catch (error) {
-        console.error("Error updating return status:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+        next(error);
     }
 };
 
-const proceedRefund = async (req, res) => {
+const proceedRefund = async (req, res, next) => {
     try {
         const { orderId, productId } = req.body;
 
@@ -239,8 +232,7 @@ const proceedRefund = async (req, res) => {
 
         res.json({ success: true, message: "Refund completed successfully" });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ success: false, error: "Internal server error" });
+        next(error);
     }
 };
 

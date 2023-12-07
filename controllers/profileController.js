@@ -1,40 +1,38 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const Address = require("../models/addressModel");
-const { ObjectId } = require("mongodb");
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
 const { getTotalProductsInCart } = require("../number/cartNumber");
 
 // ========== rendering user profile ===========
-const loadProfile = async (req, res) => {
+const loadProfile = async (req, res, next) => {
     try {
         const id = req.session.user_id;
         const userData = await User.findById({ _id: id }).populate("walletHistory");
         const userAddress = await Address.findOne({ userId: id });
-        const count = await Cart.find().countDocuments();
+        const totalProductsInCart = await getTotalProductsInCart(id);
 
-        res.render("userProfile", { user: userData, address: userAddress, count: count });
+        res.render("userProfile", { user: userData, address: userAddress, count: totalProductsInCart });
     } catch (error) {
-        console.log(error);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
 // ========= rendering user address page ==========
-const loadAddress = async (req, res) => {
+const loadAddress = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
-        const count = await Cart.find().countDocuments();
+        const totalProductsInCart = await getTotalProductsInCart(userId);
 
-        res.render("address", { user: userId, count: count });
+        res.render("address", { user: userId, count: totalProductsInCart });
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 };
 
 // =========== adding user address =========
-const addAddress = async (req, res) => {
+const addAddress = async (req, res, next) => {
     try {
         let userAddress = await Address.findOne({ userId: req.session.user_id });
         if (!userAddress) {
@@ -66,29 +64,29 @@ const addAddress = async (req, res) => {
 
         res.redirect("/userProfile");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 // ========== here user cand edit address =======
-const loadEditAddress = async (req, res) => {
+const loadEditAddress = async (req, res, next) => {
     try {
         const id = req.query.id;
         const userId = req.session.user_id;
-        const count = await Cart.find().countDocuments();
+        const totalProductsInCart = await getTotalProductsInCart(id);
 
         let userAddress = await Address.findOne({ userId: userId }, { address: { $elemMatch: { _id: id } } });
 
         const address = userAddress.address;
 
-        res.render("editAddress", { user: userId, addresses: address[0], count: count });
+        res.render("editAddress", { user: userId, addresses: address[0], count: totalProductsInCart });
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 };
 
 // ========== edit user address ==========
-const editAddress = async (req, res) => {
+const editAddress = async (req, res, next) => {
     try {
         const user_id = req.session.user_id;
         const addressId = req.body.id;
@@ -108,12 +106,12 @@ const editAddress = async (req, res) => {
         );
         res.redirect("/userProfile");
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 };
 
 // ============ deleting user address =========
-const deleteAddress = async (req, res) => {
+const deleteAddress = async (req, res, next) => {
     try {
         let userAddress = await Address.findOne({ userId: req.session.user_id });
         const addressToDeleteIndex = userAddress.address.findIndex((address) => address.id === req.body.id);
@@ -124,12 +122,12 @@ const deleteAddress = async (req, res) => {
         await userAddress.save();
         return res.json({ remove: 1 });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 // ======== updating user detailesl =========
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
     try {
         const user_id = req.session.user_id;
 
@@ -150,12 +148,12 @@ const updateUser = async (req, res) => {
 
         res.redirect("/userProfile");
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 };
 
 // ======== updating user detailesl =========
-const resetPassword = async (req, res) => {
+const resetPassword = async (req, res, next) => {
     try {
         const userDetails = await User.findOne({ _id: req.session.user_id });
 
@@ -170,13 +168,13 @@ const resetPassword = async (req, res) => {
             }
         });
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 };
 
 //=======================================================
 
-const loadOrderPage = async (req, res) => {
+const loadOrderPage = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const cart = await Cart.findOne({ user_id: userId });
@@ -221,11 +219,11 @@ const loadOrderPage = async (req, res) => {
             currentPage: page,
         });
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 };
 
-const viewDetails = async (req, res) => {
+const viewDetails = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const orderId = req.query.id;
@@ -252,7 +250,7 @@ const viewDetails = async (req, res) => {
             data: [latestOrder],
         });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 

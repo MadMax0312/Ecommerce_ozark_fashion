@@ -52,8 +52,20 @@
                                         <% } %>
                                     </td>
                                 </tr>
-                            <% } 
-                            } %>
+                            <% } %>
+                            <%  } else { %>
+
+                                <tr>
+                                    <td colspan="7" class="text-center">
+                                        <div class="error-content text-center">
+                                            <h1 class="error-title">No Categories</h1>
+                                            <p>You have not added any categories yet.</p>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <% } %>
                         </table>
                     </div>
                 </div>

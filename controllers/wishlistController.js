@@ -1,9 +1,8 @@
 const Product = require("../models/productModel");
 const Wishlist = require("../models/wishlistModel");
-const User = require("../models/userModel");
 const { getTotalProductsInCart } = require("../number/cartNumber");
 
-const loadWishlist = async (req, res) => {
+const loadWishlist = async (req, res, next) => {
     try {
         const product = await Product.find();
         const userId = req.session.user_id;
@@ -16,12 +15,11 @@ const loadWishlist = async (req, res) => {
 
         res.render("wishlist", { data: wishlist, user: user, count: totalProductsInCart });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal server error");
+        next(error);
     }
 };
 
-const addToWishlist = async (req, res) => {
+const addToWishlist = async (req, res, next) => {
     try {
         const user_id = req.session.user_id;
         if (user_id) {
@@ -48,15 +46,13 @@ const addToWishlist = async (req, res) => {
         } else {
             return res.status(401).json({ message: "User not logged in, please log in first" });
         }
-
         return res.json({ success: true, message: "Product added to the wishlist successfully" });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
+        next(error);
     }
 };
 
-const removeProduct = async (req, res) => {
+const removeProduct = async (req, res, next) => {
     try {
         const wishlistId = req.query.wishlistId;
         const productId = req.query.productId;
@@ -69,8 +65,7 @@ const removeProduct = async (req, res) => {
 
         res.redirect("/wishlist");
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal server error");
+        next(error);
     }
 };
 

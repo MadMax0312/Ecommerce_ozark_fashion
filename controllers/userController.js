@@ -46,16 +46,16 @@ const sendVerifyMail = async (email, otp) => {
 };
 
 //user otp
-const loadOtpPage = async (req, res) => {
+const loadOtpPage = async (req, res, next) => {
     try {
         res.redirect("/otp");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 //ottp sending and otp storing in session
-const verifyOtp = async (req, res) => {
+const verifyOtp = async (req, res, next) => {
     try {
         const otpCode = otpGenerator.generate(6, {
             digits: true,
@@ -114,18 +114,18 @@ const verifyOtp = async (req, res) => {
             }
         }
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 };
 
 //-----route to sign up page-----------------------------
 
-const loadRegister = async (req, res) => {
+const loadRegister = async (req, res, next) => {
     try {
         const referralCode = req.query.referralCode;
         res.render("registration", { referralCode });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
@@ -136,7 +136,7 @@ const generateOTP = () => {
 
 //------Resend OTP
 
-const resendOtp = async (req, res) => {
+const resendOtp = async (req, res, next) => {
     try {
         const currentTime = Date.now() / 1000;
         if (req.session.otp.expiry != null) {
@@ -160,13 +160,13 @@ const resendOtp = async (req, res) => {
             res.send("Please register again");
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 ///-----Inserting user details in sign up page============
 
-const insertUser = async (req, res) => {
+const insertUser = async (req, res, next) => {
     try {
         const referralCode = req.session.referralCode;
 
@@ -220,31 +220,31 @@ const insertUser = async (req, res) => {
             res.render("otp", { message: "Invalid OTP" });
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 //Login user methods started
 
-const loginLoad = async (req, res) => {
+const loginLoad = async (req, res, next) => {
     try {
         res.render("login");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const loadLogout = async (req, res) => {
+const loadLogout = async (req, res, next) => {
     try {
         req.session.user_id = null;
 
         res.redirect("/");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const verifyLogin = async (req, res) => {
+const verifyLogin = async (req, res, next) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
@@ -273,25 +273,25 @@ const verifyLogin = async (req, res) => {
             res.render("login", { message: "Login details are incorrect" });
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const loadOtp = async (req, res) => {
+const loadOtp = async (req, res, next) => {
     try {
         res.render("otp");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 //===========Forgot Password===========////
 
-const loadForgotPassword = async (req, res) => {
+const loadForgotPassword = async (req, res, next) => {
     try {
         res.render("forgotPassword");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
@@ -326,7 +326,7 @@ const resetPasswordMail = async (first_name, last_name, email, token) => {
     }
 };
 
-const forgotVerify = async (req, res) => {
+const forgotVerify = async (req, res, next) => {
     try {
         const email = req.body.email;
         const userData = await User.findOne({ email: email });
@@ -347,26 +347,24 @@ const forgotVerify = async (req, res) => {
             res.render("forgotPassword");
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const loadChangePassword = async (req, res) => {
+const loadChangePassword = async (req, res, next) => {
     try {
         const token = req.query.token;
         const tokenData = await User.findOne({ token: token });
 
         if (tokenData) {
             res.render("changePassword", { user_id: tokenData._id });
-        } else {
-            res.render("404", { message: "Token is invalid" });
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const updatePassword = async (req, res) => {
+const updatePassword = async (req, res, next) => {
     try {
         const password = req.body.password;
         const user_id = req.body.user_id;
@@ -377,31 +375,15 @@ const updatePassword = async (req, res) => {
 
         res.render("login", { message: "Password Updated Successfully" });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
 //==================== H O M E =========================================
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
     try {
         const products = await Product.find().limit(5);
-
-        const getTotalProductsInCart = async (userId) => {
-            try {
-                const userCart = await Cart.findOne({ user_id: userId });
-                if (userCart && userCart.items.length > 0) {
-                    const uniqueProductIds = new Set(userCart.items.map((item) => item.product.toString()));
-                    const totalProducts = uniqueProductIds.size;
-                    return totalProducts;
-                } else {
-                    return 0; // No items in the cart
-                }
-            } catch (error) {
-                throw error;
-            }
-        };
-
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
         const categoryProductCounts = await getCategoryProductCounts();
@@ -413,8 +395,7 @@ const login = async (req, res) => {
             categoryProductCounts: categoryProductCounts,
         });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
@@ -424,7 +405,7 @@ const getCategoryProductCounts = async () => {
     try {
         const categoryCounts = await Product.aggregate([
             {
-                $match: { status: true }, // Add this $match stage to filter products with status true
+                $match: { status: true },
             },
             {
                 $group: {
@@ -450,14 +431,14 @@ const getCategoryProductCounts = async () => {
     }
 };
 
-const loadShop = async (req, res) => {
+const loadShop = async (req, res, next) => {
     try {
         const page = req.query.page ? parseInt(req.query.page) : 1;
         const search = req.query.search ? req.query.search : "";
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
         const limit = 9;
-        const sort = req.query.sort
+        const sort = req.query.sort;
 
         const filterOptions = {};
 
@@ -476,9 +457,9 @@ const loadShop = async (req, res) => {
 
         const sortOptions = {};
 
-        if (sort === 'lowToHigh') {
+        if (sort === "lowToHigh") {
             sortOptions.price = 1; // Ascending order
-        } else if (sort === 'highToLow') {
+        } else if (sort === "highToLow") {
             sortOptions.price = -1; // Descending order
         } else {
             // Default sorting logic if req.query.sort is not provided
@@ -585,18 +566,11 @@ const loadShop = async (req, res) => {
             },
         });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
-    const discountAmount = (originalPrice * parseFloat(discountPercentage)) / 100;
-    const discountedPrice = originalPrice - discountAmount;
-    return discountedPrice.toFixed(2); // Round to 2 decimal places
-};
-
-const getProductsByCategory = async (req, res) => {
+const getProductsByCategory = async (req, res, next) => {
     try {
         const { categoryName } = req.params;
         const search = req.query.search ? req.query.search : "";
@@ -607,9 +581,9 @@ const getProductsByCategory = async (req, res) => {
         const sort = req.query.sort;
         const sortOptions = {};
 
-        if (sort === 'lowToHigh') {
+        if (sort === "lowToHigh") {
             sortOptions.price = 1;
-        } else if (sort === 'highToLow') {
+        } else if (sort === "highToLow") {
             sortOptions.price = -1;
         } else {
             sortOptions.createdAt = -1;
@@ -667,7 +641,7 @@ const getProductsByCategory = async (req, res) => {
 
         const categoryProductCounts = await getCategoryProductCounts();
         categoryProductCounts.sort((a, b) => a.categoryName.localeCompare(b.categoryName));
-        
+
         res.render("categoryMen", {
             user: req.session.user_id,
             categoryName: categoryName,
@@ -686,15 +660,13 @@ const getProductsByCategory = async (req, res) => {
             },
         });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-
 ///===========Rendering product info page -=-----------//
 
-const loadProductInfo = async (req, res) => {
+const loadProductInfo = async (req, res, next) => {
     try {
         const id = req.query.id;
         const userId = req.session.user_id;
@@ -754,21 +726,19 @@ const loadProductInfo = async (req, res) => {
             userRatingsAndReviews: userRatingsAndReviews[0].reviews || [],
         });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
 //---------Rendering about page-----------///
 
-const loadAbout = async (req, res) => {
+const loadAbout = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
         res.render("about", { user: req.session.user_id, count: totalProductsInCart });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 

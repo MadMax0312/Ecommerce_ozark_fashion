@@ -12,7 +12,6 @@
                         <li><a href="/" style="font-size: 18px;">Home</a></li>
                         <li><a href="/shop" style="font-size: 18px;">Shop</a></li>
                         <li><a href="/about" style="font-size: 18px;">About</a></li>
-                        <li><a href="/cart" style="font-size: 18px;">Cart</a></li>
                         <li><a href="/contact" style="font-size: 18px;">Contact</a></li>
                     </ul>
                 </nav>
@@ -21,9 +20,9 @@
                 <div class="site-top-icons">
                     <ul>
                         <% if (user) { %>
-                            <li><a href="/logout" style="color: red; font-weight: bold; font-size: 18px;">Logout</a></li>
+                            <li class="ml-2"><a href="/logout" class="btn btn-sm" style="border-width: 1px; border-color: #000;">Logout</a></li>
                         <% } else { %>
-                            <li><a href="/login" style="color: green; font-weight: bold; font-size: 18px;">Login</a></li>
+                            <li class="ml-2"><a href="/login" class="btn btn-sm" style="border-width: 1px; border-color: #000;">Login</a></li>
                         <% } %>
                         <li><a href="/userProfile" style="font-size: 18px;"><span class="icon icon-person"></span></a></li>
                         <li><a href="/wishlist" style="font-size: 18px;"><span class="icon icon-heart-o"></span></a></li>
@@ -33,7 +32,7 @@
                                 <% if (user) { %>
                                     <span class="count" style="font-size: 14px;"> <%= count %>  </span>
                                 <% } else { %>
-                                    <span class="count" style="font-size: 14px;">  </span>
+                                    
                                 <% } %>
                                 
                             </a>

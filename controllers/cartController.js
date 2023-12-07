@@ -10,7 +10,7 @@ const calculateDiscountedPrice = (product, quantity) => {
     const productDiscountedPrice = productPrice - (productPrice * productDiscountPercentage) / 100;
 
     // Calculate category-level discount
-    const category = product.category || {}; // Ensure category is defined
+    const category = product.category || {};
     const categoryDiscountPercentage = parseFloat(category.discountPercentage) || 0;
     const categoryDiscountedPrice = productPrice - (productPrice * categoryDiscountPercentage) / 100;
 
@@ -23,7 +23,7 @@ const calculateDiscountedPrice = (product, quantity) => {
     };
 };
 
-const loadCart = async (req, res) => {
+const loadCart = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
@@ -65,12 +65,11 @@ const loadCart = async (req, res) => {
             count: totalProductsInCart,
         });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const updateCart = async (req, res) => {
+const updateCart = async (req, res, next) => {
     try {
         const user = req.session.user_id;
         const productID = req.body.productID;
@@ -86,23 +85,21 @@ const updateCart = async (req, res) => {
         // Send the updated cart item back to the client
         res.json(updatedCartItem);
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
-const getMaxStock = async (req, res) => {
+const getMaxStock = async (req, res, next) => {
     try {
         const productID = req.params.id;
         const product = await Product.findById(productID);
         const maxStock = product.quantity;
         res.json({ maxStock });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const addToCart = async (req, res) => {
+const addToCart = async (req, res, next) => {
     try {
         const user_id = req.session.user_id;
 
@@ -143,12 +140,11 @@ const addToCart = async (req, res) => {
             return res.status(200).json({ message: "Product added to cart successfully" });
         }
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const removeProduct = async (req, res) => {
+const removeProduct = async (req, res, next) => {
     try {
         const cartId = req.query.cartId;
         const productId = req.query.productId;
@@ -166,8 +162,7 @@ const removeProduct = async (req, res) => {
 
         res.redirect("/cart");
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 

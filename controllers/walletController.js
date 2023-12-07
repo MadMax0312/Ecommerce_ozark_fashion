@@ -1,19 +1,11 @@
 const User = require("../models/userModel");
-const Address = require("../models/addressModel");
-const Cart = require("../models/cartModel");
-const Order = require("../models/orderModel");
 const { getTotalProductsInCart } = require("../number/cartNumber");
 const crypto = require("crypto");
 
 const Razorpay = require("razorpay");
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env;
 
-const razorpayInstance = new Razorpay({
-    key_id: RAZORPAY_ID_KEY,
-    key_secret: RAZORPAY_SECRET_KEY,
-});
-
-const loadWallet = async (req, res) => {
+const loadWallet = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
 
@@ -23,11 +15,11 @@ const loadWallet = async (req, res) => {
 
         res.render("wallet", { user: userData, count: totalProductsInCart });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const addMoneyToWallet = async (req, res) => {
+const addMoneyToWallet = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const { amount } = req.body;
@@ -40,12 +32,11 @@ const addMoneyToWallet = async (req, res) => {
 
         res.json({ success: true, amount: amount });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const updateWallet = async (req, res) => {
+const updateWallet = async (req, res, next) => {
     try {
         const { transactionType, transactionAmount, transactionDetails, razorpay_payment_id } = req.body;
 
@@ -68,12 +59,11 @@ const updateWallet = async (req, res) => {
 
         res.json({ success: true });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const verifyTransaction = async (req, res) => {
+const verifyTransaction = async (req, res, next) => {
     try {
         const { order_id, razorpay_payment_id, signature } = req.body;
 
@@ -90,12 +80,11 @@ const verifyTransaction = async (req, res) => {
             res.status(400).json({ error: "Payment verification failed" });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const loadReferral = async (req, res) => {
+const loadReferral = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const user = await User.findById({ _id: userId });
@@ -106,7 +95,7 @@ const loadReferral = async (req, res) => {
             res.render("referral", { user: user, count: totalProductsInCart });
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 

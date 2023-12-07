@@ -1,13 +1,9 @@
-const Admin = require("../models/adminModel");
-const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 const User = require("../models/userModel");
-
 const Order = require("../models/orderModel");
 
-const loadDashboard = async (req, res) => {
+const loadDashboard = async (req, res, next) => {
     try {
-        // const adminData = await Admin.findById({ _id:req.session.admin_id });
         const userCount = await User.find().countDocuments();
         const blockCount = await User.find({ isBlock: true }).countDocuments();
         const productCount = await Product.find().countDocuments();
@@ -184,11 +180,11 @@ const loadDashboard = async (req, res) => {
             order: orderSummary,
         });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const getSalesDataByDate = async (req, res) => {
+const getSalesDataByDate = async (req, res, next) => {
     try {
         const { startDate, endDate } = req.query;
 
@@ -199,14 +195,13 @@ const getSalesDataByDate = async (req, res) => {
         const salesData = await Order.find({
             createdAt: {
                 $gte: new Date(startDate), // Start of the day
-                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)), // End of the day
+                $lt: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)),
             },
         });
 
         res.json({ success: true, data: salesData });
     } catch (error) {
-        console.error("Error in getSalesDataByDate:", error.message);
-        res.status(500).json({ success: false, message: "Internal server error" });
+        next(error);
     }
 };
 

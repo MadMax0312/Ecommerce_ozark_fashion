@@ -1,7 +1,7 @@
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 
-const viewProducts = async (req, res) => {
+const viewProducts = async (req, res, next) => {
     try {
         var search = "";
         if (req.query.search) {
@@ -42,23 +42,21 @@ const viewProducts = async (req, res) => {
             currentPage: page,
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const loadaddProducts = async (req, res) => {
+const loadaddProducts = async (req, res, next) => {
     try {
         const categories = await Category.find();
 
         res.render("addProducts", { Category: categories });
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const addProducts = async (req, res) => {
+const addProducts = async (req, res, next) => {
     try {
         const productname = req.body.productname;
         const category = req.body.category;
@@ -104,8 +102,7 @@ const addProducts = async (req, res) => {
             res.render("addProducts", { message: "Something went wrong" });
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
@@ -116,7 +113,7 @@ const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
 
 ///--------------Unlisting products-----------------------------
 
-const unlistProduct = async (req, res) => {
+const unlistProduct = async (req, res, next) => {
     try {
         const id = req.query.id;
         const product = await Product.findById(id);
@@ -129,14 +126,13 @@ const unlistProduct = async (req, res) => {
             res.status(404).send("Product not found");
         }
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
 ///=====      Rendering edit products page   ============//
 
-const loadEditProducts = async (req, res) => {
+const loadEditProducts = async (req, res, next) => {
     try {
         const id = req.query.id;
 
@@ -150,14 +146,13 @@ const loadEditProducts = async (req, res) => {
             res.redirect("/admin/products");
         }
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
 ///==============Editing products=====================
 
-const editProduct = async (req, res) => {
+const editProduct = async (req, res, next) => {
     try {
         const id = req.body.id;
         let product = await Product.findById(id);
@@ -194,51 +189,42 @@ const editProduct = async (req, res) => {
             res.redirect("/admin/view-products");
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const deleteImage = async (req, res) => {
+const deleteImage = async (req, res, next) => {
     try {
         const imageName = req.query.imageName;
         const productId = req.query.productId;
 
-        try {
-            const product = await Product.findById(productId);
-            if (!product) {
-                return res.status(404).send("Product not found.");
-            }
+        const product = await Product.findById(productId);
 
-            const index = product.image.findIndex((img) => (Array.isArray(img) ? img[0] : img) === imageName);
-            if (index === -1) {
-                return res.status(404).send("Image not found in the product.");
-            }
-
-            product.image.splice(index, 1);
-
-            await product.save();
-
-            if (product.image.length === 0) {
-                return res.status(400).json({ error: "At least one image should be there for the product." });
-            }
-
-            if (product) {
-                return res.status(200).send("Image deleted successfully.");
-            } else {
-                return res.status(404).send("Product not found.");
-            }
-        } catch (error) {
-            console.error(error);
-            return res.status(500).send("Internal server error.");
+        if (!product) {
+            return res.status(404).send("Product not found.");
         }
+
+        const index = product.image.findIndex((img) => (Array.isArray(img) ? img[0] : img) === imageName);
+
+        if (index === -1) {
+            return res.status(404).send("Image not found in the product.");
+        }
+
+        product.image.splice(index, 1);
+
+        await product.save();
+
+        if (product.image.length === 0) {
+            return res.status(400).json({ error: "At least one image should be there for the product." });
+        }
+
+        return res.status(200).send("Image deleted successfully.");
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 };
 
-const addImages = async (req, res) => {
+const addImages = async (req, res, next) => {
     try {
         const productId = req.body.productId;
         const images = req.files.map((file) => file.filename);
@@ -257,8 +243,7 @@ const addImages = async (req, res) => {
             res.status(404).send("Product not found.");
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal server error.");
+        next(error);
     }
 };
 

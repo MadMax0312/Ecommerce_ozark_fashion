@@ -19,7 +19,7 @@ const razorpayInstance = new Razorpay({
     key_secret: RAZORPAY_SECRET_KEY,
 });
 
-const loadOrder = async (req, res) => {
+const loadOrder = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
@@ -27,7 +27,7 @@ const loadOrder = async (req, res) => {
 
         // Find the latest order for the user based on the order creation timestamp
         const latestOrder = await Order.findOne({ user: userId })
-            .sort({ createdAt: -1 }) // Sort in descending order to get the latest order first
+            .sort({ createdAt: -1 })
             .populate({
                 path: "address",
             })
@@ -42,12 +42,11 @@ const loadOrder = async (req, res) => {
             data: [latestOrder],
         });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const placeOrder = async (req, res) => {
+const placeOrder = async (req, res, next) => {
     try {
         const { productsData, totalAmount, address, paymentMethod, notes, couponDiscount, couponName } = req.body;
         const user_id = req.session.user_id;
@@ -111,12 +110,11 @@ const placeOrder = async (req, res) => {
             razorpayOrderID: razorpayOrder.id,
         });
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const handleRazorpayPayment = async (req, res) => {
+const handleRazorpayPayment = async (req, res, next) => {
     try {
         const { razorpayOrderID, paymentID, signature } = req.body;
 
@@ -141,7 +139,6 @@ const handleRazorpayPayment = async (req, res) => {
             await Cart.findOneAndDelete({ user_id: userId });
 
             if (!updatedOrder) {
-                console.error("Order not found or could not be updated");
                 return res.status(404).json({ error: "Order not found or could not be updated" });
             }
 
@@ -149,16 +146,14 @@ const handleRazorpayPayment = async (req, res) => {
 
             res.status(200).json({ message: "Razorpay Payment Success" });
         } else {
-            console.error("Razorpay signature mismatch");
             res.status(403).json({ error: "Razorpay signature mismatch" });
         }
     } catch (error) {
-        console.error("Error handling Razorpay payment:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const orderDetails = async (req, res) => {
+const orderDetails = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
@@ -194,12 +189,11 @@ const orderDetails = async (req, res) => {
             existingReview: existingReview,
         });
     } catch (error) {
-        console.error("Error fetching order details:", error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const updateStatus = async (req, res) => {
+const updateStatus = async (req, res, next) => {
     try {
         const { orderId, productId, productStatus } = req.body;
         const order = await Order.findOne({ _id: orderId, "products._id": productId });
@@ -259,12 +253,11 @@ const updateStatus = async (req, res) => {
 
         res.json({ success: true, product: updatedOrder });
     } catch (error) {
-        console.error("Error updating product status:", error.message);
-        res.status(500).json({ success: false, error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const checkWalletBalance = async (req, res) => {
+const checkWalletBalance = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const userData = await User.findById({ _id: userId });
@@ -272,11 +265,11 @@ const checkWalletBalance = async (req, res) => {
         const userWalletBalance = userData.wallet;
         res.json({ walletBalance: userWalletBalance });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const walletTransaction = async (req, res) => {
+const walletTransaction = async (req, res, next) => {
     try {
         const { transactionType, transactionAmount, transactionDetails } = req.body;
 
@@ -315,7 +308,7 @@ const walletTransaction = async (req, res) => {
 
         return res.status(200).json({ message: "Wallet transaction successful" });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
@@ -339,70 +332,56 @@ const invoiceDownload = async (req, res, next) => {
             date,
         };
 
-        const filepathName = path.resolve(__dirname, "../views/users/invoice.ejs");
-        const html = fs.readFileSync(filepathName).toString();
-        const ejsData = ejs.render(html, data);
+        res.render('invoice', {userData,orderData,data})
 
-        const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
-        await page.setContent(ejsData, { waitUntil: "networkidle0" });
-        const pdfBytes = await page.pdf({ format: "Letter" });
-        await browser.close();
-
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "attachment; filename=order_invoice.pdf");
-        res.send(pdfBytes);
+        
     } catch (error) {
-        console.error("Error in invoiceDownload:", error);
         next(error);
     }
 };
 
-const rateProduct = async (req, res) => {
+const rateProduct = async (req, res, next) => {
     try {
-      const productId = req.body.productId;
-      const rating = req.body.star;
-      const comment = req.body.comment; 
-      const userId = req.session.user_id;
-  
-      // Find the product by ID
-      const product = await Product.findById(productId);
-  
-      if (product) {
-        // Check if the user has already submitted a review for the product
-        const existingReview = product.reviews.find((review) => review.user.toString() === userId);
-  
-        if (existingReview) {
-          // User has already submitted a review, update the existing one
-          existingReview.rating = rating;
-          existingReview.comment = comment;
+        const productId = req.body.productId;
+        const rating = req.body.star;
+        const comment = req.body.comment;
+        const userId = req.session.user_id;
+
+        // Find the product by ID
+        const product = await Product.findById(productId);
+
+        if (product) {
+            // Check if the user has already submitted a review for the product
+            const existingReview = product.reviews.find((review) => review.user.toString() === userId);
+
+            if (existingReview) {
+                // User has already submitted a review, update the existing one
+                existingReview.rating = rating;
+                existingReview.comment = comment;
+            } else {
+                // User has not submitted a review, add a new one
+                product.reviews.push({ user: userId, rating: rating, comment: comment });
+            }
+
+            // Calculate the new average rating for the product
+            const totalRatings = product.reviews.length || 0;
+            const sumOfRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+            const averageRating = totalRatings > 0 ? sumOfRatings / totalRatings : 0;
+
+            // Update the product document with the new average rating
+            product.averageRating = averageRating;
+
+            // Save the updated product
+            await product.save();
+
+            return res.status(200).json({ message: "Thank You for you Response" });
         } else {
-          // User has not submitted a review, add a new one
-          product.reviews.push({ user: userId, rating: rating, comment: comment });
+            res.status(404).send("Product not found");
         }
-  
-        // Calculate the new average rating for the product
-        const totalRatings = product.reviews.length || 0;
-        const sumOfRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
-        const averageRating = totalRatings > 0 ? sumOfRatings / totalRatings : 0;
-  
-        // Update the product document with the new average rating
-        product.averageRating = averageRating;
-  
-        // Save the updated product
-        await product.save();
-
-        return res.status(200).json({ message: "Thank You for you Response" });
-
-      } else {
-        console.error("Product not found");
-        res.status(404).send("Product not found");
-      }
     } catch (error) {
-      console.error(error.message);
-      res.status(500).send("Internal Server Error");
+        next(error);
     }
-  };
+};
 
 module.exports = {
     loadOrder,
@@ -413,5 +392,5 @@ module.exports = {
     checkWalletBalance,
     walletTransaction,
     invoiceDownload,
-    rateProduct
+    rateProduct,
 };

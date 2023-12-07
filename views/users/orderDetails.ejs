@@ -250,7 +250,7 @@
                     <div class="border-start h-100"></div>
                     <div class="border-start h-100"></div>
                     <% if (product.status !== "Cancelled" && product.status !== "Out for Delivery" && product.status !== "Delivered" && product.status !== "Return") { %>
-                      <button class="btn btn-primary fw-normal mb-0 mr-2" id="cancelButton" style="font-size: 14px;">Cancel</button>
+                      <button class="btn btn-danger fw-normal mb-0 mr-2" id="cancelButton" style="font-size: 14px;">Cancel</button>
                     <% } else { %>
                       <button class="btn btn-secondary fw-normal mb-0 disabled-link text-muted mr-2" style="font-size: 14px;" disabled>Cancel</button>
                     <% } %>

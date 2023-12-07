@@ -79,9 +79,15 @@ include('../adminLayouts/navbar.ejs') %>
                                 </td>
                             </tr>
                             <% } } else { %>
-                            <tr>
-                                <td colspan="5">Product not Found</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="9" class="text-center">
+                                        <div class="error-content text-center">
+                                            <h1 class="error-title">No Products</h1>
+                                            <p>You have not added any Products yet.</p>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
                             <% } %>
                         </table>
 

@@ -1,27 +1,23 @@
 const Category = require("../models/categoryModel");
-const Product = require("../models/productModel");
-const User = require("../models/userModel");
-const randomstring = require("randomstring");
 
 ////////---------Category Section  -----------====================
 
-const loadCatogories = async (req, res) => {
+const loadCatogories = async (req, res, next) => {
     try {
-        const categories = await Category.find(); // Assuming you want to retrieve all categories from the database
+        const categories = await Category.find();
         res.render("categories", { Category: categories });
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
 //---------------Rendering Add category page---------======================
 
-const loadAddCategories = async (req, res) => {
+const loadAddCategories = async (req, res, next) => {
     try {
         res.render("addCategories");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
@@ -66,7 +62,7 @@ const addCategory = async (req, res) => {
 
 ///==============To unlist Category----=================================
 
-const unlistCategory = async (req, res) => {
+const unlistCategory = async (req, res, next) => {
     try {
         const id = req.query.id;
         const category = await Category.findById(id);
@@ -75,18 +71,15 @@ const unlistCategory = async (req, res) => {
             category.status = !category.status;
             await category.save();
             return res.status(200).json({ message: "Category Status Updated" });
-        } else {
-            res.status(404).send("Category not found"); // Send a 404 error if product is not found
         }
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error"); // Send a 500 error for internal server errors
+        next(error);
     }
 };
 
 //==============Rendering Edit Category Page--------=========================
 
-const loadEditCatogories = async (req, res) => {
+const loadEditCatogories = async (req, res, next) => {
     try {
         const id = req.query.id;
         console.log("ID:", id);
@@ -95,30 +88,27 @@ const loadEditCatogories = async (req, res) => {
         console.log(category);
 
         if (category) {
-            res.render("editCategories", { data: category }); // Pass the category object to the template
+            res.render("editCategories", { data: category });
         } else {
             res.redirect("/admin/categories");
         }
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
 ///=============Editing Category==========///////////////////
 
-const editCategory = async (req, res) => {
+const editCategory = async (req, res, next) => {
     try {
         const id = req.body.id;
         let category = await Category.findById(id);
 
         if (category) {
-            // Update product fields
             category.categoryname = req.body.categoryname;
             category.description = req.body.categorydes;
             category.discountPercentage = req.body.Offer;
 
-            // Save the updated product
             const updatedCategory = await category.save();
 
             if (updatedCategory) {
@@ -130,7 +120,7 @@ const editCategory = async (req, res) => {
             res.redirect("/admin/categories");
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 

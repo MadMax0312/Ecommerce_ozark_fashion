@@ -3,7 +3,6 @@ const { getTotalProductsInCart } = require("../number/cartNumber");
 const Address = require("../models/addressModel");
 const Cart = require("../models/cartModel");
 const Coupon = require("../models/couponModel");
-const Order = require("../models/orderModel");
 
 const calculateDiscountedPrice = (product, quantity) => {
     const productPrice = product.price;
@@ -27,7 +26,7 @@ const calculateDiscountedPrice = (product, quantity) => {
     };
 };
 
-const loadCheckout = async (req, res) => {
+const loadCheckout = async (req, res, next) => {
     try {
         const userId = req.session.user_id;
         const userData = await User.findById({ _id: userId });
@@ -70,12 +69,11 @@ const loadCheckout = async (req, res) => {
             coupon: couponData,
         });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
-const getAddressById = async (req, res) => {
+const getAddressById = async (req, res, next) => {
     try {
         const addressId = req.params.id;
         const userId = req.session.user_id;
@@ -88,12 +86,11 @@ const getAddressById = async (req, res) => {
         }
         res.status(200).json(address);
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const updateAddress = async (req, res) => {
+const updateAddress = async (req, res, next) => {
     const addressId = req.params.id;
 
     const updatedAddress = req.body;
@@ -113,17 +110,16 @@ const updateAddress = async (req, res) => {
                     "address.$.district": updatedAddress.district,
                 },
             },
-            { new: true } // { new: true } ensures the updated document is returned
+            { new: true }
         );
 
         res.status(200).json(updated);
     } catch (error) {
-        console.error("Error updating address:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const addAddress = async (req, res) => {
+const addAddress = async (req, res, next) => {
     try {
         const { c_diff_fname, c_diff_mobile, c_diff_postal_state, c_diff_state_district, c_diff_city, c_diff_pincode } =
             req.body;
@@ -158,12 +154,11 @@ const addAddress = async (req, res) => {
 
         res.json({ message: "Address added successfully" });
     } catch (error) {
-        console.error("Error adding address:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        next(error);
     }
 };
 
-const applyCoupon = async (req, res) => {
+const applyCoupon = async (req, res, next) => {
     try {
         const { couponName } = req.body;
         const userId = req.session.user_id;
@@ -204,8 +199,7 @@ const applyCoupon = async (req, res) => {
             totalAmount: totalAmountAfterDiscount,
         });
     } catch (error) {
-        console.error("Error applying coupon:", error.message);
-        res.json({ success: false, error: "Internal server error" });
+        next(error);
     }
 };
 

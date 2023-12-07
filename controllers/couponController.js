@@ -1,29 +1,24 @@
-const Admin = require("../models/adminModel");
-const Category = require("../models/categoryModel");
-const Product = require("../models/productModel");
-const User = require("../models/userModel");
-const Order = require("../models/orderModel");
 const Coupon = require("../models/couponModel");
 
-const loadCoupons = async (req, res) => {
+const loadCoupons = async (req, res, next) => {
     try {
         const couponData = await Coupon.find();
 
         res.render("coupons", { data: couponData });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const loadAddCoupons = async (req, res) => {
+const loadAddCoupons = async (req, res, next) => {
     try {
         res.render("addCoupons");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const addCoupon = async (req, res) => {
+const addCoupon = async (req, res, next) => {
     try {
         const name = req.body.couponName;
         const discountPercentage = req.body.discount;
@@ -49,22 +44,22 @@ const addCoupon = async (req, res) => {
             res.render("addCoupons", { message: "Something went wrong" });
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const loadEditCoupon = async (req, res) => {
+const loadEditCoupon = async (req, res, next) => {
     try {
         const couponId = req.query.id;
         const couponData = await Coupon.findById({ _id: couponId });
 
         res.render("editCoupons", { data: couponData });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const editCoupon = async (req, res) => {
+const editCoupon = async (req, res, next) => {
     try {
         const id = req.body.id;
         let coupon = await Coupon.findById(id);
@@ -88,11 +83,11 @@ const editCoupon = async (req, res) => {
             res.redirect("/admin/coupons");
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const deleteCoupon = async (req, res) => {
+const deleteCoupon = async (req, res, next) => {
     try {
         const couponId = req.query.id;
 
@@ -100,7 +95,7 @@ const deleteCoupon = async (req, res) => {
 
         res.redirect("/admin/coupons");
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
