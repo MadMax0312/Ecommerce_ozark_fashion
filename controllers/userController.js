@@ -65,8 +65,6 @@ const verifyOtp = async (req, res) => {
             lowerCaseAlphabets: false,
         });
 
-        console.log(otpCode);
-
         const otpcurTime = Date.now() / 1000;
         const otpExpiry = otpcurTime + 45;
 
@@ -459,6 +457,7 @@ const loadShop = async (req, res) => {
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
         const limit = 9;
+        const sort = req.query.sort
 
         const filterOptions = {};
 
@@ -474,6 +473,71 @@ const loadShop = async (req, res) => {
         if (req.query.size) {
             filterOptions.size = req.query.size;
         }
+
+        const sortOptions = {};
+
+        if (sort === 'lowToHigh') {
+            sortOptions.price = 1; // Ascending order
+        } else if (sort === 'highToLow') {
+            sortOptions.price = -1; // Descending order
+        } else {
+            // Default sorting logic if req.query.sort is not provided
+            sortOptions.createdAt = -1; // or _id: -1 for descending order
+        }
+
+        const pipeline = [
+            {
+                $match: {
+                    $and: [
+                        {
+                            $or: [
+                                { productname: { $regex: ".*" + search + ".*", $options: "i" } },
+                                { size: { $regex: ".*" + search + ".*", $options: "i" } },
+                            ],
+                        },
+                        filterOptions,
+                        { status: true }, // Only get products with status true
+                    ],
+                },
+            },
+            {
+                $lookup: {
+                    from: "categories", // Assuming your category collection is named "categories"
+                    localField: "category",
+                    foreignField: "_id",
+                    as: "category",
+                },
+            },
+            {
+                $unwind: "$category",
+            },
+            {
+                $sort: sortOptions,
+            },
+            {
+                $skip: (page - 1) * limit,
+            },
+            {
+                $limit: limit,
+            },
+            {
+                $project: {
+                    _id: 1,
+                    productname: 1,
+                    size: 1,
+                    price: 1,
+                    description: 1,
+                    image: 1,
+                    quantity: 1,
+                    status: 1,
+                    createdAt: 1,
+                    discountPercentage: 1,
+                    discountedPrice: 1,
+                    averageRating: 1,
+                    "category.categoryname": 1,
+                },
+            },
+        ];
 
         const countPipeline = [
             {
@@ -501,61 +565,7 @@ const loadShop = async (req, res) => {
 
         const totalPages = Math.ceil(count / limit);
 
-        const pipeline = [
-            {
-                $match: {
-                    $and: [
-                        {
-                            $or: [
-                                { productname: { $regex: ".*" + search + ".*", $options: "i" } },
-                                { size: { $regex: ".*" + search + ".*", $options: "i" } },
-                            ],
-                        },
-                        filterOptions,
-                        { status: true }, // Only get products with status true
-                    ],
-                },
-            },
-            {
-                $skip: (page - 1) * limit,
-            },
-            {
-                $limit: limit,
-            },
-            {
-                $lookup: {
-                    from: "categories", // Assuming your category collection is named "categories"
-                    localField: "category",
-                    foreignField: "_id",
-                    as: "category",
-                },
-            },
-            {
-                $unwind: "$category",
-            },
-            {
-                $project: {
-                    _id: 1,
-                    productname: 1,
-                    size: 1,
-                    price: 1,
-                    description: 1,
-                    image: 1,
-                    quantity: 1,
-                    status: 1,
-                    createdAt: 1,
-                    discountPercentage: 1,
-                    discountedPrice: 1,
-                    "category.categoryname": 1,
-                },
-            },
-        ];
-
         const productData = await Product.aggregate(pipeline);
-
-        productData.forEach((product) => {
-            product.price = parseFloat(product.price);
-        });
 
         const categoryProductCounts = await getCategoryProductCounts();
 
@@ -564,8 +574,8 @@ const loadShop = async (req, res) => {
             Product: productData,
             totalPages: totalPages,
             currentPage: page,
+            sortOptions: sort,
             search: search,
-            sortOption: req.query.sort,
             count: totalProductsInCart,
             categoryProductCounts: categoryProductCounts,
             filterOptions: {
@@ -576,7 +586,6 @@ const loadShop = async (req, res) => {
         });
     } catch (error) {
         console.log(error.message);
-        // Handle error and send an appropriate response
         res.status(500).send("Internal Server Error");
     }
 };
@@ -593,7 +602,33 @@ const getProductsByCategory = async (req, res) => {
         const search = req.query.search ? req.query.search : "";
         const userId = req.session.user_id;
         const totalProductsInCart = await getTotalProductsInCart(userId);
-        const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+        const page = parseInt(req.query.page) || 1;
+
+        const sort = req.query.sort;
+        const sortOptions = {};
+
+        if (sort === 'lowToHigh') {
+            sortOptions.price = 1;
+        } else if (sort === 'highToLow') {
+            sortOptions.price = -1;
+        } else {
+            sortOptions.createdAt = -1;
+        }
+
+        const filterOptions = {};
+
+        // Price Filter
+        if (req.query.minPrice && req.query.maxPrice) {
+            filterOptions.price = {
+                $gte: parseFloat(req.query.minPrice),
+                $lte: parseFloat(req.query.maxPrice),
+            };
+        }
+
+        // Size Filter
+        if (req.query.size) {
+            filterOptions.size = req.query.size;
+        }
 
         const categoryObjectId = await Category.findOne({ categoryname: categoryName }).select("_id");
 
@@ -616,8 +651,10 @@ const getProductsByCategory = async (req, res) => {
         const products = await Product.find({
             category: categoryObjectId,
             status: true,
+            ...filterOptions,
         })
             .populate("category")
+            .sort(sortOptions) // Apply sorting options
             .skip(skip)
             .limit(limit);
 
@@ -626,25 +663,34 @@ const getProductsByCategory = async (req, res) => {
             status: true,
         });
 
+        const totalPages = Math.ceil(totalProductsCount / limit);
+
         const categoryProductCounts = await getCategoryProductCounts();
         categoryProductCounts.sort((a, b) => a.categoryName.localeCompare(b.categoryName));
-
+        
         res.render("categoryMen", {
             user: req.session.user_id,
             categoryName: categoryName,
             products: products,
             categoryProductCounts: categoryProductCounts,
             currentPage: page,
-            totalPages: Math.ceil(totalProductsCount / limit),
+            totalPages: totalPages,
             search: search,
             count: totalProductsInCart,
+            sortOptions: sort,
             categoryDiscount: categoryDiscount,
+            filterOptions: {
+                minPrice: req.query.minPrice,
+                maxPrice: req.query.maxPrice,
+                size: req.query.size,
+            },
         });
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Internal Server Error");
     }
 };
+
 
 ///===========Rendering product info page -=-----------//
 
@@ -655,7 +701,6 @@ const loadProductInfo = async (req, res) => {
         const totalProductsInCart = await getTotalProductsInCart(userId);
         const product = await Product.findById(id).populate("category");
         const userRatingsAndReviews = await Product.find({ _id: id }).select("reviews").populate("reviews.user");
-        console.log(userRatingsAndReviews[0].reviews)
 
         if (!product) {
             return res.status(404).send("Product not found");

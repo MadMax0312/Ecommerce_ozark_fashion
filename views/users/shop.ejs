@@ -94,7 +94,7 @@
 
 
 .rating svg {
-  width: 2rem;
+  width: 1.7rem;
   height: 2rem;
   overflow: visible;
   fill: transparent;
@@ -180,7 +180,7 @@
             <div class="col-md-9 order-2">
                 <div class="d-flex justify-content-end mb-3">
                     <form class="form-inline">
-                        <div class="input-group">
+                        <div class="input-group mr-2">
                             <input type="text" class="form-control form-control-sm" name="search" placeholder="Search" />
                             <div class="input-group-append">
                                 <button class="btn btn-primary btn-sm" type="submit">Search</button>
@@ -188,7 +188,7 @@
                         </div>
                     </form>
                 </div>
-
+                
                 <div class="row" style="text-align: center;">
                     <% if (Product.length > 0) { 
                         for (let i = 0; i < Product.length; i++) { %>
@@ -214,18 +214,20 @@
                                             </span>
                                             <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) { %>
                                                 <span class="discounted-price offer-icon">
-                                                    <i data-feather="tag"></i> ₹<%= Product[i].discountedPrice %>
+                                                     ₹<%= Product[i].discountedPrice %>
                                                 </span>
                                             <% } %>
+
                                         </div>
                                         <div class="rating p-0">
-                                            <% for (let i = 1; i <= 5; i++) { %>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                                    <path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                                        fill="<%= i <= Math.round(Product[i].averageRating) ? 'gold' : 'gray' %>"></path>
+                                            <% for (let j = 1; j <= 5; j++) { %>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+                                                    <path pathLength="360" d="M12,17.27L18.18,21,L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                                                        fill="<%= j <= Math.round(Product[i].averageRating) ? 'gold' : '#CCCCCC' %>"></path>
                                                 </svg>
                                             <% } %>
                                         </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -242,19 +244,19 @@
                         <ul class="pagination justify-content-center">
                             <% if (currentPage > 1) { %>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                    <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>" aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
                             <% } %>
                             <% for(let j=1; j <= totalPages; j++){ %>
                                 <li class="page-item <%= j === currentPage ? 'active' : '' %>">
-                                    <a class="page-link" href="?page=<%= j %>"><%= j %></a>
+                                    <a class="page-link" href="?page=<%= j %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"><%= j %></a>
                                 </li>
                             <% } %>
                             <% if (currentPage < totalPages) { %>
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                                    <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>" aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
@@ -262,6 +264,7 @@
                         </ul>
                     </nav>
                 <% } %>
+                
             </div>
 
             <div class="col-md-3 order-1 mb-5 mb-md-0">
@@ -279,6 +282,24 @@
                             </li>
                           <% }); %>
                       </ul>
+                </div>
+
+                <div class="border p-4 rounded mb-4">
+                    <h3 class="mb-3 h6 text-uppercase text-black d-block">Sort</h3>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-1">
+                            <a href="/shop?sort=lowToHigh" class="d-flex align-items-center sort-option" data-sort="lowToHigh">
+                                <span>Price low to high</span>
+                                <i class="fas fa-sort-amount-up ml-auto"></i>
+                            </a>
+                        </li>
+                        <li class="mb-1">
+                            <a href="/shop?sort=highToLow" class="d-flex align-items-center sort-option" data-sort="highToLow">
+                                <span>Price high to low</span>
+                                <i class="fas fa-sort-amount-down ml-auto"></i>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
                 <div class="border p-4 rounded mb-4">
@@ -304,20 +325,14 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-
 <script>
     function applyFilters() {
-        const minPrice = document.getElementById('minPrice').value;
-        const maxPrice = document.getElementById('maxPrice').value;
-        const size = document.getElementById('size').value;
+        const minPrice = encodeURIComponent(document.getElementById("minPrice").value || "");
+        const maxPrice = encodeURIComponent(document.getElementById("maxPrice").value || "");
+        const size = encodeURIComponent(document.getElementById("size").value || "");
 
         window.location.href = `/shop?page=1&minPrice=${minPrice || ''}&maxPrice=${maxPrice || ''}&size=${size || ''}`;
     }
-</script>
-
-<script>
-    feather.replace();
 </script>
 
 

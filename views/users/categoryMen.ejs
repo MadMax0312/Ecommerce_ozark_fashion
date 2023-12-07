@@ -34,7 +34,7 @@
 
     .center-line {
         position: absolute;
-        height: 2px;
+        height: 1px;
         width: 100%;
         background-color: #333;
         top: 50%;
@@ -48,13 +48,12 @@
         align-items: center;
         position: relative;
         margin-top: 10px;
-        font-weight: 700;
+        font-weight: 500;
     }
 
     .actual-price {
         position: relative;
         z-index: 2;
-        padding-right: 5px;
     }
 
     .discounted-price {
@@ -62,12 +61,15 @@
         z-index: 2;
         padding-left: 5px;
     }
+
     .card-text {
         color: black;
     }
+
     .card-title {
         font-size: 22px;
     }
+
     #filterForm {
         max-width: 100%;
     }
@@ -79,10 +81,87 @@
     #filterForm button {
         width: 100%;
     }
-    .d-block{
-      font-weight: 700;
-      color: #e44d26;
+
+    .d-block {
+        font-weight: 700;
+        color: #e44d26;
     }
+    .rating {
+  display: flex;
+  justify-content: center;
+  --fill: #ffc73a;
+}
+
+
+.rating svg {
+  width: 1.7rem;
+  height: 2rem;
+  overflow: visible;
+  fill: transparent;
+  stroke: var(--stroke);
+  stroke-linejoin: bevel;
+  stroke-dasharray: 12;
+  animation: idle 4s linear infinite;
+  transition: stroke 0.2s, fill 0.5s;
+}
+
+@keyframes idle {
+  from {
+    stroke-dashoffset: 24;
+  }
+}
+
+.rating label:hover svg {
+  stroke: var(--fill);
+}
+
+.rating input:checked ~ label svg {
+  transition: 0s;
+  animation: idle 4s linear infinite, yippee 0.75s backwards;
+  fill: var(--fill);
+  stroke: var(--fill);
+  stroke-opacity: 0;
+  stroke-dasharray: 0;
+  stroke-linejoin: miter;
+  stroke-width: 8px;
+}
+
+@keyframes yippee {
+  0% {
+    transform: scale(1);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30% {
+    transform: scale(0);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30.1% {
+    stroke: var(--fill);
+    stroke-dasharray: 0;
+    stroke-linejoin: miter;
+    stroke-width: 8px;
+  }
+
+  60% {
+    transform: scale(1.2);
+    fill: var(--fill);
+  }
+}
+
 </style>
 
 <div class="bg-light py-3">
@@ -131,7 +210,6 @@
                                 <p class="card-text category" style="margin-bottom: 0;">
                                     <%= product.category.categoryname %>
                                 </p>
-                                <p class="card-text size" style="margin-bottom: 0;">Size: <%= product.size %></p>
 
                                 <div class="prices">
                                   <span class="actual-price pl-4">
@@ -165,43 +243,63 @@
                 <br/>
 
                 <% if (typeof totalPages !== 'undefined') { %>
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                        <% if (currentPage > 1) { %>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <% } %> <% for(let j=1; j <= totalPages; j++){ %>
-                        <li class="page-item <%= j === currentPage ? 'active' : '' %>">
-                            <a class="page-link" href="?page=<%= j %>"><%= j %></a>
-                        </li>
-                        <% } %> <% if (currentPage < totalPages) { %>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                        <% } %>
-                    </ul>
-                </nav>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <% if (currentPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="/shop/category/<%= categoryName %>?page=<%= currentPage - 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <% } %>
+                            <% for(let j=1; j <= totalPages; j++){ %>
+                                <li class="page-item <%= j === currentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="/shop/category/<%= categoryName %>?page=<%= j %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"><%= j %></a>
+                                </li>
+                            <% } %>
+                            <% if (currentPage < totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="/shop/category/<%= categoryName %>?page=<%= currentPage + 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
                 <% } %>
             </div>
-
             <div class="col-md-3 order-1 mb-5 mb-md-0">
                 <div class="border p-4 rounded mb-4">
-                    <h3 class="mb-3 h6 text-uppercase text-black d-block ">Categories</h3>
+                    <h3 class="mb-3 h6 text-uppercase text-black d-block">Categories</h3>
                     <ul class="list-unstyled mb-0">
-                        <% categoryProductCounts .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
-                        .forEach(categoryCount => { %>
-                        <li class="mb-1">
-                            <a href="/shop/category/<%= categoryCount.categoryName %>" class="d-flex">
+                        <% categoryProductCounts
+                          .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
+                          .forEach(categoryCount => { %>
+                            <li class="mb-1">
+                              <a href="/shop/category/<%= categoryCount.categoryName %>" class="d-flex">
                                 <span><%= categoryCount.categoryName %></span>
                                 <span class="text-black ml-auto">(<%= categoryCount.productCount %>)</span>
+                              </a>
+                            </li>
+                          <% }); %>
+                      </ul>
+                </div>
+
+                <div class="border p-4 rounded mb-4">
+                    <h3 class="mb-3 h6 text-uppercase text-black d-block">Sort</h3>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-1">
+                            <a href="/shop/category/<%= categoryName %>?sort=lowToHigh" class="d-flex align-items-center sort-option" data-sort="lowToHigh">
+                                <span>Price low to high</span>
+                                <i class="fas fa-sort-amount-up ml-auto"></i>
                             </a>
                         </li>
-                        <% }); %>
+                        <li class="mb-1">
+                            <a href="/shop/category/<%= categoryName %>?sort=highToLow" class="d-flex align-items-center sort-option" data-sort="highToLow">
+                                <span>Price high to low</span>
+                                <i class="fas fa-sort-amount-down ml-auto"></i>
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
@@ -232,11 +330,15 @@
 
 <script>
     function applyFilters() {
-        const minPrice = document.getElementById("minPrice").value;
-        const maxPrice = document.getElementById("maxPrice").value;
-        const size = document.getElementById("size").value;
+        const minPrice = encodeURIComponent(document.getElementById("minPrice").value || "");
+        const maxPrice = encodeURIComponent(document.getElementById("maxPrice").value || "");
+        const size = encodeURIComponent(document.getElementById("size").value || "");
 
-        window.location.href = `/shop?page=1&minPrice=${minPrice || ""}&maxPrice=${maxPrice || ""}&size=${size || ""}`;
+        const categoryName = '<%= categoryName %>';
+
+        alert(categoryName)
+
+        window.location.href = `/shop/category/${categoryName}?page=1&minPrice=${minPrice || ""}&maxPrice=${maxPrice || ""}&size=${size || ""}`;
     }
 </script>
 

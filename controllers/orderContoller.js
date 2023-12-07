@@ -361,9 +361,7 @@ const invoiceDownload = async (req, res, next) => {
 const rateProduct = async (req, res) => {
     try {
       const productId = req.body.productId;
-      console.log(productId)
       const rating = req.body.star;
-      console.log(rating)
       const comment = req.body.comment; 
       const userId = req.session.user_id;
   
