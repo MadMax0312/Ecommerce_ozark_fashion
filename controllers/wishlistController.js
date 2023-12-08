@@ -11,7 +11,6 @@ const loadWishlist = async (req, res, next) => {
         const user = req.session.user_id;
 
         const wishlist = await Wishlist.find({ user_id: user }).populate("product");
-        console.log(wishlist);
 
         res.render("wishlist", { data: wishlist, user: user, count: totalProductsInCart });
     } catch (error) {

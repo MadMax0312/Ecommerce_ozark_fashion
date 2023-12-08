@@ -98,13 +98,40 @@
 
           <div class="pagination-container">
             <ul class="pagination">
+                <% const maxVisiblePages = 5; // Adjust this value to control the number of visible pages %>
+        
+                <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>">&laquo;</a>
+                    </li>
+                <% } %>
+        
                 <% for (let i = 1; i <= totalPages; i++) { %>
-                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    <% if (i === 1 || i === totalPages || (i >= currentPage - Math.floor(maxVisiblePages / 2) && i <= currentPage + Math.floor(maxVisiblePages / 2))) { %>
+                        <% if (i !== 1 && i !== totalPages && i > 2 && i < currentPage - Math.floor(maxVisiblePages / 2)) { %>
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        <% } %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                        <% if (i !== 1 && i !== totalPages && i < totalPages - 1 && i > currentPage + Math.floor(maxVisiblePages / 2)) { %>
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        <% } %>
+                    <% } %>
+                <% } %>
+        
+                <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>">&raquo;</a>
                     </li>
                 <% } %>
             </ul>
         </div>
+        
 
       </div>
   </div>

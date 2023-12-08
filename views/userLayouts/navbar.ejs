@@ -1,28 +1,68 @@
+
+
+<style>
+
+.navbar {
+    justify-content: center;
+}
+.nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.navbar-toggler {
+    padding: 0.25rem 0.75rem;
+    font-size: .75rem;
+    line-height: 1;
+    background-color: transparent;
+    border: none;
+    border-color: black;
+}
+.navbar-light .navbar-nav .nav-link {
+    color: #000
+}
+    @media (min-width: 768px) {
+        .navbar-expand-md .navbar-nav .nav-link {
+            padding-right: 2.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .navbar-light .navbar-nav .nav-link {
+            color: #000;
+        }
+    }
+</style>
+
 <header class="site-navbar" role="banner">
     <div class="container">
         <div class="row align-items-center py-3">
-            <div class="col-7 col-md-3 order-1">
-                <div class="site-logo">
+            <div class="col-5 col-md-3 order-1">
+                <div >
                     <a href="/" class="js-logo-clone" style="font-size: 24px; width: 150px;">O Z A R K</a>
                 </div>
             </div>
-            <div class="col-12 col-md-6 order-3 order-md-2 text-center">
-                <nav class="site-navigation text-center" role="navigation">
-                    <ul class="site-menu">
-                        <li><a href="/" style="font-size: 18px;">Home</a></li>
-                        <li><a href="/shop" style="font-size: 18px;">Shop</a></li>
-                        <li><a href="/about" style="font-size: 18px;">About</a></li>
-                        <li><a href="/contact" style="font-size: 18px;">Contact</a></li>
-                    </ul>
+            <div class="col-12 col-md-6 order-3 order-md-2">
+                <nav class="navbar navbar-expand-md navbar-light p-0">
+                    <button class="navbar-toggler" style="border-color: #000;" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarToggler">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item"><a href="/" class="nav-link" style="font-size: 18px;">Home</a></li>
+                            <li class="nav-item"><a href="/shop" class="nav-link" style="font-size: 18px;">Shop</a></li>
+                            <li class="nav-item"><a href="/about" class="nav-link" style="font-size: 18px;">About</a></li>
+                            <li class="nav-item"><a href="/contact" class="nav-link" style="font-size: 18px;">Contact</a></li>
+                        </ul>
+                    </div>
                 </nav>
             </div>
-            <div class="col-5 col-md-3 order-2 order-md-3 text-right">
+            <div class="col-7 col-md-3 order-2 order-md-3 text-right">
                 <div class="site-top-icons">
                     <ul>
                         <% if (user) { %>
-                            <li class="ml-2"><a href="/logout" class="btn btn-sm" style="border-width: 1px; border-color: #000;">Logout</a></li>
+                            <li class="m-0"><a href="/logout" style="font-size: 20px;">Logout</a></li>
                         <% } else { %>
-                            <li class="ml-2"><a href="/login" class="btn btn-sm" style="border-width: 1px; border-color: #000;">Login</a></li>
+                            <li><a href="/login" style="font-size: 20px;">Login</a></li>
                         <% } %>
                         <li><a href="/userProfile" style="font-size: 18px;"><span class="icon icon-person"></span></a></li>
                         <li><a href="/wishlist" style="font-size: 18px;"><span class="icon icon-heart-o"></span></a></li>
@@ -30,15 +70,9 @@
                             <a href="/cart" class="site-cart" style="font-size: 18px;">
                                 <span class="icon icon-shopping_cart"></span>
                                 <% if (user) { %>
-                                    <span class="count" style="font-size: 14px;"> <%= count %>  </span>
-                                <% } else { %>
-                                    
+                                    <span class="count" style="font-size: 14px;"><%= count %></span>                                  
                                 <% } %>
-                                
                             </a>
-                        </li>
-                        <li class="d-inline-block d-md-none ml-md-0">
-                            <a href="#" class="site-menu-toggle js-menu-toggle" style="font-size: 18px;"><span class="icon-menu"></span></a>
                         </li>
                     </ul>
                 </div>

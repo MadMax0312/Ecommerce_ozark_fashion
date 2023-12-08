@@ -7,11 +7,9 @@ const cors = require("cors");
 const express = require("express");
 const adminRoute = require("./routes/adminRoute");
 const userRoute = require("./routes/userRoute");
+const passport = require('passport');
 
-mongoose.connect("mongodb+srv://thahirmuhammedap:rUAxPc9lbK8Rfsy4@clusterozark.x3veijw.mongodb.net/?retryWrites=true&w=majority", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(console.log("dfdf"));
+mongoose.connect(process.env.MONGO_URL)
 
 const app = express();
 app.use(cors());
@@ -23,6 +21,9 @@ app.use(
         saveUninitialized: true,
     })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.set("view engine", "ejs");
 app.set("views", "./views/users");

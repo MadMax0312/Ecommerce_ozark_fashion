@@ -3,6 +3,10 @@ const session = require("express-session");
 const auth = require("../middleware/userAuth");
 const errorHandler =require('../middleware/errorHandler')
 const config = require("../config/config");
+const passport = require("passport");
+const googleStrategy = require( 'passport-google-oauth2' ).Strategy;
+const User = require("../models/userModel")
+const shortid = require("shortid");
 
 const userController = require("../controllers/userController");
 const wishlistController = require("../controllers/wishlistController");
@@ -21,6 +25,72 @@ user_route.use(
         saveUninitialized: true, 
     })
 );
+
+passport.use(new googleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret:process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL:"/auth/google/callback"
+  },async (accessToken,refreshToken,profile,done) => {
+
+    try {
+      const user = await User.findOne({email: profile.emails[0].value});
+      const referralCode = shortid.generate();
+  
+      if(user) {
+        done(null,user);
+      } else {
+        const newUser = new User({
+          email: profile.emails[0].value,
+          first_name: profile.displayName,
+          is_verified:1,
+          mobile: "dummyMobile",
+          password: "dummyPassword",
+          referralCode:referralCode,
+        });
+  
+        await newUser.save();
+        done(null,newUser);
+      }
+    } catch (error) {
+      done(error,false);
+    }
+  }
+  ))
+  
+  passport.serializeUser((user,done) => {
+    done(null,user.id); //Searialize user's id instead of profile
+  })
+  
+  
+  passport.deserializeUser(async(id,done)=> {
+    try {
+      const user= await User.findById(id);
+      done(null,user);
+    } catch (error) {
+      done(error,false);
+    }
+  })
+  
+  
+  user_route.get('/auth/google',passport.authenticate('google',{
+    scope:["profile","email"]
+  }));
+  
+  user_route.get('/auth/google/callback',passport.authenticate('google',{
+    failureRedirect:'/login'
+  }), async function (req,res) {
+    console.log(req.user.email);
+    const userEmail = req.user.email;
+    const user = await User.findOne({email:userEmail});
+  
+    if(user){
+      req.session.user_id = user._id;
+      res.redirect('/')
+    } else {
+      res.redirect('/login')
+    }
+  
+  })
 
 user_route.set("view engine", "ejs");
 user_route.set("views", "./views/users");
@@ -65,19 +135,19 @@ user_route.get('/address',auth.isLogin,profileController.loadAddress);
 user_route.post('/addAddress',auth.isLogin,profileController.addAddress);
 user_route.get('/editAddress',auth.isLogin,profileController.loadEditAddress);
 user_route.post('/editAddress',auth.isLogin,profileController.editAddress);
-user_route.delete('/deleteAddress',profileController.deleteAddress);
+user_route.delete('/deleteAddress',auth.isLogin, profileController.deleteAddress);
 user_route.post('/updateUser',auth.isLogin,profileController.updateUser);
 user_route.post('/resetPassword',auth.isLogin,profileController.resetPassword);
 
 
 user_route.get('/viewOrder',auth.isLogin,profileController.loadOrderPage);
-user_route.get('/orderDetails', profileController.viewDetails);
+user_route.get('/orderDetails', auth.isLogin, profileController.viewDetails);
 
 
-user_route.get('/wallet', walletController.loadWallet);
-user_route.post('/creditMoney', walletController.addMoneyToWallet);
-user_route.post('/updateWallet', walletController.updateWallet);
-user_route.post('/verifypayment', walletController.verifyTransaction);
+user_route.get('/wallet', auth.isLogin, walletController.loadWallet);
+user_route.post('/creditMoney', auth.isLogin, walletController.addMoneyToWallet);
+user_route.post('/updateWallet', auth.isLogin, walletController.updateWallet);
+user_route.post('/verifypayment', auth.isLogin, walletController.verifyTransaction);
 
 user_route.get('/referral', auth.isLogin, walletController.loadReferral);
 
@@ -102,7 +172,7 @@ user_route.get("/cart", auth.isLogin, cartController.loadCart);
 
 user_route.post("/addToCart", cartController.addToCart);
 
-user_route.post("/update-cart", cartController.updateCart);
+user_route.post("/update-cart", auth.isLogin, cartController.updateCart);
 
 user_route.get("/get-max-stock/:id", auth.isLogin, cartController.getMaxStock);
 
@@ -113,17 +183,17 @@ user_route.get("/checkout", auth.isLogin, checkoutController.loadCheckout);
 
 user_route.get('/address/:id', auth.isLogin, checkoutController.getAddressById);
 
-user_route.post("/updateAddress/:id", checkoutController.updateAddress);
+user_route.post("/updateAddress/:id", auth.isLogin, checkoutController.updateAddress);
 
-user_route.post("/addNewAddress", checkoutController.addAddress);
+user_route.post("/addNewAddress", auth.isLogin, checkoutController.addAddress);
 
-user_route.post("/applyCoupon", checkoutController.applyCoupon);
+user_route.post("/applyCoupon", auth.isLogin, checkoutController.applyCoupon);
 
 //===================== O R D E R ========================================
 
 user_route.get("/order", auth.isLogin, orderContoller.loadOrder);
 
-user_route.post("/place-order", orderContoller.placeOrder);
+user_route.post("/place-order", auth.isLogin, orderContoller.placeOrder);
 
 user_route.get("/about", userController.loadAbout);
 
@@ -131,15 +201,15 @@ user_route.get('/invoice', auth.isLogin,  orderContoller.orderDetails);
 
 user_route.get('/downloadInvoice', auth.isLogin, orderContoller.invoiceDownload)
 
-user_route.post('/updateProductStatus', orderContoller.updateStatus);
+user_route.post('/updateProductStatus', auth.isLogin, orderContoller.updateStatus);
 
-user_route.post('/razorpay-payment', orderContoller.handleRazorpayPayment);
+user_route.post('/razorpay-payment', auth.isLogin, orderContoller.handleRazorpayPayment);
 
 user_route.get('/checkBalance', auth.isLogin, orderContoller.checkWalletBalance);
 
-user_route.post('/walletTransaction', orderContoller.walletTransaction);
+user_route.post('/walletTransaction', auth.isLogin, orderContoller.walletTransaction);
 
-user_route.post('/submit-rating-review', orderContoller.rateProduct);
+user_route.post('/submit-rating-review', auth.isLogin, orderContoller.rateProduct);
 
 // ========= error  page to handle=======
 user_route.use(errorHandler); 

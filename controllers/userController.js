@@ -608,14 +608,12 @@ const getProductsByCategory = async (req, res, next) => {
 
         const category = await Category.findOne({ categoryname: categoryName });
         if (!category) {
-            console.log(`Category not found for name: ${categoryName}`);
             return res.status(404).send("Category not found");
         }
 
         const categoryDiscount = parseFloat(category.discountPercentage) || 0;
 
         if (!categoryObjectId) {
-            console.log(`Category not found for name: ${categoryName}`);
             return res.status(404).send("Category not found");
         }
 

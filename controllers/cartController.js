@@ -38,9 +38,7 @@ const loadCart = async (req, res, next) => {
         // Calculate discounted prices for each product in the cart
         cartItems.forEach((cartItem) => {
             cartItem.items.forEach((item) => {
-                console.log("item0", item);
                 const { finalDiscountedPrice } = calculateDiscountedPrice(item.product, item.quantity);
-                console.log("finalDiscount", finalDiscountedPrice);
                 item.product.finalDiscountedPrice = finalDiscountedPrice;
             });
         });

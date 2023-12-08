@@ -55,8 +55,7 @@ const addCategory = async (req, res) => {
             res.render("addCategories", { message: "Something went wrong" });
         }
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send("Internal Server Error");
+        next(error);
     }
 };
 
@@ -82,10 +81,8 @@ const unlistCategory = async (req, res, next) => {
 const loadEditCatogories = async (req, res, next) => {
     try {
         const id = req.query.id;
-        console.log("ID:", id);
 
         const category = await Category.findById(id);
-        console.log(category);
 
         if (category) {
             res.render("editCategories", { data: category });

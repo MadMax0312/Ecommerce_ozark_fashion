@@ -4,31 +4,33 @@
     .text-primary {
         color: #000 !important;
     }
-    body {
-        width: 98.7vw;
-    }
+
+    .site-blocks-1 .icon span {
+     color: #000; 
+}
 </style>
 
 <div class="site-wrap">
-    <div class="site-blocks-cover" style="background-image: url(/static/user/images/hero_1.jpg)" data-aos="fade">
-        <div class="container">
-            <div class="row align-items-start align-items-md-center justify-content-end">
-                <div class="col-md-5 text-center text-md-left pt-5 pt-md-0">
-                    <h1 class="mb-2">Discover Your Perfect Style</h1>
-                    <div class="intro-text text-center text-md-left">
-                        <p class="mb-4">
-                            Elevate your wardrobe with our curated collection of fashionable clothing. Explore a world of
-            sophistication and comfort that reflects your unique style. Find the perfect pieces to express yourself
-            with confidence.
-                        </p>
-                        <p>
-                            <a href="/shop" class="btn btn-sm btn-primary">Shop Now</a>
-                        </p>
+    <div class="site-wrap">
+        <div class="site-blocks-cover" style="background-image: url(/static/user/images/mediamodifier-7cERndkOyDw-unsplash.jpg)" data-aos="fade">
+            <div class="container">
+                <div class="row align-items-start align-items-md-center justify-content-end">
+                    <div class="col-md-5 text-center text-md-left pt-5 pt-md-0">
+                        <h1 class="mb-2">Discover Your Perfect Style</h1>
+                        <div class="intro-text text-center text-md-left">
+                            <p class="mb-4">
+                                Elevate your wardrobe with our curated collection of fashionable clothing. Explore a world of sophistication and comfort that reflects your unique style. Find the perfect pieces to express yourself with confidence.
+                            </p>
+                            <p>
+                                <a href="/shop" class="btn btn-sm" style="background-color: rgb(206, 201, 201); color: black;">Shop Now</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
 
     <div class="site-section site-section-sm site-blocks-1">
         <div class="container">
@@ -131,7 +133,6 @@
                                     <h5 class="card-title" style="margin-bottom: 6px">
                                         <a href="/product-info/id=<%= product._id %>" style="color: black"><%= product.productname %></a>
                                     </h5>
-                                    <p class="card-text" style="margin-bottom: 6px"><%= product.description %></p>
                 
                                     <% if (product.discountPrice && product.discountPrice > 0) { %>
                                         <p class="card-text text-danger font-weight-bold">
@@ -146,7 +147,7 @@
                                     <div class="col-md-6 d-inline-block">
                                         <button
                                             type="button"
-                                            class="btn btn-primary p-1 m-1 addToCartBtn"
+                                            class="btn btn-dark p-1 m-1 addToCartBtn"
                                             data-product-id="<%= product._id %>"
                                             style="font-size: 14px;"
                                         >
@@ -158,7 +159,7 @@
                                             type="button"
                                             class="btn p-1 m-1 addToWishlistBtn"
                                             data-product-id="<%= product._id %>"
-                                            style="background-color: orange; font-size: 14px;"
+                                            style="background-color: white; border-width: 1px; border-color: #000; font-size: 14px;"
                                         >
                                             Add to Wishlist
                                         </button>
@@ -189,16 +190,17 @@
                     /></a>
                 </div>
                 <div class="col-md-12 col-lg-5 text-center pl-md-5">
-                    <h2><a href="#">50% less in all items</a></h2>
+                    <h2>Discover the Latest Trends with 50% Off</h2>
                     <p class="post-meta mb-4">
-                        By <a href="#">Carl Smith</a> <span class="block-8-sep">&bullet;</span> September 3, 2018
+                        By OZARK Fashions
                     </p>
                     <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam iste dolor accusantium facere
-                        corporis ipsum animi deleniti fugiat. Ex, veniam?
+                        Elevate your style with our exclusive collection! Explore a world of fashion where comfort meets elegance.
+                        Unleash your personality with our carefully curated items, now available at an incredible 50% discount.
                     </p>
-                    <p><a href="/shop" class="btn btn-primary btn-sm">Shop Now</a></p>
+                    <a href="/shop" class="btn btn-sm" style="background-color: rgb(206, 201, 201); color: black;">Shop Now</a>
                 </div>
+                
             </div>
         </div>
     </div>

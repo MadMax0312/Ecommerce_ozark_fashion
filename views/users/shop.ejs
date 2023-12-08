@@ -44,10 +44,10 @@
 
     .prices {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
         position: relative;
-        margin-top: 10px;
+        margin-top: 7px;
         font-weight: 500;
     }
 
@@ -161,6 +161,11 @@
     fill: var(--fill);
   }
 }
+.page-item.active .page-link {
+    color: #000;
+    background-color: #fff;
+    border-color: #000;
+}
 
 </style>
 
@@ -183,7 +188,7 @@
                         <div class="input-group mr-2">
                             <input type="text" class="form-control form-control-sm" name="search" placeholder="Search" />
                             <div class="input-group-append">
-                                <button class="btn btn-primary btn-sm" type="submit">Search</button>
+                                <button class="btn btn-sm" style="background-color: rgb(200, 197, 197); border-width: 1px; border-color: #000;" type="submit">Search</button>
                             </div>
                         </div>
                     </form>
@@ -205,11 +210,11 @@
                                         </h5>
 
                                         <div class="prices">
-                                            <span class="actual-price pl-4">
+                                            <span class="actual-price">
                                                 <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) { %>
                                                     <span class="center-line" style="width: 44px;"></span> ₹<%= Product[i].price %>
                                                 <% } else { %>
-                                                    <span class="ml-5">Price: </span> ₹<%= Product[i].price %>
+                                                    <h6>Price: ₹<%= Product[i].price %></h6>
                                                 <% } %>
                                             </span>
                                             <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) { %>
@@ -227,6 +232,17 @@
                                                 </svg>
                                             <% } %>
                                         </div>
+                                        <div>
+                                
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-dark p-1 m-1 addToCartBtn"
+                                                    data-product-id="<%= Product._id %>"
+                                                    style="font-size: 14px;"
+                                                >
+                                                    Add to Cart
+                                                </button>
+                                            </div>
                                         
                                     </div>
                                 </div>
@@ -317,7 +333,7 @@
                             <label for="size">Size:</label>
                             <input type="text" class="form-control" id="size" placeholder="Enter size" />
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="applyFilters()">Apply Filters</button>
+                        <button type="button" class="btn btn-sm" style="background-color: rgb(196, 192, 192); border-width: 1px; border-color: #000;" onclick="applyFilters()">Apply Filters</button>
                     </form>
                 </div>
             </div>

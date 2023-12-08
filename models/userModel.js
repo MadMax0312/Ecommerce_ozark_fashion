@@ -17,11 +17,11 @@ const userSchema = new mongoose.Schema(
         },
         mobile: {
             type: String,
-            required: true,
+            required: false,
         },
         password: {
             type: String,
-            required: true,
+            required: false,
         },
         is_verified: {
             type: Number,

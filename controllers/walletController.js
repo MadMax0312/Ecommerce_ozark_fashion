@@ -72,8 +72,6 @@ const verifyTransaction = async (req, res, next) => {
             .update(`${order_id}|${razorpay_payment_id}`)
             .digest("hex");
 
-        console.log(generatedSignature);
-
         if (generatedSignature === signature) {
             res.json({ success: true });
         } else {
