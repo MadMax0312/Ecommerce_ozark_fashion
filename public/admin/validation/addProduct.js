@@ -1,16 +1,24 @@
 
 function productValidForm(event) {
-
   event.preventDefault();
 
-  const isValid = validateForm(); // Your client-side validation logic
+  const isValid = validateForm();
 
-  if (isValid) {
-    // If client-side validation passes, allow the form to submit
-    event.currentTarget.submit();
+  const imageInputs = document.querySelectorAll(".custom-file-input");
+  const hasImage = Array.from(imageInputs).some((input) => input.files.length > 0);
+
+  if (isValid && hasImage) {
+      event.currentTarget.submit();
+  } else {
+      const errorMessage = document.getElementById("image-error");
+      errorMessage.textContent = "At least one image should be added.";
+
+      setTimeout(function () {
+          errorMessage.textContent = "";
+      }, 3000);
   }
-  // If validation fails, the form will not be submitted
 }
+
 
 function validateForm() {
 
@@ -19,12 +27,14 @@ function validateForm() {
   const quantityError = document.getElementById("quantity-error");
   const descriptionError = document.getElementById("description-error");
   const sizeError = document.getElementById("size-error");
+  const imageError = document.getElementById("image-error");
 
   priceError.textContent = "";
   nameError.textContent = "";
   quantityError.textContent = "";
   descriptionError.textContent = "";
   sizeError.textContent = "";
+  imageError.textContent = "";
 
 
   const productname = document.getElementById("exampleInputName1").value;
@@ -73,7 +83,6 @@ if (
   }, 3000);
   return false;
 }
-
 
 
 if (productname.length > 15) {

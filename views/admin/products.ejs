@@ -143,13 +143,9 @@ include('../adminLayouts/navbar.ejs') %>
                     });
 
                     const data = await response.json();
-                    console.log("dfldkf", data);
 
                     if (response.ok) {
-                        const button = event.target;
-                        button.textContent = button.textContent === "Unlist" ? "List" : "Unlist";
-                        button.classList.toggle("btn-inverse-danger");
-                        button.classList.toggle("btn-inverse-success");
+
 
                         Swal.fire({
                             title: data.message,
@@ -159,9 +155,16 @@ include('../adminLayouts/navbar.ejs') %>
                                 popup: "animate__animated animate__fadeInDown",
                                 content: "your-custom-class",
                             },
+                        }).then((result) => {
+                            // Check if the user clicked the "OK" button
+                            if (result.isConfirmed) {
+                                // Reload the page
+                              location.reload();
+                            }else{
+                                location.reload()
+                            }
                         });
                     } else {
-                        console.error("Error updating product status:", response.statusText);
                         Swal.fire({
                             title: "Error",
                             text: "Failed to update product status.",
@@ -175,7 +178,6 @@ include('../adminLayouts/navbar.ejs') %>
                         });
                     }
                 } catch (error) {
-                    console.error("Error:", error);
                     Swal.fire({
                         title: "Network Error",
                         text: "Failed to communicate with the server.",
