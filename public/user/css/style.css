@@ -26,6 +26,7 @@ a {
 }
   a:hover {
     text-decoration: none; 
+    color: gray;
   }
 
 .text-black {
@@ -147,7 +148,9 @@ a {
   border-top: 1px solid #edf0f5 !important; }
 
 .site-footer {
-  padding: 4em 0; }
+  padding-top: 4em ;
+  padding-bottom: 0.5em;
+}
   .site-footer ul li {
     margin-bottom: 10px; }
     .site-footer ul li a {

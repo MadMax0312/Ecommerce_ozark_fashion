@@ -1,23 +1,23 @@
 <%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
 <div id="content" class="row">
-    <div id="sidebar" class="col-md-3 col-lg-2">
+    <div id="sidebar" class="col-md-3 col-lg-2" style="background-color: rgb(207, 203, 203);">
         <h3 class="text-center my-3">My Account</h3>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link" href="/userProfile"><i class="fa fa-ticket"></i>Profile</a>
+                <a class="nav-link" href="/userProfile">Profile</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/userProfile"><i class="fa fa-ticket"></i>Address</a>
+                <a class="nav-link" href="/userProfile">Address</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/viewOrder"><i class="fa fa-shopping-cart"></i>Orders</a>
+                <a class="nav-link" href="/viewOrder">Orders</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/wallet"><i class="fa fa-ticket"></i>Wallet</a>
+                <a class="nav-link" href="/wallet">Wallet</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/referral"><i class="fa fa-ticket"></i>My Referral</a>
+                <a class="nav-link" href="/referral">My Referral</a>
             </li>
         </ul>
     </div>
@@ -67,7 +67,7 @@
                     </table>
                 </div>
                 <div class="text-center transaction-actions">
-                    <button id="viewMoreButton" class="btn btn-outline-primary">View More Transactions</button>
+                    <button id="viewMoreButton" class="btn btn-outline-dark">View More Transactions</button>
                 </div>
             </div>
 
@@ -79,7 +79,7 @@
                         <label for="addMoneyAmount">Amount:</label>
                         <input type="number" class="form-control" id="addMoneyAmount" />
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="initiateRazorpayPayment()">Add Money</button>
+                    <button type="button" class="btn btn-dark" onclick="initiateRazorpayPayment()">Add Money</button>
                 </form>
                 <input type="hidden" id="userId" value="<%= user._id %>" />
             </div>

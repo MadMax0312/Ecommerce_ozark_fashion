@@ -1,64 +1,96 @@
-
 <%- include('../userLayouts/header.ejs') %> 
 <%- include('../userLayouts/navbar.ejs') %>
 
-<form action="/addAddress" method="post" onsubmit="return validAddress()">
-  <div class="container">
-      <div class="row">
-          <div class="col-lg-9 m-t-90">
-              <h2 class="checkout-title mb-3">Billing Details</h2>
-              <div class="form-group">
-                  <label for="company-name">Full Name</label>
-                  <input type="text" class="form-control" id="fullName" name="fullName">
-                  <p id="name-error" style="color: red;"></p>
-              </div>
+<nav aria-label="breadcrumb" class="breadcrumb-nav mb-4">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a href="/addAddress">Add Address</a></li>
+        </ol>
+    </div>
+</nav>
 
-              <div class="form-group">
-                  <label for="phone">Mobile Number</label>
-                  <input type="tel" class="form-control" id="phone" name="mobile">
-                  <p id="mobile-error" style="color: red;"></p>
-              </div>
+<div class="container">
+    <div class="row">
+        <div id="sidebar" class="col-md-3 col-lg-2 bg-light sidebar">
+            <h3 class="text-center my-3">My Account</h3>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/userProfile">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/userProfile">Address</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/viewOrder">Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/referral">My Referral</a>
+                </li>
+            </ul>
+        </div>
 
-              <div class="row">
-                  <div class="col-sm-6">
-                      <div class="form-group">
-                          <label for="state-county">State</label>
-                          <input type="text" class="form-control" id="state" name="state">
-                          <p id="state-error" style="color: red;"></p>
-                      </div>
-                  </div>
-                  <div class="col-sm-6">
-                      <div class="form-group">
-                          <label for="country">District</label>
-                          <input type="text" class="form-control" id="district" name="district">
-                          <p id="district-error" style="color: red;"></p>
-                      </div>
-                  </div>
-              </div>
+        <div id="content" class="col-md-9 m-t-90">
+            <form action="/addAddress" method="post" onsubmit="return validAddress()">
+                <h2 class="checkout-title mb-3">Add Address</h2>
 
-              <div class="row">
-                  <div class="col-sm-6">
-                      <div class="form-group">
-                          <label for="town-city">City</label>
-                          <input type="text" class="form-control" id="city" name="city">
-                          <p id="city-error" style="color: red;"></p>
-                      </div>
-                  </div>
-                  <div class="col-sm-6">
-                      <div class="form-group">
-                          <label for="postcode">Pincode</label>
-                          <input type="text" class="form-control" id="pinCode" name="pincode">
-                          <p id="pincode-error" style="color: red;"></p>
-                      </div>
-                  </div>
-                  <div class="col-12 text-center mb-3">
-                      <button type="submit" class="btn btn-outline-primary-2">Submit</button>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
-</form>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" name="fullName">
+                            <p id="name-error" style="color: red;"></p>
+                        </div>
 
+                        <div class="form-group">
+                            <label for="phone">Mobile Number</label>
+                            <input type="tel" class="form-control" id="phone" name="mobile">
+                            <p id="mobile-error" style="color: red;"></p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" class="form-control" id="state" name="state">
+                            <p id="state-error" style="color: red;"></p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="district">District</label>
+                            <input type="text" class="form-control" id="district" name="district">
+                            <p id="district-error" style="color: red;"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" class="form-control" id="city" name="city">
+                            <p id="city-error" style="color: red;"></p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="pinCode">Pincode</label>
+                            <input type="text" class="form-control" id="pinCode" name="pincode">
+                            <p id="pincode-error" style="color: red;"></p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 text-center mb-3">
+                        <button type="submit" class="btn btn-dark">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <%- include('../userLayouts/footer.ejs') %>

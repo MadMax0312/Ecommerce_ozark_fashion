@@ -1,23 +1,23 @@
 <%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
 <div id="content" class="row">
-    <div id="sidebar" class="col-md-3 col-lg-2">
+    <div id="sidebar" class="col-md-3 col-lg-2" style="background-color: rgb(207, 203, 203);">
         <h3 class="text-center my-3">My Account</h3>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link" href="/userProfile"><i class="fa fa-ticket"></i>Profile</a>
+                <a class="nav-link" href="/userProfile">Profile</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/profile/coupons"><i class="fa fa-ticket"></i>Address</a>
+                <a class="nav-link" href="/userProfile">Address</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/viewOrder"><i class="fa fa-shopping-cart"></i>Orders</a>
+                <a class="nav-link" href="/viewOrder">Orders</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/wallet"><i class="fa fa-ticket"></i>Wallet</a>
+                <a class="nav-link" href="/wallet">Wallet</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/referral"><i class="fa fa-ticket"></i>My Referral</a>
+                <a class="nav-link" href="/referral">My Referral</a>
             </li>
         </ul>
     </div>
@@ -39,38 +39,44 @@
                   <h3 class="mb-4">Referral Link</h3>
               </div>
           </div>
-
+          
           <div class="wallet-container balance-section">
             <h5>My Referral Link:-</h5>
             <p class="text-primary lead" id="referralLink"></p>
-            <button id="shareButton" class="btn btn-info">Share</button>
+            <button id="shareButton" class="btn btn-dark">Share</button>
         </div>
         </div>
     </div>
 </div>
 
 <script>
-  const referralCode = '<%= userReferralCode %>';
-  const referralLink = window.location.origin + '/signup?referralCode=' + referralCode;
-  document.getElementById('referralLink').innerText = referralLink;
-
-  // Share button event handler
-  const shareButton = document.getElementById('shareButton');
-  if (navigator.share) {
-      shareButton.addEventListener('click', async () => {
-          try {
-              await navigator.share({
-                  title: 'Check out this referral link!',
-                  text: `Join now and use my referral code: ${referralCode}`,
-                  url: referralLink,
-              });
-          } catch (error) {
-              console.error('Error sharing:', error.message);
-          }
-      });
-  } else {
-
-  }
-</script>
+    const referralCode = '<%= userReferralCode %>';
+    const referralLink = window.location.origin + '/signup?referralCode=' + referralCode;
+    document.getElementById('referralLink').innerText = referralLink;
+  
+    // Share button event handler
+    const shareButton = document.getElementById('shareButton');
+    if (navigator.share) {
+        shareButton.addEventListener('click', async () => {
+            try {
+                await navigator.share({
+                    title: 'Check out this referral link!',
+                    text: `Join now and use my referral code: ${referralCode}`,
+                    url: referralLink,
+                });
+            } catch (error) {
+                console.error('Error sharing:', error.message);
+                // Handle errors or provide a fallback for sharing
+            }
+        });
+    } else {
+        // Fallback for browsers that don't support the Web Share API
+        shareButton.addEventListener('click', () => {
+            // Implement a fallback mechanism (e.g., open default email client)
+            window.location.href = 'mailto:?subject=Check%20out%20this%20referral%20link!&body=Join%20now%20and%20use%20my%20referral%20code:%20' + referralCode + '%0A' + referralLink;
+        });
+    }
+  </script>
+  
 
 <%- include('../userLayouts/footer.ejs') %>
