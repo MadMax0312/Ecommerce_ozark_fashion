@@ -312,7 +312,7 @@ const resetPasswordMail = async (first_name, last_name, email, token) => {
             from: "thahirmuhammedap@gmail.com",
             to: email,
             subject: "For Reset Password",
-            html: `<p> Hi, ${first_name} ${last_name}, please click here to <a href="http://127.0.0.1:8080/changePassword?token=${token}"> Reset </a> your password</p>`,
+            html: `<p> Hi, ${first_name} ${last_name}, please click here to <a href="http://ozarkfashionhub.online/changePassword?token=${token}"> Reset </a> your password</p>`,
         };
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {

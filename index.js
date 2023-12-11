@@ -46,6 +46,6 @@ app.use('*',(req,res)=>{
     res.render('404')
 })
 
-app.listen(process.env.PORT || 8080, () => {
+app.listen(process.env.PORT, () => {
     console.log("Server is running....");
 });
