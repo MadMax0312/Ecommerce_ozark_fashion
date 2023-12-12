@@ -99,7 +99,7 @@
             <p class="text-primary leads" id="referralLink"></p>
             <div style="display: flex; align-items: center;">
                 <button id="shareButton" class="btn btn-dark" style="margin-right: 10px;">Share</button>
-                <a href="https://api.whatsapp.com/send?text=Join now with my referral link: <%= encodeURIComponent('https://ozarkfashionhub.online/signup?ref=' + userReferralCode) %>" target="_blank" style="text-decoration: none;">
+                <a href="https://api.whatsapp.com/send?text=Join now with my referral link: <%= encodeURIComponent('https://ozarkfashionhub.online/register?ref=' + userReferralCode) %>" target="_blank" style="text-decoration: none;">
                   <button class="Btn">
                     <span class="svgContainer">
                       <svg
@@ -126,7 +126,7 @@
 
 <script>
     const referralCode = '<%= userReferralCode %>';
-    const referralLink = window.location.origin + '/signup?referralCode=' + referralCode;
+    const referralLink = window.location.origin + '/register?referralCode=' + referralCode;
     document.getElementById('referralLink').innerText = referralLink;
 
   
