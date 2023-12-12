@@ -37,8 +37,6 @@ const viewProducts = async (req, res, next) => {
             $or: [
                 { productname: { $regex: ".*" + search + ".*", $options: "i" } },
                 { size: { $regex: ".*" + search + ".*", $options: "i" } },
-                { quantity: { $regex: ".*" + search + ".*", $options: "i" } },
-                { price: { $regex: ".*" + search + ".*", $options: "i" } },
             ],
         })
             .populate("category")

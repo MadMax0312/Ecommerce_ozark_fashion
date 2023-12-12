@@ -114,18 +114,23 @@
                                                   Product successfully delivered!!!
                                                 </div>
                                               <% } %>  
-                                           <div class="col-md-6 return-status-section <%= product.status === 'Return' ? '' : 'd-none' %>" id="returnStatusSection">
+                                              <div class="col-md-6 return-status-section <%= product.status === 'Return' ? '' : 'd-none' %>" id="returnStatusSection">
                                                 <p>
                                                     <strong>Return Status:</strong>
-                                                    <select class="form-select returnStatus" data-product-id="<%= product._id %>">
+                                                    <select class="form-select returnStatus" data-product-id="<%= product._id %>" <%= product.returnStatus === "Returned" ? 'disabled' : '' %>>
                                                         <option value="Return Placed" <%= product.returnStatus === 'Return Placed' ? 'selected' : '' %>>Return Placed</option>
                                                         <option value="Out for Pickup" <%= product.returnStatus === 'Out for Pickup' ? 'selected' : '' %>>Out for Pickup</option>
                                                         <option value="Returned" <%= product.returnStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
                                                     </select>
                                                 </p>
-                                                <button class="btn btn-md btn-warning refund-btn" style="color: black;" data-product-id="<%= product._id %>" disabled>Refund</button>
-
+                                            
+                                                <% if (product.returnStatus !== "Returned") { %>
+                                                    <button class="btn btn-md btn-warning refund-btn" style="color: black;" data-product-id="<%= product._id %>">Refund</button>
+                                                <% } else if(product.returnStatus === "Returned") { %>
+                                                    <button class="btn btn-md btn-warning" style="color: black;" data-product-id="<%= product._id %>" disabled>Refunded</button>
+                                                <% } %>
                                             </div>
+                                            
                                         </div>                                                                                                          
                                     </div>
                                 </div>
@@ -263,8 +268,6 @@
                 const responseData = await response.json();
 
                 if (responseData.success) {
-                    refundButton.setAttribute('disabled', true);
-                    refundButton.innerHTML = 'Refunded'; // Change the button text or style
                     Swal.fire({
                         title: responseData.message,
                         icon: "success",
@@ -274,7 +277,9 @@
                             popup: "animate__animated animate__fadeInDown",
                             content: "your-custom-class",
                         },
-                    });
+                    }).then(()=>{
+                        location.reload()
+                    })
                 } else {
                     throw new Error(`Error processing refund: ${responseData.message}`);
                 }

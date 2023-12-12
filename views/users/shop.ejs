@@ -1,6 +1,4 @@
-<%- include('../userLayouts/header.ejs') %> 
-<%- include('../userLayouts/navbar.ejs') %>
-
+<%- include('../userLayouts/header.ejs') %> <%- include('../userLayouts/navbar.ejs') %>
 
 <style>
     .product-card {
@@ -87,86 +85,84 @@
         color: #e44d26;
     }
     .rating {
-  display: flex;
-  justify-content: center;
-  --fill: #ffc73a;
-}
+        display: flex;
+        justify-content: center;
+        --fill: #ffc73a;
+    }
 
+    .rating svg {
+        width: 1.7rem;
+        height: 2rem;
+        overflow: visible;
+        fill: transparent;
+        stroke: var(--stroke);
+        stroke-linejoin: bevel;
+        stroke-dasharray: 12;
+        animation: idle 4s linear infinite;
+        transition: stroke 0.2s, fill 0.5s;
+    }
 
-.rating svg {
-  width: 1.7rem;
-  height: 2rem;
-  overflow: visible;
-  fill: transparent;
-  stroke: var(--stroke);
-  stroke-linejoin: bevel;
-  stroke-dasharray: 12;
-  animation: idle 4s linear infinite;
-  transition: stroke 0.2s, fill 0.5s;
-}
+    @keyframes idle {
+        from {
+            stroke-dashoffset: 24;
+        }
+    }
 
-@keyframes idle {
-  from {
-    stroke-dashoffset: 24;
-  }
-}
+    .rating label:hover svg {
+        stroke: var(--fill);
+    }
 
-.rating label:hover svg {
-  stroke: var(--fill);
-}
+    .rating input:checked ~ label svg {
+        transition: 0s;
+        animation: idle 4s linear infinite, yippee 0.75s backwards;
+        fill: var(--fill);
+        stroke: var(--fill);
+        stroke-opacity: 0;
+        stroke-dasharray: 0;
+        stroke-linejoin: miter;
+        stroke-width: 8px;
+    }
 
-.rating input:checked ~ label svg {
-  transition: 0s;
-  animation: idle 4s linear infinite, yippee 0.75s backwards;
-  fill: var(--fill);
-  stroke: var(--fill);
-  stroke-opacity: 0;
-  stroke-dasharray: 0;
-  stroke-linejoin: miter;
-  stroke-width: 8px;
-}
+    @keyframes yippee {
+        0% {
+            transform: scale(1);
+            fill: var(--fill);
+            fill-opacity: 0;
+            stroke-opacity: 1;
+            stroke: var(--stroke);
+            stroke-dasharray: 10;
+            stroke-width: 1px;
+            stroke-linejoin: bevel;
+        }
 
-@keyframes yippee {
-  0% {
-    transform: scale(1);
-    fill: var(--fill);
-    fill-opacity: 0;
-    stroke-opacity: 1;
-    stroke: var(--stroke);
-    stroke-dasharray: 10;
-    stroke-width: 1px;
-    stroke-linejoin: bevel;
-  }
+        30% {
+            transform: scale(0);
+            fill: var(--fill);
+            fill-opacity: 0;
+            stroke-opacity: 1;
+            stroke: var(--stroke);
+            stroke-dasharray: 10;
+            stroke-width: 1px;
+            stroke-linejoin: bevel;
+        }
 
-  30% {
-    transform: scale(0);
-    fill: var(--fill);
-    fill-opacity: 0;
-    stroke-opacity: 1;
-    stroke: var(--stroke);
-    stroke-dasharray: 10;
-    stroke-width: 1px;
-    stroke-linejoin: bevel;
-  }
+        30.1% {
+            stroke: var(--fill);
+            stroke-dasharray: 0;
+            stroke-linejoin: miter;
+            stroke-width: 8px;
+        }
 
-  30.1% {
-    stroke: var(--fill);
-    stroke-dasharray: 0;
-    stroke-linejoin: miter;
-    stroke-width: 8px;
-  }
-
-  60% {
-    transform: scale(1.2);
-    fill: var(--fill);
-  }
-}
-.page-item.active .page-link {
-    color: #000;
-    background-color: #fff;
-    border-color: #000;
-}
-
+        60% {
+            transform: scale(1.2);
+            fill: var(--fill);
+        }
+    }
+    .page-item.active .page-link {
+        color: #000;
+        background-color: #fff;
+        border-color: #000;
+    }
 </style>
 
 <div class="bg-light py-3">
@@ -181,136 +177,128 @@
 
 <div class="site-section" style="padding-top: 20px">
     <div class="container">
-        <div class="row mb-5">
+        <div class="row mb-4">
             <div class="col-md-9 order-2">
                 <div class="d-flex justify-content-end mb-3">
                     <form class="form-inline">
                         <div class="input-group mr-2">
                             <input type="text" class="form-control form-control-sm" name="search" placeholder="Search" />
                             <div class="input-group-append">
-                                <button class="btn btn-sm" style="background-color: rgb(200, 197, 197); border-width: 1px; border-color: #000;" type="submit">Search</button>
+                                <button
+                                    class="btn btn-sm"
+                                    style="background-color: rgb(200, 197, 197); border-width: 1px; border-color: #000"
+                                    type="submit"
+                                >
+                                    Search
+                                </button>
                             </div>
                         </div>
                     </form>
                 </div>
-                
-                <div class="row" style="text-align: center;">
-                    <% if (Product.length > 0) { 
-                        for (let i = 0; i < Product.length; i++) { %>
-                            <div class="col-sm-6 col-md-4 mb-1 mb-md-0" data-aos="fade-up">
-                                <div class="card product-card">
-                                    <div class="product-image-wrapper">
-                                        <a href="/product-info?id=<%= Product[i]._id %>">
-                                            <img src="/static/admin/Assets/images/products/<%= Product[i].image[0] %>" alt="Product Image" class="card-img-top product-image img-fluid" />
-                                        </a>
-                                    </div>
-                                    <div class="card-body">
-                                        <h5 class="card-title" style="margin-bottom: 0;">
-                                            <a href="/product-info?id=<%= Product[i]._id %>" style="color: black"><%= Product[i].productname %></a>
-                                        </h5>
 
-                                        <div class="prices">
-                                            <span class="actual-price">
-                                                <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) { %>
-                                                    <span class="center-line" style="width: 44px;"></span> ₹<%= Product[i].price %>
-                                                <% } else { %>
-                                                    <h6>Price: ₹<%= Product[i].price %></h6>
-                                                <% } %>
-                                            </span>
-                                            <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) { %>
-                                                <span class="discounted-price offer-icon">
-                                                     ₹<%= Product[i].discountedPrice %>
-                                                </span>
-                                            <% } %>
+                <div class="row" style="text-align: center">
+                    <% if (Product.length > 0) { for (let i = 0; i < Product.length; i++) { %>
+                    <div class="col-6 col-md-4 mb-1 mb-md-0" data-aos="fade-up">
+                        <div class="card product-card">
+                            <div class="product-image-wrapper">
+                                <a href="/product-info?id=<%= Product[i]._id %>">
+                                    <img
+                                        src="/static/admin/Assets/images/products/<%= Product[i].image[0] %>"
+                                        alt="Product Image"
+                                        class="card-img-top product-image img-fluid"
+                                        style="object-fit: cover; height: 100%"
+                                    />
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title" style="margin-bottom: 0">
+                                    <a href="/product-info?id=<%= Product[i]._id %>" style="color: black"
+                                        ><%= Product[i].productname %></a
+                                    >
+                                </h5>
 
-                                        </div>
-                                        <div class="rating p-0">
-                                            <% for (let j = 1; j <= 5; j++) { %>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
-                                                    <path pathLength="360" d="M12,17.27L18.18,21,L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
-                                                        fill="<%= j <= Math.round(Product[i].averageRating) ? 'gold' : '#CCCCCC' %>"></path>
-                                                </svg>
-                                            <% } %>
-                                        </div>
-                                        <div>
-                                
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-dark p-1 m-1 addToCartBtn"
-                                                    data-product-id="<%= Product[i]._id %>"
-                                                    style="font-size: 14px;"
-                                                >
-                                                    Add to Cart
-                                                </button>
-                                            </div>
-                                        
-                                    </div>
+                                <div class="prices">
+                                    <span class="actual-price">
+                                        <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) >
+                                        0) { %>
+                                        <span class="center-line" style="width: 44px"></span> ₹<%= Product[i].price %> <% }
+                                        else { %>
+                                        <h6>Price: ₹<%= Product[i].price %></h6>
+                                        <% } %>
+                                    </span>
+                                    <% if (Product[i].discountPercentage && parseFloat(Product[i].discountPercentage) > 0) {
+                                    %>
+                                    <span class="discounted-price offer-icon"> ₹<%= Product[i].discountedPrice %> </span>
+                                    <% } %>
+                                </div>
+                                <div class="rating p-0">
+                                    <% for (let j = 1; j <= 5; j++) { %>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+                                        <path
+                                            pathLength="360"
+                                            d="M12,17.27L18.18,21,L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"
+                                            fill="<%= j <= Math.round(Product[i].averageRating) ? 'gold' : '#CCCCCC' %>"
+                                        ></path>
+                                    </svg>
+                                    <% } %>
+                                </div>
+                                <div>
+                                    <button
+                                        type="button"
+                                        class="btn btn-dark p-1 m-1 addToCartBtn"
+                                        data-product-id="<%= Product[i]._id %>"
+                                        style="font-size: 14px"
+                                    >
+                                        Add to Cart
+                                    </button>
                                 </div>
                             </div>
-                    <% } } else { %>
-                        <div class="col-12">
-                            <p class="text-center">No products available.</p>
                         </div>
+                    </div>
+                    <% } } else { %>
+                    <div class="col-12">
+                        <p class="text-center">No products available.</p>
+                    </div>
                     <% } %>
                 </div>
-                <br>
-
-                <% if (typeof totalPages !== 'undefined') { %>
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            <% if (currentPage > 1) { %>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                            <% } %>
-                            <% for(let j=1; j <= totalPages; j++){ %>
-                                <li class="page-item <%= j === currentPage ? 'active' : '' %>">
-                                    <a class="page-link" href="?page=<%= j %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"><%= j %></a>
-                                </li>
-                            <% } %>
-                            <% if (currentPage < totalPages) { %>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                            <% } %>
-                        </ul>
-                    </nav>
-                <% } %>
-                
+                <br />
             </div>
 
             <div class="col-md-3 order-1 mb-5 mb-md-0">
                 <div class="border p-4 rounded mb-4">
                     <h3 class="mb-3 h6 text-uppercase text-black d-block">Categories</h3>
                     <ul class="list-unstyled mb-0">
-                        <% categoryProductCounts
-                          .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
-                          .forEach(categoryCount => { %>
-                            <li class="mb-1">
-                              <a href="/shop/category/<%= categoryCount.categoryName %>" class="d-flex">
+                        <% categoryProductCounts .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
+                        .forEach(categoryCount => { %>
+                        <li class="mb-1">
+                            <a href="/shop/category/<%= categoryCount.categoryName %>" class="d-flex">
                                 <span><%= categoryCount.categoryName %></span>
                                 <span class="text-black ml-auto">(<%= categoryCount.productCount %>)</span>
-                              </a>
-                            </li>
-                          <% }); %>
-                      </ul>
+                            </a>
+                        </li>
+                        <% }); %>
+                    </ul>
                 </div>
 
                 <div class="border p-4 rounded mb-4">
                     <h3 class="mb-3 h6 text-uppercase text-black d-block">Sort</h3>
                     <ul class="list-unstyled mb-0">
                         <li class="mb-1">
-                            <a href="/shop?sort=lowToHigh" class="d-flex align-items-center sort-option" data-sort="lowToHigh">
+                            <a
+                                href="/shop?sort=lowToHigh"
+                                class="d-flex align-items-center sort-option"
+                                data-sort="lowToHigh"
+                            >
                                 <span>Price low to high</span>
                                 <i class="fas fa-sort-amount-up ml-auto"></i>
                             </a>
                         </li>
                         <li class="mb-1">
-                            <a href="/shop?sort=highToLow" class="d-flex align-items-center sort-option" data-sort="highToLow">
+                            <a
+                                href="/shop?sort=highToLow"
+                                class="d-flex align-items-center sort-option"
+                                data-sort="highToLow"
+                            >
                                 <span>Price high to low</span>
                                 <i class="fas fa-sort-amount-down ml-auto"></i>
                             </a>
@@ -333,10 +321,54 @@
                             <label for="size">Size:</label>
                             <input type="text" class="form-control" id="size" placeholder="Enter size" />
                         </div>
-                        <button type="button" class="btn btn-sm" style="background-color: rgb(196, 192, 192); border-width: 1px; border-color: #000;" onclick="applyFilters()">Apply Filters</button>
+                        <button
+                            type="button"
+                            class="btn btn-sm"
+                            style="background-color: rgb(196, 192, 192); border-width: 1px; border-color: #000"
+                            onclick="applyFilters()"
+                        >
+                            Apply Filters
+                        </button>
                     </form>
                 </div>
             </div>
+        </div>
+        <div class="pagination pt-5" style="justify-content: center">
+            <% if (typeof totalPages !== 'undefined') { %>
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                        <a
+                            class="page-link"
+                            href="?page=<%= currentPage - 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"
+                            aria-label="Previous"
+                        >
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <% } %> <% for(let j=1; j <= totalPages; j++){ %>
+                    <li class="page-item <%= j === currentPage ? 'active' : '' %>">
+                        <a
+                            class="page-link"
+                            href="?page=<%= j %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"
+                            ><%= j %></a
+                        >
+                    </li>
+                    <% } %> <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                        <a
+                            class="page-link"
+                            href="?page=<%= currentPage + 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"
+                            aria-label="Next"
+                        >
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <% } %>
+                </ul>
+            </nav>
+            <% } %>
         </div>
     </div>
 </div>
@@ -347,7 +379,7 @@
         const maxPrice = encodeURIComponent(document.getElementById("maxPrice").value || "");
         const size = encodeURIComponent(document.getElementById("size").value || "");
 
-        window.location.href = `/shop?page=1&minPrice=${minPrice || ''}&maxPrice=${maxPrice || ''}&size=${size || ''}`;
+        window.location.href = `/shop?page=1&minPrice=${minPrice || ""}&maxPrice=${maxPrice || ""}&size=${size || ""}`;
     }
 </script>
 
@@ -413,6 +445,5 @@
         }
     });
 </script>
-
 
 <%- include('../userLayouts/footer.ejs') %>
