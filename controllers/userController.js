@@ -122,7 +122,7 @@ const verifyOtp = async (req, res, next) => {
 
 const loadRegister = async (req, res, next) => {
     try {
-        const referralCode = req.query.referralCode;
+        const referralCode = req.query.ref;
         res.render("registration", { referralCode });
     } catch (error) {
         next(error);
