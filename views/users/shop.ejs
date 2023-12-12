@@ -177,7 +177,7 @@
 
 <div class="site-section" style="padding-top: 20px">
     <div class="container">
-        <div class="row mb-4">
+        <div class="row">
             <div class="col-md-9 order-2">
                 <div class="d-flex justify-content-end mb-3">
                     <form class="form-inline">
@@ -185,8 +185,8 @@
                             <input type="text" class="form-control form-control-sm" name="search" placeholder="Search" />
                             <div class="input-group-append">
                                 <button
-                                    class="btn btn-sm"
-                                    style="background-color: rgb(200, 197, 197); border-width: 1px; border-color: #000"
+                                    class="btn px-1 "
+                                    style="background-color: rgb(200, 197, 197); border-width: 1px; border-color: #000;padding: 0;"
                                     type="submit"
                                 >
                                     Search
@@ -196,10 +196,10 @@
                     </form>
                 </div>
 
-                <div class="row" style="text-align: center">
+                <div class="row" style="text-align: center;">
                     <% if (Product.length > 0) { for (let i = 0; i < Product.length; i++) { %>
                     <div class="col-6 col-md-4 mb-1 mb-md-0" data-aos="fade-up">
-                        <div class="card product-card">
+                        <div class="card product-card" style="margin-bottom: 180px;">
                             <div class="product-image-wrapper">
                                 <a href="/product-info?id=<%= Product[i]._id %>">
                                     <img
@@ -333,7 +333,7 @@
                 </div>
             </div>
         </div>
-        <div class="pagination pt-5" style="justify-content: center">
+        <div class="pagination" style="justify-content: center">
             <% if (typeof totalPages !== 'undefined') { %>
             <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center">

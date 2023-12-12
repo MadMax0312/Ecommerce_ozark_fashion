@@ -161,6 +161,11 @@
     fill: var(--fill);
   }
 }
+.page-item.active .page-link {
+        color: #000;
+        background-color: #fff;
+        border-color: #000;
+    }
 
 </style>
 
@@ -177,14 +182,20 @@
 
 <div class="site-section" style="padding-top: 20px">
     <div class="container">
-        <div class="row mb-5">
+        <div class="row mb-4">
             <div class="col-md-9 order-2">
                 <div class="d-flex justify-content-end mb-3">
                     <form class="form-inline">
                         <div class="input-group">
                             <input type="text" class="form-control form-control-sm" name="search" placeholder="Search" />
                             <div class="input-group-append">
-                                <button class="btn btn-primary btn-sm" type="submit">Search</button>
+                                <button
+                                    class="btn px-1 "
+                                    style="background-color: rgb(200, 197, 197); border-width: 1px; border-color: #000;padding: 0;"
+                                    type="submit"
+                                >
+                                    Search
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -242,31 +253,6 @@
                 </div>
                 <br/>
 
-                <% if (typeof totalPages !== 'undefined') { %>
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            <% if (currentPage > 1) { %>
-                                <li class="page-item">
-                                    <a class="page-link" href="/shop/category/<%= categoryName %>?page=<%= currentPage - 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                            <% } %>
-                            <% for(let j=1; j <= totalPages; j++){ %>
-                                <li class="page-item <%= j === currentPage ? 'active' : '' %>">
-                                    <a class="page-link" href="/shop/category/<%= categoryName %>?page=<%= j %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"><%= j %></a>
-                                </li>
-                            <% } %>
-                            <% if (currentPage < totalPages) { %>
-                                <li class="page-item">
-                                    <a class="page-link" href="/shop/category/<%= categoryName %>?page=<%= currentPage + 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                            <% } %>
-                        </ul>
-                    </nav>
-                <% } %>
             </div>
             <div class="col-md-3 order-1 mb-5 mb-md-0">
                 <div class="border p-4 rounded mb-4">
@@ -318,10 +304,47 @@
                             <label for="size">Size:</label>
                             <input type="text" class="form-control" id="size" placeholder="Enter size" />
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="applyFilters()">Apply Filters</button>
+                        <button type="button" class="btn btn-sm" style="background-color: rgb(196, 192, 192); border-width: 1px; border-color: #000" onclick="applyFilters()">Apply Filters</button>
                     </form>
                 </div>
             </div>
+        </div>
+        <div class="pagination pt-2" style="justify-content: center">
+            <% if (typeof totalPages !== 'undefined') { %>
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                        <a
+                            class="page-link"
+                            href="?page=<%= currentPage - 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"
+                            aria-label="Previous"
+                        >
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <% } %> <% for(let j=1; j <= totalPages; j++){ %>
+                    <li class="page-item <%= j === currentPage ? 'active' : '' %>">
+                        <a
+                            class="page-link"
+                            href="?page=<%= j %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"
+                            ><%= j %></a
+                        >
+                    </li>
+                    <% } %> <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                        <a
+                            class="page-link"
+                            href="?page=<%= currentPage + 1 %>&search=<%= search %>&sort=<%= sortOptions %>&minPrice=<%= filterOptions.minPrice %>&maxPrice=<%= filterOptions.maxPrice %>&size=<%= filterOptions.size %>"
+                            aria-label="Next"
+                        >
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <% } %>
+                </ul>
+            </nav>
+            <% } %>
         </div>
     </div>
 </div>

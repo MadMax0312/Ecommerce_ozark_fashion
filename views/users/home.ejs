@@ -85,8 +85,8 @@
                                     <img src="/static/user/images/<%= category.categoryName.toLowerCase() %>.jpg" alt="" class="img-fluid" />
                                     <% if (category.categoryName.toLowerCase() === 'kids') { %>
                                         <div class="offer-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 70%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                            <img src="/static/user/images/offfer.png" alt="Discount Icon" class="offer-icon" style="width: 100px; height: 100px; margin-bottom: 140px; margin-right: 220px; margin-top: 40px;">
-                                            <img src="/static/user/images/30.png" alt="Discount text" class="offer-text" style="width: 130px; height: 100px;">
+                                            <img src="/static/user/images/offfer.png" alt="Discount Icon" class="offer-icon" style="width: 100px; height: 100px; margin-bottom: 180px; margin-right: 220px;">
+                                            
                                         </div>
                                     <% } %>
                                 </figure>
@@ -211,15 +211,13 @@
         if (event.target.matches(".addToCartBtn")) {
             const productId = event.target.getAttribute("data-product-id");
             const quantity = 1;
-            console.log(quantity);
-
             try {
                 const response = await fetch("/addToCart", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ id: productId, quantity: 1 }),
+                    body: JSON.stringify({ id: productId, quantity: quantity }),
                 });
 
                 const data = await response.json();

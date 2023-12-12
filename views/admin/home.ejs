@@ -102,33 +102,46 @@ include('../adminLayouts/navbar.ejs') %>
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Transaction History</h4>
-                        <canvas id="transaction-history" class="transaction-chart"></canvas>
+                        <canvas id="transaction" class="transactions-chart"></canvas>
                         <div
                             class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3"
                         >
                             <div class="text-md-center text-xl-left">
-                                <h6 class="mb-1">Transfer to Paypal</h6>
-                                <p class="text-muted mb-0">07 Jan 2019, 09:12AM</p>
+                                <h6 class="mb-1">Razor Transfer</h6>
+                                
                             </div>
                             <div
                                 class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0"
                             >
-                                <h6 class="font-weight-bold mb-0">$236</h6>
+                                <h6 class="font-weight-bold mb-0"><%= order.razorRevenue.toLocaleString('en-IN', { style: 'currency', currency: 'INR'}) %></h6>
                             </div>
                         </div>
                         <div
                             class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3"
                         >
                             <div class="text-md-center text-xl-left">
-                                <h6 class="mb-1">Tranfer to Stripe</h6>
-                                <p class="text-muted mb-0">07 Jan 2019, 09:12AM</p>
+                                <h6 class="mb-1">Wallet Transfer</h6>
+                                
                             </div>
                             <div
                                 class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0"
                             >
-                                <h6 class="font-weight-bold mb-0">$593</h6>
+                                <h6 class="font-weight-bold mb-0"><%= order.walletRevenue.toLocaleString('en-IN', { style: 'currency', currency: 'INR'}) %></h6>
                             </div>
                         </div>
+                        <div
+                        class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3"
+                    >
+                        <div class="text-md-center text-xl-left">
+                            <h6 class="mb-1">COD</h6>
+                            
+                        </div>
+                        <div
+                            class="align-self-center flex-grow text-right text-md-center text-xl-right py-md-2 py-xl-0"
+                        >
+                            <h6 class="font-weight-bold mb-0"><%= order.cashOnDeliveryRevenue.toLocaleString('en-IN', { style: 'currency', currency: 'INR'}) %></h6>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -905,7 +918,48 @@ include('../adminLayouts/navbar.ejs') %>
         }
     });
 </script>
-  
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const count1 = parseInt(`<%= order.razorRevenue || 0 %>`);
+        const count2 = parseInt(`<%= order.walletRevenue || 0 %>`);
+        const count3 = parseInt(`<%= order.cashOnDeliveryRevenue || 0 %>`);
+
+        var ctx = document.getElementById("transaction").getContext("2d");
+        var myChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Razor Transfer", "Wallet Transfer", "COD"],
+                datasets: [
+                    {
+                        label: "Revenue",
+                        data: [count1, count2, count3],
+                        backgroundColor: [
+                            "rgba(255, 99, 132, 0.2)",
+                            "rgba(75, 192, 192, 0.2)",
+                            "rgba(255, 205, 86, 0.2)",
+                        ],
+                        borderColor: [
+                            "rgba(255, 99, 132, 1)",
+                            "rgba(75, 192, 192, 1)",
+                            "rgba(255, 205, 86, 1)",
+                        ],
+                        borderWidth: 1,
+                    },
+                ],
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
+    });
+</script>
+
+
   
 
 <%- include('../adminLayouts/footer.ejs') %>
