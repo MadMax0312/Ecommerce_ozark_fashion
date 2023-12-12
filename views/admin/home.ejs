@@ -496,114 +496,12 @@ include('../adminLayouts/navbar.ejs') %>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-6 col-xl-4 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex flex-row justify-content-between">
-                            <h4 class="card-title">Revenue</h4>
-                        </div>
-                        <div class="preview-list">
-                            <div class="preview-item border-bottom">
-                                <div class="preview-thumbnail">
-                                    <img src="/static/admin/images/file-icons/64/cashless-payment.png" alt="image" class="rounded-circle" />
-                                </div>
-                                <div class="preview-item-content d-flex flex-grow">
-                                    <div class="flex-grow">
-                                        <div class="d-flex d-md-block d-xl-flex justify-content-between">
-                                            <h6 class="preview-subject">Razor Revenue</h6>
-                                        </div>
-                                        <p class="text-muted"><%= order.razorRevenue.toLocaleString('en-IN', { style: 'currency', currency: 'INR'}) %></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="preview-item border-bottom">
-                                <div class="preview-thumbnail">
-                                    <img src="/static/admin/images/file-icons/64/wallet.png" alt="image" class="rounded-circle" />
-                                </div>
-                                <div class="preview-item-content d-flex flex-grow">
-                                    <div class="flex-grow">
-                                        <div class="d-flex d-md-block d-xl-flex justify-content-between">
-                                            <h6 class="preview-subject">Wallet Revenue</h6>
-                                         
-                                        </div>
-                                        <p class="text-muted"><%= order.walletRevenue.toLocaleString('en-IN', { style: 'currency', currency: 'INR'}) %></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="preview-item border-bottom">
-                                <div class="preview-thumbnail">
-                                    <img src="/static/admin/images/file-icons/64/cash-payment.png" alt="image" class="rounded-circle" />
-                                </div>
-                                <div class="preview-item-content d-flex flex-grow">
-                                    <div class="flex-grow">
-                                        <div class="d-flex d-md-block d-xl-flex justify-content-between">
-                                            <h6 class="preview-subject">Cash on Delivery Revenue</h6>                                        
-                                        </div>
-                                        <p class="text-muted"><%= order.cashOnDeliveryRevenue.toLocaleString('en-IN', { style: 'currency', currency: 'INR'}) %></p>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-8 grid-margin stretch-card">
-                <canvas id="revenuePieChart" width="400" height="400"></canvas>
-            </div>
-        </div>
-
 
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const count1 = parseInt(`<%= order.razorRevenue || 0 %>`)
-        const count2 = parseInt(`<%= order.walletRevenue || 0 %>`)
-        const count3 = parseInt(`<%= order.cashOnDeliveryRevenue || 0 %>`)
-      const revenueData = [
-        {
-          label: 'Razor Revenue',
-          amount: count1,
-          color: '#007bff',
-        },
-        {
-          label: 'Wallet Revenue',
-          amount: count2,
-          color: '#28a745',
-        },
-        {
-          label: 'Cash on Delivery Revenue',
-          amount: count3,
-          color: '#ffc107',
-        },
-      ];
-  
-      var ctx = document.getElementById('revenuePieChart').getContext('2d');
-      var revenuePieChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: revenueData.map(revenue => revenue.label),
-          datasets: [
-            {
-              data: revenueData.map(revenue => revenue.amount),
-              backgroundColor: revenueData.map(revenue => revenue.color),
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false, // Set to false to make the chart fit its container
-        },
-      });
-    });
-  </script>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
