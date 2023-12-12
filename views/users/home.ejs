@@ -221,10 +221,8 @@
                     },
                     body: JSON.stringify({ id: productId, quantity: 1 }),
                 });
-                console.log(response);
 
                 const data = await response.json();
-                console.log(data);
 
                 if (response.ok) {
                     Swal.fire({
@@ -325,61 +323,7 @@
         }
     });
 
-    document.body.addEventListener("click", async (event) => {
-        if (event.target.matches(".buyNowBtn")) {
-            const productId = event.target.getAttribute("data-product-id");
 
-            try {
-                const response = await fetch(`/checkout?id=${productId}`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Success!",
-                        text: data.message,
-                    });
-                } else {
-                    // Check if the response status is 401 (Unauthorized)
-                    if (response.status === 401) {
-                        Swal.fire({
-                            icon: "warning",
-                            title: "Warning!",
-                            text: "Please log in to continue.",
-                            showCancelButton: true,
-                            confirmButtonText: "Log In",
-                            cancelButtonText: "Cancel",
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Redirect the user to the login page or handle the login action here
-                                window.location.href = "/login";
-                            }
-                        });
-                    } else {
-                        // Handle other error cases
-                        Swal.fire({
-                            icon: "warning",
-                            title: "Warning!",
-                            text: data.message,
-                        });
-                    }
-                }
-            } catch (error) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error!",
-                    text: "An error occurred while adding the product to the cart.",
-                });
-                console.error("There was a problem with the fetch operation:", error);
-            }
-        }
-    });
 </script>
 
 <%- include('../userLayouts/footer.ejs') %>

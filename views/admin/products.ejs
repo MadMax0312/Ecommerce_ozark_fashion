@@ -92,31 +92,40 @@ include('../adminLayouts/navbar.ejs') %>
                         </table>
 
                         <!-- Pagination -->
-                        <div class="pagination-container ty">
-                            <% if (typeof totalPages !== 'undefined') { %>
+                        <div class="pagination-container pt-2">
                             <nav aria-label="Page navigation">
-                                <ul class="pagination">
+                                <ul class="pagination justify-content-center">
+                        
                                     <% if (currentPage > 1) { %>
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page=1" aria-label="First">
-                                            <span aria-hidden="true">&laquo;&laquo;</span>
-                                        </a>
-                                    </li>
-                                    <% } %> <% for (let j = 1; j <= totalPages; j++) { %>
-                                    <li class="page-item <%= j === currentPage ? 'active' : '' %>">
-                                        <a class="page-link" href="?page=<%= j %>"><%= j %></a>
-                                    </li>
-                                    <% } %> <% if (currentPage < totalPages) { %>
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page=<%= totalPages %>" aria-label="Last">
-                                            <span aria-hidden="true">&raquo;&raquo;</span>
-                                        </a>
-                                    </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1<%= getQueryParams(searchQuery, statusFilter, paymentFilter) %>" aria-label="First">
+                                                <span aria-hidden="true">&laquo;&laquo;</span>
+                                            </a>
+                                        </li>
                                     <% } %>
+                        
+                                    <% const startPage = Math.max(currentPage - 2, 1); %>
+                                    <% const endPage = Math.min(currentPage + 2, totalPages); %>
+                        
+                                    <% for (let i = startPage; i <= endPage; i++) { %>
+                                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                            <a class="page-link" href="?page=<%= i %><%= getQueryParams(search) %>"><%= i %></a>
+                                        </li>
+                                    <% } %>
+                        
+                                    <% if (currentPage < totalPages) { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<%= currentPage + 1 %><%= getQueryParams(search) %>" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    <% } %>
+                        
                                 </ul>
                             </nav>
-                            <% } %>
                         </div>
+                        
+                        
                     </div>
                 </div>
             </div>

@@ -51,6 +51,7 @@ const placeOrder = async (req, res, next) => {
         const { productsData, totalAmount, address, paymentMethod, notes, couponDiscount, couponName } = req.body;
         const user_id = req.session.user_id;
         var payment;
+        console.log(paymentMethod)
 
         if (paymentMethod == "Cash on Delivery") {
             payment = "Pending";
@@ -135,8 +136,6 @@ const handleRazorpayPayment = async (req, res, next) => {
                 { $set: { paymentStatus: "Paid", razorpayPaymentID: paymentID } },
                 { new: true }
             );
-
-            await Cart.findOneAndDelete({ user_id: userId });
 
             if (!updatedOrder) {
                 return res.status(404).json({ error: "Order not found or could not be updated" });

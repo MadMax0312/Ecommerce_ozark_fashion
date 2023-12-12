@@ -2,6 +2,24 @@ const Product = require("../models/productModel");
 const User = require("../models/userModel");
 const Order = require("../models/orderModel");
 
+function getQueryParams(searchQuery, statusFilter, paymentFilter) {
+    let queryParams = '';
+
+    if (searchQuery) {
+        queryParams += `&search=${encodeURIComponent(searchQuery)}`;
+    }
+
+    if (statusFilter) {
+        queryParams += `&status=${encodeURIComponent(statusFilter)}`;
+    }
+
+    if (paymentFilter) {
+        queryParams += `&payment=${encodeURIComponent(paymentFilter)}`;
+    }
+
+    return queryParams;
+}
+
 const loadOrder = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -9,17 +27,19 @@ const loadOrder = async (req, res, next) => {
 
         const searchQuery = req.query.search || "";
         const statusFilter = req.query.status || "";
+        const paymentFilter = req.query.payment || "";
 
         const filter = {};
         if (searchQuery) {
             filter.$or = [
                 { _id: { $regex: searchQuery, $options: "i" } },
-                // Add more fields for search as needed
+                { orderTrackId: { $regex: searchQuery, $options: "i" } }, // Search by order ID
+                { createdAt: { $regex: searchQuery, $options: "i" } }, 
             ];
         }
 
-        if (statusFilter) {
-            filter["products.status"] = statusFilter;
+        if (paymentFilter) {
+            filter.paymentMethod = paymentFilter;
         }
 
         const orders = await Order.find(filter)
@@ -66,8 +86,10 @@ const loadOrder = async (req, res, next) => {
             currentPage: page,
             totalPages: totalPages,
             searchQuery: searchQuery,
-            statusFilter: statusFilter,
+            paymentFilter: paymentFilter,
             orderSummary: orderSummary,
+            getQueryParams: getQueryParams,
+            statusFilter: statusFilter,
         });
     } catch (error) {
         next(error);

@@ -551,8 +551,8 @@ include('../adminLayouts/navbar.ejs') %>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const count1 = parseInt(`<%= order.razorRevenue || 0 %>`)
-        const count2 = parseInt(`<%= order.razorRevenue || 0 %>`)
-        const count3 = parseInt(`<%= order.razorRevenue || 0 %>`)
+        const count2 = parseInt(`<%= order.walletRevenue || 0 %>`)
+        const count3 = parseInt(`<%= order.cashOnDeliveryRevenue || 0 %>`)
       const revenueData = [
         {
           label: 'Razor Revenue',

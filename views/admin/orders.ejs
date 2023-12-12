@@ -41,15 +41,11 @@
                                     <input type="text" class="form-control" placeholder="Search" name="search" value="<%= searchQuery %>">
                                 </div>
                                 <div class="form-group mr-2">
-                                    <select class="form-control" name="status">
-                                        <option value="" <%= statusFilter === '' ? 'selected' : '' %>>All Status</option>
-                                        <option value="Order Placed" <%= statusFilter === 'Order Placed' ? 'selected' : '' %>>Order Placed</option>
-                                        <option value="Shipped" <%= statusFilter === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                        <option value="Out for Delivery" <%= statusFilter === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
-                                        <option value="Delivered" <%= statusFilter === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                        <option value="Cancelled" <%= statusFilter === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                        <option value="Return" <%= statusFilter === 'Return' ? 'selected' : '' %>>Return</option>
-                                        <!-- Add more status options as needed -->
+                                    <select class="form-control" name="payment">
+                                        <option value="" <%= paymentFilter === '' ? 'selected' : '' %>>All Payment Methods</option>
+                                        <option value="Razor Payment" <%= paymentFilter === 'Razor Payment' ? 'selected' : '' %>>Razor Payment</option>
+                                        <option value="Wallet Transfer" <%= paymentFilter === 'Wallet Transfer' ? 'selected' : '' %>>Wallet Transfer</option>
+                                        <option value="Cash on Delivery" <%= paymentFilter === 'Cash on Delivery' ? 'selected' : '' %>>Cash on Delivery</option>
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Apply Filter</button>
@@ -108,16 +104,41 @@
                                 </table>
                             </div>
 
-                            <!-- Pagination links -->
-                            <div class="pagination-container">
-                                <ul class="pagination">
-                                    <% for (let i = 1; i <= totalPages; i++) { %>
-                                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                                        </li>
-                                    <% } %>
-                                </ul>
+                            <div class="pagination-container pt-2">
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center">
+                            
+                                        <% if (currentPage > 1) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=1<%= getQueryParams(searchQuery, statusFilter, paymentFilter) %>" aria-label="First">
+                                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                                </a>
+                                            </li>
+                                        <% } %>
+                            
+                                        <% const startPage = Math.max(currentPage - 2, 1); %>
+                                        <% const endPage = Math.min(currentPage + 2, totalPages); %>
+                            
+                                        <% for (let i = startPage; i <= endPage; i++) { %>
+                                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                                <a class="page-link" href="?page=<%= i %><%= getQueryParams(searchQuery, statusFilter, paymentFilter) %>"><%= i %></a>
+                                            </li>
+                                        <% } %>
+                            
+                                        <% if (currentPage < totalPages) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<%= currentPage + 1 %><%= getQueryParams(searchQuery, statusFilter, paymentFilter) %>" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        <% } %>
+                            
+                                    </ul>
+                                </nav>
                             </div>
+                            
+                            
+                            
                         </div>
                     </div>
                 </div>

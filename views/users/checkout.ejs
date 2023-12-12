@@ -294,7 +294,7 @@
                                         aria-describedby="button-addon2"
                                     />
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="button" id="applyCouponButton">
+                                        <button class="btn btn-dark btn-sm" type="button" id="applyCouponButton">
                                             Apply
                                         </button>
                                     </div>
@@ -445,7 +445,7 @@
                                     <div>
                                         <button
                                             type="button"
-                                            class="btn btn-primary btn-lg py-3 btn-block placeOrderBtns"
+                                            class="btn btn-dark btn-lg py-3 btn-block placeOrderBtns"
                                             id="placeOrderBtn"
                                             onclick="confirmOrder()"
                                         >
@@ -754,6 +754,8 @@
 
 <script>
     document.getElementById("placeOrderBtn").addEventListener("click", async function () {
+        const selectedPaymentOption = document.querySelector('input[name="paymentOption"]:checked');
+        if (selectedPaymentOption.value !== 'Razor Payment') {
         try {
             const selectedAddress = document.querySelector('input[name="defaultAddress"]:checked');
 
@@ -837,12 +839,28 @@
 
             if (response.ok) {
                 const responseData = await response.json();
+                
+                Swal.fire({
+                                            title: "Yeahh!!!!",
+                                            text: "Your Order is Successful",
+                                            icon: "success",
+                                            confirmButtonColor: "#28a745",
+                                            confirmButtonText: "View Details",
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location.href = "/order";
+                                            }
+                                        });
+                                    
             } else {
                 console.error("Failed to place order");
             }
         } catch (error) {
             console.error("Error occurred while placing the order", error);
         }
+    }else{
+        console.error("Error occurred while placing the order", error);
+    }
     });
 </script>
 

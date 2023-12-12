@@ -1,6 +1,24 @@
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
 
+function getQueryParams(searchQuery, statusFilter, paymentFilter) {
+    let queryParams = '';
+
+    if (searchQuery) {
+        queryParams += `&search=${encodeURIComponent(searchQuery)}`;
+    }
+
+    if (statusFilter) {
+        queryParams += `&status=${encodeURIComponent(statusFilter)}`;
+    }
+
+    if (paymentFilter) {
+        queryParams += `&payment=${encodeURIComponent(paymentFilter)}`;
+    }
+
+    return queryParams;
+}
+
 const viewProducts = async (req, res, next) => {
     try {
         var search = "";
@@ -19,6 +37,8 @@ const viewProducts = async (req, res, next) => {
             $or: [
                 { productname: { $regex: ".*" + search + ".*", $options: "i" } },
                 { size: { $regex: ".*" + search + ".*", $options: "i" } },
+                { quantity: { $regex: ".*" + search + ".*", $options: "i" } },
+                { price: { $regex: ".*" + search + ".*", $options: "i" } },
             ],
         })
             .populate("category")
@@ -40,6 +60,8 @@ const viewProducts = async (req, res, next) => {
             Category: categories,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
+            search: search,
+            getQueryParams: getQueryParams, // Pass the function to the template
         });
     } catch (error) {
         next(error);
