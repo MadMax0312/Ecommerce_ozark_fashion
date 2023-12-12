@@ -59,11 +59,7 @@
             <div class="col-7 col-md-3 order-2 order-md-3 text-right">
                 <div class="site-top-icons">
                     <ul>
-                        <% if (user) { %>
-                            <li class="m-0"><a href="/logout" style="font-size: 20px;">Logout</a></li>
-                        <% } else { %>
-                            <li><a href="/login" style="font-size: 20px;">Login</a></li>
-                        <% } %>
+                        
                         <li><a href="/userProfile" style="font-size: 18px;"><span class="icon icon-person"></span></a></li>
                         <li><a href="/wishlist" style="font-size: 18px;"><span class="icon icon-heart-o"></span></a></li>
                         <li>
@@ -74,6 +70,11 @@
                                 <% } %>
                             </a>
                         </li>
+                        <% if (user) { %>
+                            <li class="m-0"><a href="/logout" style="font-size: 20px;">Logout</a></li>
+                        <% } else { %>
+                            <li><a href="/login" style="font-size: 20px;">Login</a></li>
+                        <% } %>
                     </ul>
                 </div>
             </div>
