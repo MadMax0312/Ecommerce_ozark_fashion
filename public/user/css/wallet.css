@@ -16,6 +16,12 @@
     font-weight: 400;
 }
 
+.leads {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #24a0ed   !important;
+}
+
 #sidebar {
     background-color: #d0bbbb;
     padding-top: 20px;
