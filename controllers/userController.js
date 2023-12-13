@@ -184,8 +184,6 @@ const insertUser = async (req, res, next) => {
 
             const userData = await user.save();
 
-            console.log(userData)
-
             if (referralCode) {
                 const referringUserId = req.session.referralUserId;
                 const referringUser = await User.findById(referringUserId);
@@ -201,7 +199,7 @@ const insertUser = async (req, res, next) => {
                     referringUser.walletHistory.push({
                         transactionDate: new Date(),
                         transactionAmount: bonusAmount,
-                        transactionDetails: `Referral bonus for user ${userData.first_name}`,
+                        transactionDetails: `Referral bonus for user ${req.session.firstname}`,
                         transactionType: "Deposit",
                     });
                     await referringUser.save();
