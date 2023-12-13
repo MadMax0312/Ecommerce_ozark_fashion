@@ -3,44 +3,63 @@ const { Parser } = require("json2csv");
 
 const loadSales = async (req, res, next) => {
     try {
-        const orders = await Order.find().sort({ createdAt: -1 });
-
-        const ordersWithFormattedDeliveryDate = orders.map((order) => {
-            const orderDate = new Date(order.createdAt);
-            const expectedDeliveryDate = new Date(orderDate);
-            expectedDeliveryDate.setDate(orderDate.getDate() + 7);
-
-            const formattedDeliveryDate = expectedDeliveryDate
-                .toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "2-digit",
-                })
-                .replace(/\//g, "-");
-
-            return {
-                ...order.toObject(),
-                formattedDeliveryDate: formattedDeliveryDate,
-            };
-        });
-
-        // Get order summary statistics
-        const totalSales = await Order.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } }]);
-
-        const orderSummary = {
-            totalOrders: orders.length,
-            totalSales: totalSales.length > 0 ? totalSales[0].totalAmount : 0,
-            averageOrderValue: orders.length > 0 ? totalSales[0].totalAmount / orders.length : 0,
-        };
+        const productSales = await Order.aggregate([
+     
+            { $unwind: "$products" },
+            {
+                $lookup: {
+                    from: "products", // Name of the Product model collection
+                    localField: "products.productId",
+                    foreignField: "_id",
+                    as: "product",
+                },
+            },
+            {
+                $unwind: "$product",
+            },
+    
+            {
+                $group: {
+                    _id: {
+                        productId: "$products.productId",
+                        orderTrackId: "$orderTrackId",
+                    },
+                    productName: { $first: "$product.productname" },
+                    orderedQuantity: { $sum: "$products.quantity" },
+                    total: { $sum: "$products.subtotal" },
+                    paymentMethod: { $first: "$paymentMethod" },
+                    paymentStatus: { $first: "$products.paymentStatus" },
+                    status: { $first: "$products.status" },
+                    orderedDate: { $first: "$createdAt" },
+                },
+            },
+            {
+                $sort: { orderedDate: -1 }, // Sort by createdAt in descending order
+            },
+            {
+                $project: {
+                    _id: 0,
+                    orderTrackId: "$_id.orderTrackId",
+                    productId: "$_id.productId",
+                    productName: 1,
+                    orderedQuantity: 1,
+                    total: 1,
+                    paymentMethod: 1,
+                    paymentStatus: 1,
+                    status: 1,
+                    orderedDate: 1,
+                },
+            },
+        ]);
 
         res.render("sales", {
-            orders: ordersWithFormattedDeliveryDate,
-            orderSummary: orderSummary,
+            productSales: productSales,
         });
     } catch (error) {
         next(error);
     }
 };
+
 
 const exportReport = async (req, res, next) => {
     try {

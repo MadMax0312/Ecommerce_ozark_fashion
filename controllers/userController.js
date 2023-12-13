@@ -199,7 +199,7 @@ const insertUser = async (req, res, next) => {
                     referringUser.walletHistory.push({
                         transactionDate: new Date(),
                         transactionAmount: bonusAmount,
-                        transactionDetails: `Referral bonus for user ${req.session.firstname}`,
+                        transactionDetails: `Referral bonus for ${req.session.firstname}`,
                         transactionType: "Deposit",
                     });
                     await referringUser.save();
