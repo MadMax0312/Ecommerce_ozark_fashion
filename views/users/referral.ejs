@@ -54,6 +54,21 @@
 
 </style>
 
+<main class="main">
+  <div class="page-header text-center m-t-85">
+      <div class="container">
+          <h1 class="page-title text-dark">My Referral</h1>
+      </div>
+  </div>
+  <nav aria-label="breadcrumb" class="breadcrumb-nav mb-4">
+      <div class="container">
+          <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/">Home</a></li>
+              <li class="breadcrumb-item"><a href="">My Referral</a></li>
+          </ol>
+      </div>
+  </nav>
+
 <div id="content" class="row">
     <div id="sidebar" class="col-md-3 col-lg-2" style="background-color: rgb(207, 203, 203);">
         <h3 class="text-center my-3">My Account</h3>
@@ -73,6 +88,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="/referral">My Referral</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Sign Out</a>
+          </li>
         </ul>
     </div>
 
@@ -123,6 +141,7 @@
         </div>
     </div>
 </div>
+</main>
 
 <script>
     const referralCode = '<%= userReferralCode %>';

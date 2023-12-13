@@ -16,6 +16,20 @@
 }
 </style>
 
+<main class="main">
+    <div class="page-header text-center m-t-85">
+        <div class="container">
+            <h1 class="page-title text-dark">My Orders</h1>
+        </div>
+    </div>
+    <nav aria-label="breadcrumb" class="breadcrumb-nav mb-4">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="">My Orders</a></li>
+            </ol>
+        </div>
+    </nav>
 
 <div id="content" class="row">
     <div id="sidebar" class="col-md-3 col-lg-2" style="background-color: rgb(207, 203, 203);">
@@ -35,6 +49,9 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/referral">My Referral</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Sign Out</a>
             </li>
         </ul>
     </div>
@@ -106,7 +123,7 @@
               </table>
           </div>
 
-          <div class="pagination-container">
+          <div class="pagination-container" style="display: flex; justify-content: center;">
             <ul class="pagination">
                 <% const maxVisiblePages = 5; // Adjust this value to control the number of visible pages %>
         
@@ -146,6 +163,7 @@
       </div>
   </div>
 </div>
+</main>
 
 
 <%- include('../userLayouts/footer.ejs') %>
