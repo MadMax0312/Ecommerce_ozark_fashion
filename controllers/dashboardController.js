@@ -58,23 +58,34 @@ const loadDashboard = async (req, res, next) => {
         ]);
 
         const totalSales = await Order.aggregate([
-            { $match: { paymentStatus: "Paid" } },
-            { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
-        ]);
-
-        const totalPurchase = await Order.aggregate([
-            { $match: { paymentStatus: "Paid" } },
-            { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
+            //  ----------- All paid Products Total  -------------------
+            {
+                $unwind: "$products",
+            },
+            {
+                $match: {
+                    "products.paymentStatus": "Paid",
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: {
+                        $sum: "$products.subtotal",
+                    },
+                },
+            },
         ]);
 
         const totalProductsSold = await Order.aggregate([
-            { $match: { paymentStatus: "Paid" } },
-            { $group: { _id: null, totalQuantity: { $sum: { $sum: "$products.quantity" } } } },
+            { $unwind: "$products" },
+            { $match: { "products.paymentStatus": "Paid" } },
+            { $group: { _id: null, totalQuantity: { $sum: "$products.quantity" } } },
         ]);
 
         const mostSoldProduct = await Order.aggregate([
-            { $match: { paymentStatus: "Paid" } },
             { $unwind: "$products" },
+            { $match: { "products.paymentStatus": "Paid" } },
             { $group: { _id: "$products.productId", totalQuantity: { $sum: "$products.quantity" } } },
             { $sort: { totalQuantity: -1 } },
             { $limit: 3 },
@@ -93,11 +104,18 @@ const loadDashboard = async (req, res, next) => {
             })
         );
 
+        // Monthly Revenue
         const monthlyRevenue = await Order.aggregate([
-            { $match: { createdAt: { $gte: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) } } },
+            {
+                $match: {
+                    createdAt: { $gte: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) },
+                    "products.paymentStatus": "Paid", // Payment status condition
+                },
+            },
             { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
         ]);
 
+        // Daily Revenue
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -111,6 +129,7 @@ const loadDashboard = async (req, res, next) => {
                         $gte: today,
                         $lt: tomorrow,
                     },
+                    "products.paymentStatus": "Paid", // Payment status condition
                 },
             },
             {
@@ -121,8 +140,14 @@ const loadDashboard = async (req, res, next) => {
             },
         ]);
 
+        // Yearly Revenue
         const yearlyRevenue = await Order.aggregate([
-            { $match: { createdAt: { $gte: new Date(new Date().getFullYear(), 0, 1) } } }, // Current year
+            {
+                $match: {
+                    createdAt: { $gte: new Date(new Date().getFullYear(), 0, 1) }, // Current year
+                    "products.paymentStatus": "Paid", // Payment status condition
+                },
+            },
             { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
         ]);
 
@@ -155,7 +180,6 @@ const loadDashboard = async (req, res, next) => {
 
         const orderSummary = {
             totalSales: totalSales.length > 0 ? totalSales[0].totalAmount : 0,
-            totalPurchase: totalPurchase.length > 0 ? totalPurchase[0].totalAmount : 0,
             totalProductsSold: totalProductsSold.length > 0 ? totalProductsSold[0].totalQuantity : 0,
             mostSoldProduct: mostSoldProduct.length > 0 ? mostSoldProduct[0] : null,
             mostSoldProductDetails: mostSoldProductDetails,
