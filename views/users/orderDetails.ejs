@@ -279,7 +279,6 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const submitButton = document.getElementById("submitButton");
-    alert(submitButton)
     const reviewSections = document.getElementById("reviewSections");
 
     submitButton.addEventListener("click", async function () {
@@ -385,7 +384,6 @@
     const cancelLink = document.getElementById('cancelLink');
     if (cancelLink) {
       cancelLink.addEventListener('click', function (event) {
-        alert("dsfdsf")
         event.preventDefault();
 
         const progressBar = document.querySelector('.progress-track');
