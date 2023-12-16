@@ -33,11 +33,7 @@ const loadCheckout = async (req, res, next) => {
         const userAddress = await Address.findOne({ userId });
         const totalProductsInCart = await getTotalProductsInCart(userId);
 
-        if (!userId) {
-            return res.status(401).json({ message: "Please log in to continue." });
-        }
-
-        if (totalProductsInCart == 0) {
+        if (totalProductsInCart === 0) {
             return res.status(402).json({ message: "Please add items to the cart." });
         }
 

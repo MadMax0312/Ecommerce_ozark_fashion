@@ -217,8 +217,8 @@ const updateStatus = async (req, res, next) => {
             await Product.findByIdAndUpdate(productIdValue, { $inc: { quantity: returnedQuantity } }, { new: true });
         }
 
-        if (productStatus === "Cancelled") {
-            order.products[productIndex].paymentStatus = "Refunded";
+        if (productStatus === "Cancelled" && order.paymentMethod === "Cash on Delivery") {
+            order.products[productIndex].paymentStatus = "Failed";
         }
 
         order.products[productIndex].status = productStatus;
@@ -228,6 +228,7 @@ const updateStatus = async (req, res, next) => {
             (order.paymentMethod === "Razor Payment" || order.paymentMethod === "Wallet Transfer")
         ) {
             const refundAmount = order.products[productIndex].subtotal;
+            order.products[productIndex].paymentStatus = "Refunded";
 
             const user = await User.findById(order.user);
 

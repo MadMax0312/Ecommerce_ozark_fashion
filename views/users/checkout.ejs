@@ -262,6 +262,7 @@
 
                     <div class="col">
                         <h3>Coupons Available</h3>
+                        <% if(coupon.length>0){%>
                         <% coupon.forEach(coupon => { %>
                             <div class="coupon-container" style="background-color: rgb(210, 246, 246);">
                                 <h6 class="m-0" style="background-color: darkseagreen; display: inline-block;"><%= coupon.couponName %></h6>                      
@@ -273,6 +274,11 @@
                                 
                             </div>
                         <% }); %>
+                        <%}else{%>
+                            <div class="text-center" style="background-color: bisque;">
+                                <h5>No Coupons Available</h5>
+                            </div>
+                            <%}%>
             
                     </div>
 
@@ -501,7 +507,7 @@
                             <input type="text" class="form-control" id="pincode" name="pincode" />
                             <span id="pincode-error" class="error-message" style="color: red"></span>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                        <button type="submit" class="btn btn-dark" id="saveChangesBtn">Save Changes</button>
                     </form>
                 </div>
             </div>
@@ -561,6 +567,18 @@
 
     async function confirmOrder() {
         const selectedPaymentOption = document.querySelector('input[name="paymentOption"]:checked');
+        const selectedAddress = document.querySelector('input[name="defaultAddress"]:checked');
+                    if (!selectedAddress) {
+                // Show an error message if the user didn't select an address
+                Swal.fire({
+                    title: "Oops!",
+                    text: "Please add or select an address before placing the order.",
+                    icon: "error",
+                    confirmButtonColor: "#dc3545",
+                    confirmButtonText: "OK",
+                });
+                return; // Stop further execution
+            }
 
         if (selectedPaymentOption) {
             if (selectedPaymentOption.value === 'Wallet Transfer') {
@@ -621,6 +639,17 @@
             } else if (selectedPaymentOption.value === 'Razor Payment') {
                 try {
                     const selectedAddress = document.querySelector('input[name="defaultAddress"]:checked');
+                    if (!selectedAddress) {
+                // Show an error message if the user didn't select an address
+                Swal.fire({
+                    title: "Oops!",
+                    text: "Please add or select an address before placing the order.",
+                    icon: "error",
+                    confirmButtonColor: "#dc3545",
+                    confirmButtonText: "OK",
+                });
+                return; // Stop further execution
+            }
                     const selectedAddressId = selectedAddress.id.split("_")[1];
 
                     const fullName = document.getElementById("data-full-name").textContent;

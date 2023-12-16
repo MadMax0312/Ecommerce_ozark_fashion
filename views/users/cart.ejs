@@ -146,7 +146,6 @@
 <script>
 
  document.body.addEventListener("click", async (event) => {
-    console.log("clicked");
     if (event.target.matches(".buyNowBtn")) {
         try {
             const response = await fetch("/checkout", {
@@ -157,41 +156,17 @@
             });
 
             if (response.ok) {
-           
                 window.location.href = "/checkout";
             } else {
-
-                if (response.status === 401) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Warning!",
-                        text: "Please log in to continue.",
-                        showCancelButton: true,
-                        confirmButtonText: "Log In",
-                        cancelButtonText: "Cancel",
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "/login";
-                        }
-                    });
-                }else if(response.status === 401){
+                const data = await response.json()
+                if(response.status === 402){
                     Swal.fire({
                         icon: "warning",
                         title: "Warning!",
                         text: data.message || "Please add items in cart",
                         showCancelButton: true,
-                        confirmButtonText: "Log In",
                         cancelButtonText: "Cancel",
                     })
-                }
-                else {
-                    // Handle other error cases
-                    const data = await response.json();
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Warning!",
-                        text: data.message,
-                    });
                 }
             }
         } catch (error) {

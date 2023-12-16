@@ -156,9 +156,15 @@
                       <li class="step <%= product.status === 'Order Placed' ? 'active' : '' %>">Order Placed</li>
                       <li class="step <%= product.status === 'Cancelled' ? 'active text-black' : '' %>">Order Cancelled</li>
                     </ul>
+                  <% if(order.paymentMethod !== "Cash on Delivery") { %>
                     <div class="alert alert-danger text-center" role="alert">
-                      Your Order has been Cancelled. Refund is processed.
+                      Your Order has been Cancelled. Amount refunded to your account.
                     </div>
+                    <% }else {%>
+                      <div class="alert alert-danger text-center" role="alert">
+                        Your Order has been Cancelled.
+                      </div>
+                      <% } %>
                   </div>
                 <% } else if (product.status === "Return") { %>
                   <div class="return-progress-track" data-order-id="<%= order._id %>" data-product-id="<%= product._id %>" data-product-status="<%= product.status === 'Return' ? 5 : 0 %>">

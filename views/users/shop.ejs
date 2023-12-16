@@ -388,7 +388,6 @@
         if (event.target.matches(".addToCartBtn")) {
             const productId = event.target.getAttribute("data-product-id");
             const quantity = 1;
-            console.log(quantity);
 
             try {
                 const response = await fetch("/addToCart", {
@@ -398,10 +397,8 @@
                     },
                     body: JSON.stringify({ id: productId, quantity: 1 }),
                 });
-                console.log(response);
 
                 const data = await response.json();
-                console.log(data);
 
                 if (response.ok) {
                     Swal.fire({
